@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Minecraft CTF - DVWA Platform{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}">
+</head>
+<body class="dimension-{{ current_dimension|default('overworld') }}">
+
+  <!-- Barra de Navegación Superior -->
+  <header class="mc-navbar">
+    <a href="{{ url_for('index') }}" class="mc-logo">
+      <span>⛏️ MINECRAFT CTF</span>
+      <span class="mc-badge" style="background:#22c55e; color:#000;">DVWA LAB</span>
+    </a>
+    <nav class="mc-nav-links">
+      <a href="{{ url_for('overworld_view') }}" class="mc-btn mc-btn-green {% if current_dimension == 'overworld' %}active{% endif %}">
+        🟢 Overworld
+      </a>
+      {% if 'portal' in session.get('inventory', []) %}
+        <a href="{{ url_for('nether_view') }}" class="mc-btn mc-btn-red {% if current_dimension == 'nether' %}active{% endif %}">
+          🔴 Nether
+        </a>
+      {% else %}
+        <button class="mc-btn mc-btn-disabled" title="Debes completar el Overworld para desbloquear el Nether">
+          🔒 Nether
+        </button>
+      {% endif %}
+
+      {% if 'pearl' in session.get('inventory', []) %}
+        <a href="{{ url_for('the_end_view') }}" class="mc-btn mc-btn-purple {% if current_dimension == 'the_end' %}active{% endif %}">
+          🟣 The End
+        </a>
+      {% else %}
+        <button class="mc-btn mc-btn-disabled" title="Debes craftear el Ojo de Ender en el Nether">
+          🔒 The End
+        </button>
+      {% endif %}
+
+      <a href="{{ url_for('reset_session') }}" class="mc-btn" onclick="return confirm('¿Reiniciar todo el progreso del juego?')">
+        🔄 Reiniciar
+      </a>
+    </nav>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="mc-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="mc-alert mc-alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- HUD INVENTARIO MINECRAFT FIJO AL PIE DE PÁGINA (9 SLOTS) -->
+  <footer class="mc-hud-bottom">
+    <div class="mc-stats-bar">
+      <!-- Corazones de vida de Steve -->
+      <div class="mc-hearts">
+        {% for i in range(10) %}
+          <img src="{{ url_for('static', filename='img/heart.svg') }}" class="mc-heart" alt="heart">
+        {% endfor %}
+      </div>
+      <!-- Nivel de Experiencia -->
+      <div class="mc-level-badge" id="mc-xp-level">
+        NIVEL {{ (session.get('inventory', [])|length) * 10 }}
+      </div>
+    </div>
+
+    <!-- Hotbar de 9 ranuras -->
+    <div class="mc-hotbar">
+      <!-- 1. Hierro -->
+      <div class="mc-slot {% if 'iron' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-1">
+        <span class="mc-slot-num">1</span>
+        <img src="{{ url_for('static', filename='img/iron_ingot.svg') }}" alt="Hierro">
+        <span class="mc-slot-name">1. Lingote de Hierro</span>
+      </div>
+      <!-- 2. Diamante -->
+      <div class="mc-slot {% if 'diamond' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-2">
+        <span class="mc-slot-num">2</span>
+        <img src="{{ url_for('static', filename='img/diamond.svg') }}" alt="Diamante">
+        <span class="mc-slot-name">2. Diamante</span>
+      </div>
+      <!-- 3. Portal Nether -->
+      <div class="mc-slot {% if 'portal' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-3">
+        <span class="mc-slot-num">3</span>
+        <img src="{{ url_for('static', filename='img/nether_portal.svg') }}" alt="Portal">
+        <span class="mc-slot-name">3. Portal Nether</span>
+      </div>
+      <!-- 4. Oro -->
+      <div class="mc-slot {% if 'gold' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-4">
+        <span class="mc-slot-num">4</span>
+        <img src="{{ url_for('static', filename='img/gold_ingot.svg') }}" alt="Oro">
+        <span class="mc-slot-name">4. Lingote de Oro</span>
+      </div>
+      <!-- 5. Vara de Blaze -->
+      <div class="mc-slot {% if 'blaze' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-5">
+        <span class="mc-slot-num">5</span>
+        <img src="{{ url_for('static', filename='img/blaze_rod.svg') }}" alt="Blaze">
+        <span class="mc-slot-name">5. Vara de Blaze</span>
+      </div>
+      <!-- 6. Ender Pearl -->
+      <div class="mc-slot {% if 'pearl' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-6">
+        <span class="mc-slot-num">6</span>
+        <img src="{{ url_for('static', filename='img/ender_pearl.svg') }}" alt="Perla">
+        <span class="mc-slot-name">6. Ojo de Ender</span>
+      </div>
+      <!-- 7. Cristales -->
+      <div class="mc-slot {% if 'crystals' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-7">
+        <span class="mc-slot-num">7</span>
+        <img src="{{ url_for('static', filename='img/end_crystal.svg') }}" alt="Cristal">
+        <span class="mc-slot-name">7. Cristales del End</span>
+      </div>
+      <!-- 8. Ender Dragon -->
+      <div class="mc-slot {% if 'dragon' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-8">
+        <span class="mc-slot-num">8</span>
+        <img src="{{ url_for('static', filename='img/ender_dragon.svg') }}" alt="Dragon">
+        <span class="mc-slot-name">8. Ender Dragón</span>
+      </div>
+      <!-- 9. Huevo de Dragón -->
+      <div class="mc-slot {% if 'egg' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-9">
+        <span class="mc-slot-num">9</span>
+        <img src="{{ url_for('static', filename='img/dragon_egg.svg') }}" alt="Huevo">
+        <span class="mc-slot-name">9. Huevo de Dragón</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/hud.js') }}"></script>
+</body>
+</html>

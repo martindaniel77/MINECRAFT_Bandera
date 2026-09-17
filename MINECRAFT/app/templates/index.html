@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Minecraft CTF - Menú Principal{% endblock %}
+
+{% block content %}
+<div class="mc-box">
+  <h1 class="mc-title">
+    <span>⚔️ MINECRAFT CTF: VULNERABLE SECURITY LAB</span>
+  </h1>
+  <p style="margin-bottom: 16px; color: #ddd; font-size: 0.95rem;">
+    Bienvenido al laboratorio de seguridad interactivo con temática de Minecraft estilo <strong>DVWA</strong>.
+    Tu objetivo como atacante en <strong>Kali Linux</strong> es superar los 9 desafíos de seguridad organizados en 3 dimensiones para derrotar al Ender Dragón y capturar la bandera final.
+  </p>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 24px 0;">
+    
+    <!-- Tarjeta Overworld -->
+    <div style="background:#1e331e; border: 2px solid #2e7d32; padding: 16px;">
+      <h3 style="color:#81c784; margin-bottom: 8px;">🟢 1. Overworld (Fácil)</h3>
+      <p style="font-size:0.85rem; color:#c8e6c9;">
+        Fundamentos de esteganografía, cifrado César/XOR, inyecciones SQL y análisis de metadatos.
+      </p>
+      <div style="margin-top: 12px;">
+        <span class="mc-badge" style="background:#2e7d32; color:#fff;">
+          Progreso: {{ overworld_count|default(0) }}/3
+        </span>
+      </div>
+      <a href="{{ url_for('overworld_view') }}" class="mc-btn mc-btn-green" style="margin-top: 12px; width: 100%;">
+        Entrar al Overworld ➔
+      </a>
+    </div>
+
+    <!-- Tarjeta Nether -->
+    <div style="background:#331a1a; border: 2px solid #c62828; padding: 16px;">
+      <h3 style="color:#ef5350; margin-bottom: 8px;">🔴 2. Nether (Medio)</h3>
+      <p style="font-size:0.85rem; color:#ffcdd2;">
+        Explotación web avanzada: Stored XSS con robo de cookies, subida de archivos maliciosos (Webshell RCE) y violación de mínimo privilegio.
+      </p>
+      <div style="margin-top: 12px;">
+        <span class="mc-badge" style="background:#c62828; color:#fff;">
+          Progreso: {{ nether_count|default(0) }}/3
+        </span>
+      </div>
+      {% if 'portal' in session.get('inventory', []) %}
+        <a href="{{ url_for('nether_view') }}" class="mc-btn mc-btn-red" style="margin-top: 12px; width: 100%;">
+          Entrar al Nether ➔
+        </a>
+      {% else %}
+        <button class="mc-btn mc-btn-disabled" style="margin-top: 12px; width: 100%;">
+          🔒 Bloqueado (Falta Portal)
+        </button>
+      {% endif %}
+    </div>
+
+    <!-- Tarjeta The End -->
+    <div style="background:#221333; border: 2px solid #7e22ce; padding: 16px;">
+      <h3 style="color:#c084fc; margin-bottom: 8px;">🟣 3. The End (Difícil)</h3>
+      <p style="font-size:0.85rem; color:#e9d5ff;">
+        Explotación de servicios de red (CVEs estilo Metasploit), inyección de comandos en telemetría y evasión de Honeypots.
+      </p>
+      <div style="margin-top: 12px;">
+        <span class="mc-badge" style="background:#7e22ce; color:#fff;">
+          Progreso: {{ end_count|default(0) }}/3
+        </span>
+      </div>
+      {% if 'pearl' in session.get('inventory', []) %}
+        <a href="{{ url_for('the_end_view') }}" class="mc-btn mc-btn-purple" style="margin-top: 12px; width: 100%;">
+          Entrar a The End ➔
+        </a>
+      {% else %}
+        <button class="mc-btn mc-btn-disabled" style="margin-top: 12px; width: 100%;">
+          🔒 Bloqueado (Falta Ojo)
+        </button>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Panel de Información Académica -->
+  <div style="background: #222; border-left: 4px solid var(--mc-gold); padding: 14px; margin-top: 16px;">
+    <h4 style="color: var(--mc-gold); margin-bottom: 6px;">📚 Alineación con el Programa de Seguridad:</h4>
+    <p style="font-size: 0.82rem; color: #bbb;">
+      • <strong>6. Semestre:</strong> Esteganografía, Cifrado César/XOR en Python, Honeypots y Mínimo Privilegio.<br>
+      • <strong>7. Semestre:</strong> Metadatos (FOCA/Exif), Escaneo Activo y Explotación de CVEs con Metasploit.<br>
+      • <strong>8. Semestre:</strong> SQL Injection, Stored XSS y Robo de Sesiones, Carga de Archivos a RCE y Automatización Kali Linux.
+    </p>
+  </div>
+</div>
+{% endblock %}

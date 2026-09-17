@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Overworld - Minecraft CTF{% endblock %}
+
+{% block content %}
+<div class="mc-box">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 class="mc-title" style="color: #81c784;">
+      <span>🟢 FASE 1: OVERWORLD (Nivel: Fácil)</span>
+    </h1>
+    <span class="mc-badge" style="background:#2e7d32; color:#fff;">3 Desafíos</span>
+  </div>
+  <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
+    Comienzas tu aventura en el mundo superior. Para llegar al Nether necesitas craftear herramientas y conseguir los materiales básicos: 
+    <strong>Hierro</strong> para tu armadura, <strong>Diamante</strong> para tu pico y encender el <strong>Portal de Obsidiana</strong>.
+  </p>
+
+  <div class="challenges-grid">
+
+    <!-- ================================================================= -->
+    <!-- DESAFÍO 1: HIERRO (ESTEGANOGRAFÍA + CIFRADO CÉSAR/XOR) -->
+    <!-- ================================================================= -->
+    <div class="challenge-card {% if 'iron' in session.get('inventory', []) %}unlocked{% endif %}">
+      <div>
+        <div class="challenge-header">
+          <div class="challenge-icon">
+            <img src="{{ url_for('static', filename='img/iron_ingot.svg') }}" alt="Hierro">
+          </div>
+          <div>
+            <h3 style="color:#ffffff; font-size:1.05rem;">1. Lingote de Hierro</h3>
+            <span class="syllabus-tag">6º Semestre: Esteganografía & Cifrado</span>
+          </div>
+        </div>
+        <div class="challenge-body">
+          <p>
+            Steve dejó una copia del mapa de la cueva (<code>mapa_cueva.png</code>). Se rumorea que dentro de los metadatos de la imagen ocultó coordenadas de una veta de hierro usando <strong>Base64</strong> y <strong>Cifrado César (ROT-13)</strong>.
+          </p>
+          <div style="margin: 12px 0;">
+            <a href="{{ url_for('static', filename='img/mapa_cueva.png') }}" download class="mc-btn mc-btn-green" style="width:100%;">
+              📥 Descargar mapa_cueva.png
+            </a>
+          </div>
+
+          <!-- Pistas y Código DVWA -->
+          <div class="dvwa-tools">
+            <div style="display: flex; gap: 8px;">
+              <button class="mc-btn" onclick="toggleHint('iron')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
+              <button class="mc-btn" onclick="toggleSource('iron')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
+            </div>
+            <div id="hint-iron" class="hint-box">
+              <strong>Pista (Kali Linux):</strong><br>
+              Usa <code>exiftool mapa_cueva.png</code> o <code>strings mapa_cueva.png | grep -i SECRETO</code>.<br>
+              Decodifica la cadena con <code>echo '...' | base64 -d</code> y luego pásala por <code>tr 'A-Za-z' 'N-ZA-Mn-za-m'</code> (Cifrado César de 13 posiciones).
+            </div>
+            <div id="source-iron" class="source-box">
+              <strong>Código Python de cifrado del reto:</strong>
+              <pre class="source-code-block"># Rot-13 + Base64
+flag = "FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}"
+rot13 = codecs.encode(flag, 'rot_13')
+payload = base64.b64encode(rot13.encode()).decode()
+# Insertado en PNG metadata: Comment</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Bandera -->
+      <form class="flag-form" onsubmit="submitFlag('overworld', 'iron', event)">
+        <input type="text" id="flag-input-iron" class="mc-input" placeholder="FLAG{...}" 
+               value="{% if 'iron' in session.get('inventory', []) %}FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}{% endif %}"
+               {% if 'iron' in session.get('inventory', []) %}readonly{% endif %}>
+        <button type="submit" class="mc-btn mc-btn-green" {% if 'iron' in session.get('inventory', []) %}disabled{% endif %}>
+          {% if 'iron' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+        </button>
+      </form>
+      <div id="feedback-iron"></div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- DESAFÍO 2: DIAMANTE (SQL INJECTION CLÁSICO / BYPASS) -->
+    <!-- ================================================================= -->
+    <div class="challenge-card {% if 'diamond' in session.get('inventory', []) %}unlocked{% endif %}">
+      <div>
+        <div class="challenge-header">
+          <div class="challenge-icon">
+            <img src="{{ url_for('static', filename='img/diamond.svg') }}" alt="Diamante">
+          </div>
+          <div>
+            <h3 style="color:#ffffff; font-size:1.05rem;">2. Diamante en Y=-58</h3>
+            <span class="syllabus-tag">8º Semestre: SQL Injection (SQLi)</span>
+          </div>
+        </div>
+        <div class="challenge-body">
+          <p>
+            El herrero de la aldea guardó sus diamantes en un cofre protegido en la capa más profunda. El buscador web de inventario no sanitiza la consulta a la base de datos SQLite.
+          </p>
+
+          <!-- Formulario interactivo vulnerable -->
+          <form method="POST" action="{{ url_for('overworld_diamond_search') }}" style="margin: 10px 0;">
+            <input type="text" name="chest_query" class="mc-input" placeholder="Buscar cofre (ej. Herrero)" value="{{ request.form.get('chest_query', '') }}">
+            <button type="submit" class="mc-btn mc-btn-gold" style="width:100%;">
+              🔍 Consultar Base de Datos
+            </button>
+          </form>
+
+          {% if sql_results is defined %}
+            <div class="terminal-output">
+              <strong>[+] Resultados de la consulta:</strong>
+              {% if sql_results %}
+                {% for row in sql_results %}
+                  <div>📦 <strong>{{ row.chest_name }}</strong> (Profundidad: Y={{ row.depth_level }}) -> Botín: <span style="color:#55ff55;">{{ row.secret_loot }}</span></div>
+                {% endfor %}
+              {% else %}
+                <span style="color:#ef4444;">[!] No se encontraron cofres con ese término.</span>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <!-- Pistas y Código DVWA -->
+          <div class="dvwa-tools">
+            <div style="display: flex; gap: 8px;">
+              <button class="mc-btn" onclick="toggleHint('diamond')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
+              <button class="mc-btn" onclick="toggleSource('diamond')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
+            </div>
+            <div id="hint-diamond" class="hint-box">
+              <strong>Pistas para SQLi (Kali Linux):</strong><br>
+              1. Prueba con <code>' OR 1=1 --</code> para volcar todos los cofres de la aldea.<br>
+              2. O usa <code>sqlmap -u "http://localhost:8080/overworld/diamond/search" --data="chest_query=test" --dump</code>.
+            </div>
+            <div id="source-diamond" class="source-box">
+              <strong>Código Vulnerable en Python/Flask:</strong>
+              <pre class="source-code-block">query = f"SELECT * FROM villager_chests WHERE chest_name LIKE '%{user_input}%'"
+cursor.execute(query) # Vulnerable a inyección directa!</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Bandera -->
+      <form class="flag-form" onsubmit="submitFlag('overworld', 'diamond', event)">
+        <input type="text" id="flag-input-diamond" class="mc-input" placeholder="FLAG{...}"
+               value="{% if 'diamond' in session.get('inventory', []) %}FLAG{MINECRAFT_DIAMOND_SQL1_Y58_UNLOCKED}{% endif %}"
+               {% if 'diamond' in session.get('inventory', []) %}readonly{% endif %}>
+        <button type="submit" class="mc-btn mc-btn-green" {% if 'diamond' in session.get('inventory', []) %}disabled{% endif %}>
+          {% if 'diamond' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+        </button>
+      </form>
+      <div id="feedback-diamond"></div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- DESAFÍO 3: PORTAL NETHER (METADATOS / FOCA / RECONOCIMIENTO) -->
+    <!-- ================================================================= -->
+    <div class="challenge-card {% if 'portal' in session.get('inventory', []) %}unlocked{% endif %}">
+      <div>
+        <div class="challenge-header">
+          <div class="challenge-icon">
+            <img src="{{ url_for('static', filename='img/nether_portal.svg') }}" alt="Portal">
+          </div>
+          <div>
+            <h3 style="color:#ffffff; font-size:1.05rem;">3. Portal del Nether</h3>
+            <span class="syllabus-tag">7º Semestre: Metadatos (FOCA/ExifTool)</span>
+          </div>
+        </div>
+        <div class="challenge-body">
+          <p>
+            Para activar la obsidiana y abrir el portal al Nether necesitas encontrar la clave secreta de ignición escondida en el archivo de planos de la fortaleza de aldeanos.
+          </p>
+          <div style="margin: 12px 0;">
+            <a href="{{ url_for('static', filename='docs/planos_portal_nether.txt') }}" target="_blank" class="mc-btn mc-btn-purple" style="width:100%;">
+              📄 Inspeccionar Planos del Portal
+            </a>
+          </div>
+
+          <!-- Pistas y Código DVWA -->
+          <div class="dvwa-tools">
+            <div style="display: flex; gap: 8px;">
+              <button class="mc-btn" onclick="toggleHint('portal')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
+              <button class="mc-btn" onclick="toggleSource('portal')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
+            </div>
+            <div id="hint-portal" class="hint-box">
+              <strong>Pista (Kali Linux):</strong><br>
+              Abre el documento de planos o inspecciona los encabezados HTTP con <code>curl -I http://localhost:8080/static/docs/planos_portal_nether.txt</code> o busca dentro del texto la clave <code>X-Obsidian-Ignition-Key</code>.
+            </div>
+            <div id="source-portal" class="source-box">
+              <strong>Estructura de Metadatos:</strong>
+              <pre class="source-code-block">[METADATA_HEADER_INTERNAL]
+X-Obsidian-Ignition-Key: FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Bandera -->
+      <form class="flag-form" onsubmit="submitFlag('overworld', 'portal', event)">
+        <input type="text" id="flag-input-portal" class="mc-input" placeholder="FLAG{...}"
+               value="{% if 'portal' in session.get('inventory', []) %}FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}{% endif %}"
+               {% if 'portal' in session.get('inventory', []) %}readonly{% endif %}>
+        <button type="submit" class="mc-btn mc-btn-green" {% if 'portal' in session.get('inventory', []) %}disabled{% endif %}>
+          {% if 'portal' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+        </button>
+      </form>
+      <div id="feedback-portal"></div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

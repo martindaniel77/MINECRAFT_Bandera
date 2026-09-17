@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Nether - Minecraft CTF{% endblock %}
+
+{% block content %}
+<div class="mc-box">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 class="mc-title" style="color: #ef5350;">
+      <span>🔴 FASE 2: NETHER (Nivel: Medio)</span>
+    </h1>
+    <span class="mc-badge" style="background:#c62828; color:#fff;">3 Desafíos</span>
+  </div>
+  <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
+    Has cruzado el portal al inframundo. El calor de la lava y los monstruos acechan. 
+    Para abrir el portal al End necesitas conseguir <strong>Oro</strong> para comerciar con los Piglins, 
+    derrotar a los Blazes para obtener sus <strong>Varas de Blaze</strong> y recolectar una <strong>Ender Pearl</strong> para craftear el Ojo de Ender.
+  </p>
+
+  <div class="challenges-grid">
+
+    <!-- ================================================================= -->
+    <!-- DESAFÍO 1: ORO (STORED XSS Y ROBO DE SESIONES) -->
+    <!-- ================================================================= -->
+    <div class="challenge-card {% if 'gold' in session.get('inventory', []) %}unlocked{% endif %}">
+      <div>
+        <div class="challenge-header">
+          <div class="challenge-icon">
+            <img src="{{ url_for('static', filename='img/gold_ingot.svg') }}" alt="Oro">
+          </div>
+          <div>
+            <h3 style="color:#ffffff; font-size:1.05rem;">1. Lingote de Oro</h3>
+            <span class="syllabus-tag">8º Semestre: Stored XSS & Robo de Cookies</span>
+          </div>
+        </div>
+        <div class="challenge-body">
+          <p>
+            Los Piglins del Bastión tienen un libro público de ofertas de trueque. El <strong>Piglin Guard</strong> revisa periódicamente cada propuesta en su navegador con su cookie de tesorero real.
+          </p>
+
+          <!-- Formulario de Oferta Vulnerable a XSS -->
+          <form method="POST" action="{{ url_for('nether_gold_submit_offer') }}" style="margin: 10px 0;">
+            <input type="text" name="player_name" class="mc-input" placeholder="Tu nombre (ej. Steve)" required>
+            <input type="text" name="offered_item" class="mc-input" placeholder="Objeto que ofreces (ej. 5x Manzanas)" required>
+            <textarea name="note_to_piglin" class="mc-input" rows="2" placeholder="Nota al Piglin (Permite HTML/JS)..." required></textarea>
+            <button type="submit" class="mc-btn mc-btn-gold" style="width:100%;">
+              📜 Enviar Oferta al Bastión
+            </button>
+          </form>
+
+          <!-- Tablón de ofertas recientes -->
+          <div class="terminal-output" style="max-height: 140px;">
+            <strong>[+] Últimas ofertas en el Bastión:</strong>
+            {% if trade_offers %}
+              {% for offer in trade_offers %}
+                <div style="border-top: 1px dashed #444; padding-top: 4px; margin-top: 4px;">
+                  👤 <strong>{{ offer.player_name }}</strong> ofrece: <em>{{ offer.offered_item }}</em><br>
+                  💬 Mensaje: <span>{{ offer.note_to_piglin|safe }}</span>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div>No hay ofertas registradas aún.</div>
+            {% endif %}
+          </div>
+
+          <!-- Pistas y Código DVWA -->
+          <div class="dvwa-tools">
+            <div style="display: flex; gap: 8px;">
+              <button class="mc-btn" onclick="toggleHint('gold')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
+              <button class="mc-btn" onclick="toggleSource('gold')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
+            </div>
+            <div id="hint-gold" class="hint-box">
+              <strong>Pista para XSS (Kali Linux):</strong><br>
+              1. Inyecta: <code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code> en la nota.<br>
+              2. O roba la cookie del Piglin enviándola al endpoint de fuga: <code>&lt;script&gt;fetch('/nether/gold/leak?cookie='+document.cookie)&lt;/script&gt;</code>.<br>
+              3. También puedes revisar la cookie de sesión local con las herramientas de desarrollador de Kali (F12 -> Storage -> Cookies).
+            </div>
+            <div id="source-gold" class="source-box">
+              <strong>Código Vulnerable en la plantilla:</strong>
+              <pre class="source-code-block">{{ "{{ offer.note_to_piglin|safe }}" }} 
+# Al usar el filtro |safe se renderiza HTML y JS sin sanitizar!</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Bandera -->
+      <form class="flag-form" onsubmit="submitFlag('nether', 'gold', event)">
+        <input type="text" id="flag-input-gold" class="mc-input" placeholder="FLAG{...}"
+               value="{% if 'gold' in session.get('inventory', []) %}FLAG{MINECRAFT_PIGLIN_XSS_GOLD_BARTERED}{% endif %}"
+               {% if 'gold' in session.get('inventory', []) %}readonly{% endif %}>
+        <button type="submit" class="mc-btn mc-btn-green" {% if 'gold' in session.get('inventory', []) %}disabled{% endif %}>
+          {% if 'gold' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+        </button>
+      </form>
+      <div id="feedback-gold"></div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- DESAFÍO 2: VARAS DE BLAZE (ARBITRARY FILE UPLOAD & RCE) -->
+    <!-- ================================================================= -->
+    <div class="challenge-card {% if 'blaze' in session.get('inventory', []) %}unlocked{% endif %}">
+      <div>
+        <div class="challenge-header">
+          <div class="challenge-icon">
+            <img src="{{ url_for('static', filename='img/blaze_rod.svg') }}" alt="Blaze">
+          </div>
+          <div>
+            <h3 style="color:#ffffff; font-size:1.05rem;">2. Vara de Blaze</h3>
+            <span class="syllabus-tag">8º Semestre: File Upload & RCE</span>
+          </div>
+        </div>
+        <div class="challenge-body">
+          <p>
+            En la Fortaleza del Nether, el caldero de pociones permite subir un archivo de "receta personalizada" para activar el dispensador. El formulario no valida extensiones peligrosas.
+          </p>
+
+          <!-- Formulario de Subida Vulnerable -->
+          <form method="POST" action="{{ url_for('nether_blaze_upload') }}" enctype="multipart/form-data" style="margin: 10px 0;">
+            <input type="file" name="recipe_file" class="mc-input" required>
+            <button type="submit" class="mc-btn mc-btn-red" style="width:100%;">
+              📤 Subir Receta al Caldero
+            </button>
+          </form>
+
+          {% if upload_success is defined %}
+            <div class="terminal-output">
+              {% if upload_success %}
+                <span style="color:#55ff55;">[+] Archivo subido con éxito a: <code>/static/uploads/{{ uploaded_filename }}</code></span><br>
+                <span>Ejecutar receta: <a href="{{ url_for('nether_blaze_execute', filename=uploaded_filename) }}" target="_blank" style="color:#ffaa00;">Click para ejecutar receta</a></span>
+              {% else %}
+                <span style="color:#ef4444;">[!] Error al subir el archivo.</span>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          {% if rce_output is defined %}
+            <div class="terminal-output">
+              <strong>[+] Salida del script ejecutado en el servidor:</strong>
+              <pre style="color:#55ff55; margin-top:4px;">{{ rce_output }}</pre>
+            </div>
+          {% endif %}
+
+          <!-- Pistas y Código DVWA -->
+          <div class="dvwa-tools">
+            <div style="display: flex; gap: 8px;">
+              <button class="mc-btn" onclick="toggleHint('blaze')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
+              <button class="mc-btn" onclick="toggleSource('blaze')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
+            </div>
+            <div id="hint-blaze" class="hint-box">
+              <strong>Pista para File Upload (Kali Linux):</strong><br>
+              1. Crea un script en Python (<code>exploit.py</code>) con:
+              <code>import os; print(open('/secret/blaze_rod.txt').read())</code><br>
+              2. Súbelo mediante el formulario y haz clic en "Ejecutar receta" para obtener la flag.
+            </div>
+            <div id="source-blaze" class="source-box">
+              <strong>Código Vulnerable en backend:</strong>
+              <pre class="source-code-block">file.save(os.path.join(UPLOAD_FOLDER, filename))
+# No hay lista blanca de extensiones ni validación de tipo MIME!</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Bandera -->
+      <form class="flag-form" onsubmit="submitFlag('nether', 'blaze', event)">
+        <input type="text" id="flag-input-blaze" class="mc-input" placeholder="FLAG{...}"
+               value="{% if 'blaze' in session.get('inventory', []) %}FLAG{MINECRAFT_BLAZE_ROD_WEBSHELL_RCE}{% endif %}"
+               {% if 'blaze' in session.get('inventory', []) %}readonly{% endif %}>
+        <button type="submit" class="mc-btn mc-btn-green" {% if 'blaze' in session.get('inventory', []) %}disabled{% endif %}>
+          {% if 'blaze' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+        </button>
+      </form>
+      <div id="feedback-blaze"></div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- DESAFÍO 3: ENDER PEARL (MÍNIMO PRIVILEGIO & BROKEN ACCESS CONTROL) -->
+    <!-- ================================================================= -->
+    <div class="challenge-card {% if 'pearl' in session.get('inventory', []) %}unlocked{% endif %}">
+      <div>
+        <div class="challenge-header">
+          <div class="challenge-icon">
+            <img src="{{ url_for('static', filename='img/ender_pearl.svg') }}" alt="Perla">
+          </div>
+          <div>
+            <h3 style="color:#ffffff; font-size:1.05rem;">3. Ender Pearl / Ojo</h3>
+            <span class="syllabus-tag">6º Semestre: Principio de Mínimo Privilegio</span>
+          </div>
+        </div>
+        <div class="challenge-body">
+          <p>
+            El altar del Enderman controla la forja del Ojo de Ender. La API verifica el rol del usuario a través de una cookie o parámetro modificable <code>user_role</code> sin validar la firma criptográfica.
+          </p>
+
+          <form method="GET" action="{{ url_for('nether_pearl_altar') }}" style="margin: 10px 0;">
+            <div style="display:flex; gap:6px;">
+              <input type="text" name="user_role" class="mc-input" placeholder="Rol actual: guest_traveler" value="{{ request.args.get('user_role', 'guest_traveler') }}">
+              <button type="submit" class="mc-btn mc-btn-purple" style="white-space:nowrap;">
+                👁️ Activar Altar
+              </button>
+            </div>
+          </form>
+
+          {% if altar_response is defined %}
+            <div class="terminal-output">
+              {{ altar_response|safe }}
+            </div>
+          {% endif %}
+
+          <!-- Pistas y Código DVWA -->
+          <div class="dvwa-tools">
+            <div style="display: flex; gap: 8px;">
+              <button class="mc-btn" onclick="toggleHint('pearl')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
+              <button class="mc-btn" onclick="toggleSource('pearl')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
+            </div>
+            <div id="hint-pearl" class="hint-box">
+              <strong>Pista (Kali Linux):</strong><br>
+              1. En la URL o en Burp Suite cambia el parámetro <code>user_role=guest_traveler</code> a <code>user_role=ender_master</code> o <code>user_role=bastion_overlord</code>.<br>
+              2. Consulta: <code>curl "http://localhost:8080/nether/pearl/altar?user_role=ender_master"</code>
+            </div>
+            <div id="source-pearl" class="source-box">
+              <strong>Código Vulnerable:</strong>
+              <pre class="source-code-block">role = request.args.get('user_role') or request.cookies.get('user_role')
+if role in ['ender_master', 'admin', 'root']:
+    return flag # Confianza ciega en el input del cliente!</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Bandera -->
+      <form class="flag-form" onsubmit="submitFlag('nether', 'pearl', event)">
+        <input type="text" id="flag-input-pearl" class="mc-input" placeholder="FLAG{...}"
+               value="{% if 'pearl' in session.get('inventory', []) %}FLAG{MINECRAFT_ENDER_PEARL_PRIV_ESCALATION}{% endif %}"
+               {% if 'pearl' in session.get('inventory', []) %}readonly{% endif %}>
+        <button type="submit" class="mc-btn mc-btn-green" {% if 'pearl' in session.get('inventory', []) %}disabled{% endif %}>
+          {% if 'pearl' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+        </button>
+      </form>
+      <div id="feedback-pearl"></div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

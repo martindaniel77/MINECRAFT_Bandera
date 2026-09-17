@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}The End - Minecraft CTF{% endblock %}
+
+{% block content %}
+<div class="mc-box">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 class="mc-title" style="color: #c084fc;">
+      <span>🟣 FASE 3: THE END (Nivel: Difícil - Boss Final)</span>
+    </h1>
+    <span class="mc-badge" style="background:#7e22ce; color:#fff;">3 Desafíos</span>
+  </div>
+  <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
+    Has colocado los 12 Ojos de Ender y cruzado el portal hacia el Vacío. 
+    Te encuentras en la isla central frente al <strong>Ender Dragón</strong>. 
+    Para liberar el End debes <strong>destruir los Cristales de las Torres</strong>, <strong>asestar el golpe final al Dragón</strong> y <strong>capturar el Huevo legítimo evadiendo los señuelos (Honeypots)</strong>.
+  </p>
+
+  <div class="challenges-grid">
+
+    <!-- ================================================================= -->
+    <!-- DESAFÍO 1: CRISTALES (EXPLOTACIÓN DE SERVICIO / CVE METASPLOIT) -->
+    <!-- ================================================================= -->
+    <div class="challenge-card {% if 'crystals' in session.get('inventory', []) %}unlocked{% endif %}">
+      <div>
+        <div class="challenge-header">
+          <div class="challenge-icon">
+            <img src="{{ url_for('static', filename='img/end_crystal.svg') }}" alt="Cristales">
+          </div>
+          <div>
+            <h3 style="color:#ffffff; font-size:1.05rem;">1. Cristales del End</h3>
+            <span class="syllabus-tag">7º Semestre: CVEs & Metasploit</span>
+          </div>
+        </div>
+        <div class="challenge-body">
+          <p>
+            Los 4 cristales de curación de obsidiana se comunican con un servicio de telemetría interno que emula un servicio vulnerable conocido (<strong>CVE Backdoor</strong>).
+          </p>
+
+          <!-- Consola de ataque a cristales -->
+          <form method="POST" action="{{ url_for('the_end_crystals_exploit') }}" style="margin: 10px 0;">
+            <input type="text" name="exploit_payload" class="mc-input" placeholder="Payload de explotación (ej. AB;shatter_crystals)" value="{{ request.form.get('exploit_payload', '') }}">
+            <button type="submit" class="mc-btn mc-btn-purple" style="width:100%;">
+              💥 Enviar Exploit a los Cristales
+            </button>
+          </form>
+
+          {% if crystal_exploit_result is defined %}
+            <div class="terminal-output">
+              {{ crystal_exploit_result|safe }}
+            </div>
+          {% endif %}
+
+          <!-- Pistas y Código DVWA -->
+          <div class="dvwa-tools">
+            <div style="display: flex; gap: 8px;">
+              <button class="mc-btn" onclick="toggleHint('crystals')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
+              <button class="mc-btn" onclick="toggleSource('crystals')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
+            </div>
+            <div id="hint-crystals" class="hint-box">
+              <strong>Pista para Explotación (Kali Linux):</strong><br>
+              1. En la materia de 7º Semestre viste la explotación de backdoors de IRC y ProFTPD con secuencias mágicas.<br>
+              2. El disparador de backdoor en este servicio es enviar la secuencia <code>CVE-2026-OVERLOAD_CRYSTALS</code> o <code>AB;cat /secret/end_crystals.txt</code>.<br>
+              3. También puedes enviar por curl: <code>curl -X POST http://localhost:8080/end/crystals/exploit -d "exploit_payload=CVE-2026-OVERLOAD_CRYSTALS"</code>
+            </div>
+            <div id="source-crystals" class="source-box">
+              <strong>Lógica del Servicio Emulado:</strong>
+              <pre class="source-code-block">if "CVE-2026-OVERLOAD" in payload or "AB;" in payload:
+    return "💥 BOOM! Cristales destruidos: " + read_flag('/secret/end_crystals.txt')</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Bandera -->
+      <form class="flag-form" onsubmit="submitFlag('the_end', 'crystals', event)">
+        <input type="text" id="flag-input-crystals" class="mc-input" placeholder="FLAG{...}"
+               value="{% if 'crystals' in session.get('inventory', []) %}FLAG{MINECRAFT_END_CRYSTALS_CVE_SHATTERED}{% endif %}"
+               {% if 'crystals' in session.get('inventory', []) %}readonly{% endif %}>
+        <button type="submit" class="mc-btn mc-btn-green" {% if 'crystals' in session.get('inventory', []) %}disabled{% endif %}>
+          {% if 'crystals' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+        </button>
+      </form>
+      <div id="feedback-crystals"></div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- DESAFÍO 2: DRAGÓN (COMMAND INJECTION EN TELEMETRÍA / RCE) -->
+    <!-- ================================================================= -->
+    <div class="challenge-card {% if 'dragon' in session.get('inventory', []) %}unlocked{% endif %}">
+      <div>
+        <div class="challenge-header">
+          <div class="challenge-icon">
+            <img src="{{ url_for('static', filename='img/ender_dragon.svg') }}" alt="Dragón">
+          </div>
+          <div>
+            <h3 style="color:#ffffff; font-size:1.05rem;">2. Derrotar al Dragón</h3>
+            <span class="syllabus-tag">8º Semestre: Command Injection & RCE</span>
+          </div>
+        </div>
+        <div class="challenge-body">
+          <p>
+            El sistema de daño del dragón procesa un cálculo de trayectoria mediante un script de consola en el servidor (<code>/end/dragon/damage?shot_power=...</code>).
+          </p>
+
+          <!-- Formulario de Disparo al Dragón -->
+          <form method="POST" action="{{ url_for('the_end_dragon_damage') }}" style="margin: 10px 0;">
+            <input type="text" name="shot_power" class="mc-input" placeholder="Potencia de disparo (ej. 100)" value="{{ request.form.get('shot_power', '100') }}">
+            <button type="submit" class="mc-btn mc-btn-red" style="width:100%;">
+              🏹 Disparar Flecha Sónica
+            </button>
+          </form>
+
+          {% if dragon_damage_output is defined %}
+            <div class="terminal-output">
+              <strong>[+] Telemetría de Combate:</strong>
+              <pre style="color:#55ff55; margin-top:4px;">{{ dragon_damage_output }}</pre>
+            </div>
+          {% endif %}
+
+          <!-- Pistas y Código DVWA -->
+          <div class="dvwa-tools">
+            <div style="display: flex; gap: 8px;">
+              <button class="mc-btn" onclick="toggleHint('dragon')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
+              <button class="mc-btn" onclick="toggleSource('dragon')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
+            </div>
+            <div id="hint-dragon" class="hint-box">
+              <strong>Pista para Command Injection (Kali Linux):</strong><br>
+              1. Concatena comandos con <code>;</code> o <code>&&</code> o <code>|</code>.<br>
+              2. Ejemplo: <code>100; cat /secret/dragon_slain.txt</code> o <code>100 && cat /secret/dragon_slain.txt</code>.<br>
+              3. El servidor ejecutará la orden en la shell de Linux del contenedor.
+            </div>
+            <div id="source-dragon" class="source-box">
+              <strong>Código Vulnerable:</strong>
+              <pre class="source-code-block">cmd = f"echo 'Calculando impacto: {shot_power}'"
+output = subprocess.check_output(cmd, shell=True) # Shell=True sin sanitizar!</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Bandera -->
+      <form class="flag-form" onsubmit="submitFlag('the_end', 'dragon', event)">
+        <input type="text" id="flag-input-dragon" class="mc-input" placeholder="FLAG{...}"
+               value="{% if 'dragon' in session.get('inventory', []) %}FLAG{MINECRAFT_ENDER_DRAGON_SLAIN_COMMAND_INJECTION}{% endif %}"
+               {% if 'dragon' in session.get('inventory', []) %}readonly{% endif %}>
+        <button type="submit" class="mc-btn mc-btn-green" {% if 'dragon' in session.get('inventory', []) %}disabled{% endif %}>
+          {% if 'dragon' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+        </button>
+      </form>
+      <div id="feedback-dragon"></div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- DESAFÍO 3: HUEVO (EVASIÓN DE HONEYPOT Y CAPTURA DE FLAG ROOT) -->
+    <!-- ================================================================= -->
+    <div class="challenge-card {% if 'egg' in session.get('inventory', []) %}unlocked{% endif %}">
+      <div>
+        <div class="challenge-header">
+          <div class="challenge-icon">
+            <img src="{{ url_for('static', filename='img/dragon_egg.svg') }}" alt="Huevo">
+          </div>
+          <div>
+            <h3 style="color:#ffffff; font-size:1.05rem;">3. Huevo de Dragón</h3>
+            <span class="syllabus-tag">6º Semestre: Honeypots & Evasión</span>
+          </div>
+        </div>
+        <div class="challenge-body">
+          <p>
+            El dragón ha caído, pero el altar del Huevo contiene un <strong>Honeypot (Señuelo)</strong> que entrega banderas falsas. Debes analizar la ruta del sistema para extraer el huevo real en <code>/root/real_dragon_egg.txt</code>.
+          </p>
+
+          <!-- Visor de Archivos del Altar (LFI) -->
+          <form method="GET" action="{{ url_for('the_end_egg_inspect') }}" style="margin: 10px 0;">
+            <div style="display:flex; gap:6px;">
+              <input type="text" name="altar_file" class="mc-input" placeholder="Archivo del altar (ej. honeypot/fake_egg.txt)" value="{{ request.args.get('altar_file', 'honeypot/fake_egg.txt') }}">
+              <button type="submit" class="mc-btn mc-btn-gold" style="white-space:nowrap;">
+                🥚 Leer Altar
+              </button>
+            </div>
+          </form>
+
+          {% if egg_inspect_output is defined %}
+            <div class="terminal-output">
+              <strong>[+] Contenido del altar leído:</strong>
+              <pre style="color:{% if 'HONEYPOT' in egg_inspect_output %}#ef4444{% else %}#55ff55{% endif %}; margin-top:4px;">{{ egg_inspect_output }}</pre>
+            </div>
+          {% endif %}
+
+          <!-- Pistas y Código DVWA -->
+          <div class="dvwa-tools">
+            <div style="display: flex; gap: 8px;">
+              <button class="mc-btn" onclick="toggleHint('egg')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
+              <button class="mc-btn" onclick="toggleSource('egg')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
+            </div>
+            <div id="hint-egg" class="hint-box">
+              <strong>Pista (Kali Linux):</strong><br>
+              1. Si consultas <code>honeypot/fake_egg.txt</code> caerás en la trampa del señuelo.<br>
+              2. Usa Directory Traversal / Path Traversal para leer el archivo del superusuario: <code>../../root/real_dragon_egg.txt</code>.<br>
+              3. URL: <code>http://localhost:8080/end/egg/inspect?altar_file=../../root/real_dragon_egg.txt</code>
+            </div>
+            <div id="source-egg" class="source-box">
+              <strong>Código del Lector del Altar:</strong>
+              <pre class="source-code-block">base_path = "/var/www"
+filepath = os.path.join(base_path, altar_file)
+# No valida si el path sale de /var/www mediante ../../ !</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Bandera -->
+      <form class="flag-form" onsubmit="submitFlag('the_end', 'egg', event)">
+        <input type="text" id="flag-input-egg" class="mc-input" placeholder="FLAG{...}"
+               value="{% if 'egg' in session.get('inventory', []) %}FLAG{MINECRAFT_FINAL_DRAGON_EGG_VICTORY_GG}{% endif %}"
+               {% if 'egg' in session.get('inventory', []) %}readonly{% endif %}>
+        <button type="submit" class="mc-btn mc-btn-green" {% if 'egg' in session.get('inventory', []) %}disabled{% endif %}>
+          {% if 'egg' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+        </button>
+      </form>
+      <div id="feedback-egg"></div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

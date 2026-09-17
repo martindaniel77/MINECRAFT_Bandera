@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  minecraft-ctf:
+    build: .
+    container_name: minecraft_ctf_dvwa
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    networks:
+      - ctf_net
+
+networks:
+  ctf_net:
+    driver: bridge
