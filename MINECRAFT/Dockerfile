@@ -32,14 +32,22 @@ RUN echo "FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}" > /secret/iron_ingot.txt &
 
 # Asignar permisos
 RUN chmod 644 /secret/*.txt && \
-    chmod 644 /var/www/honeypot/fake_egg.txt && \
-    chmod 644 /root/real_dragon_egg.txt
+    chmod 755 /root && \
+    chmod 644 /root/real_dragon_egg.txt && \
+    chmod 755 /var/www /var/www/honeypot && \
+    chmod 644 /var/www/honeypot/fake_egg.txt
 
 # Copiar código de la aplicación
 COPY app/ /app/
 
 # Crear carpeta de subidas para el reto de File Upload
-RUN mkdir -p /app/static/uploads && chmod 777 /app/static/uploads
+RUN mkdir -p /app/static/uploads
+
+# Ejecutar la aplicación sin privilegios de root
+RUN useradd --create-home --shell /usr/sbin/nologin mcuser && \
+    chown -R mcuser:mcuser /app
+
+USER mcuser
 
 # Exponer el puerto principal de la plataforma
 EXPOSE 8080

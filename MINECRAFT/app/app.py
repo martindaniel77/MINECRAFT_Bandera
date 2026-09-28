@@ -1,12 +1,12 @@
 import os
 import sqlite3
-import subprocess
 import base64
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, send_from_directory
 from werkzeug.utils import secure_filename
 
 from database import init_db, get_db_connection
 from bot import bot_instance, PIGLIN_SECRET_TOKEN
+from sandbox import run_sandboxed
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'minecraft_dvwa_secret_key_2026_kali')
@@ -14,6 +14,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'minecraft_dvwa_secret_key_2026_ka
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 
 # ------------------------------------------------------------------------------
 # DICCIONARIO OFICIAL DE BANDERAS DEL CTF
@@ -52,6 +53,11 @@ def get_inventory():
     if 'inventory' not in session:
         session['inventory'] = []
     return session['inventory']
+
+@app.errorhandler(413)
+def upload_too_large(error):
+    flash("El archivo supera el limite permitido de 2 MB para las recetas del caldero.", "error")
+    return redirect(url_for('nether_view'))
 
 # ------------------------------------------------------------------------------
 # RUTAS DE NAVEGACIÓN PRINCIPAL
@@ -241,16 +247,17 @@ def nether_blaze_execute(filename):
     output = ""
     try:
         if filename.endswith('.py'):
-            output = subprocess.check_output(['python', file_path], stderr=subprocess.STDOUT, timeout=5).decode('utf-8')
+            output, error = run_sandboxed(['python', file_path])
         elif filename.endswith('.sh'):
-            output = subprocess.check_output(['bash', file_path], stderr=subprocess.STDOUT, timeout=5).decode('utf-8')
+            output, error = run_sandboxed(['bash', file_path])
         else:
             with open(file_path, 'r', errors='ignore') as f:
-                output = f.read()
-    except subprocess.CalledProcessError as cpe:
-        output = cpe.output.decode('utf-8', errors='ignore')
+                output, error = f.read(4096), None
     except Exception as e:
-        output = f"Error ejecutando receta: {str(e)}"
+        output, error = f"Error ejecutando receta: {str(e)}", None
+
+    if error:
+        output = f"{output}\n{error}".strip() if output else error
 
     return render_template('nether.html', current_dimension='nether', rce_output=output)
 
@@ -323,10 +330,9 @@ def the_end_dragon_damage():
     
     # VULNERABILIDAD: Inyección de comandos en subprocess shell=True
     cmd = f"echo 'Calculando impacto de flecha: potencia {shot_power}'"
-    try:
-        output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT, timeout=5).decode('utf-8')
-    except Exception as e:
-        output = f"Error de cálculo: {str(e)}"
+    output, error = run_sandboxed(cmd, shell=True)
+    if error:
+        output = f"{output}\n{error}".strip() if output else error
 
     return render_template('the_end.html', current_dimension='the_end', dragon_damage_output=output)
 
