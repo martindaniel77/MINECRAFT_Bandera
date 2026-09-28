@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+app/minecraft_ctf.db
+app/.init.lock
+app/static/uploads/*
+app/static/img/
+app/static/docs/
