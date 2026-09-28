@@ -16,10 +16,10 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
      exiftool mapa_cueva.png
      ```
   3. En la sección `Comment` o `Description` se encuentra la cadena cifrada en Base64:
-     `U1lOVHtaVkFQUkVOR19WRUJBX1ZBVEdHX1AzRjRFX0swRV9aMUEzUX0=`
+     `U1lOVHtaVkFSUEVOU0dfVkVCQV9WQVRCR19QM0Y0RV9LMEVfWjFBM1F9`
   4. Decodificar Base64 y aplicar ROT-13 (Cifrado César de 13 desplazamientos):
      ```bash
-     echo "U1lOVHtaVkFQUkVOR19WRUJBX1ZBVEdHX1AzRjRFX0swRV9aMUEzUX0=" | base64 -d | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+     echo "U1lOVHtaVkFSUEVOU0dfVkVCQV9WQVRCR19QM0Y0RV9LMEVfWjFBM1F9" | base64 -d | tr 'A-Za-z' 'N-ZA-Mn-za-m'
      ```
 - **Bandera Obtenida:**
   `FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}`
@@ -39,6 +39,13 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
      curl -X POST http://localhost:8080/overworld/diamond/search -d "chest_query=' OR 1=1 --"
      ```
   3. En la respuesta aparece el registro del cofre secreto en la profundidad $Y=-58$ con la bandera.
+  4. La consulta aplica además `is_locked = 0`, así que buscar directamente `Herrero` **no**
+     devuelve nada. Hay que romper ese filtro con la inyección (el `--` comenta el resto de
+     la consulta, incluido el `AND is_locked = 0`):
+     ```bash
+     # atajo que ya NO funciona:
+     curl -X POST http://localhost:8080/overworld/diamond/search -d "chest_query=Herrero"
+     ```
 - **Bandera Obtenida:**
   `FLAG{MINECRAFT_DIAMOND_SQL1_Y58_UNLOCKED}`
 
@@ -72,11 +79,19 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
      ```html
      <script>alert(document.cookie);</script>
      ```
-  3. El bot simulado del Piglin Guard revisará la oferta y filtrará su cookie de sesión con el token del tesoro.
-  4. También se puede consultar directamente el endpoint de fuga:
+  3. El bot simulado del Piglin Guard revisa la oferta y, al encontrar la referencia al
+     endpoint receptor, reproduce la exfiltración: envía su cookie real de tesorero.
+  4. Al recargar `/nether`, el tablón muestra el **registro de credenciales comprometidas**
+     con el token del Piglin:
+     ```
+     🔑 piglin_gold_vault_token=FLAG{MINECRAFT_PIGLIN_XSS_GOLD_BARTERED}
+     ```
+  5. Ese token es la bandera. El endpoint de fuga **no** la entrega si solo se consulta:
      ```bash
      curl -s "http://localhost:8080/nether/gold/leak?cookie=piglin"
+     # -> "token_verified": false, "flag": null
      ```
+     Solo responde con la bandera si los datos exfiltrados contienen el token real.
 - **Bandera Obtenida:**
   `FLAG{MINECRAFT_PIGLIN_XSS_GOLD_BARTERED}`
 

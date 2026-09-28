@@ -52,7 +52,7 @@
             <strong>[+] Últimas ofertas en el Bastión:</strong>
             {% if trade_offers %}
               {% for offer in trade_offers %}
-                <div style="border-top: 1px dashed #444; padding-top: 4px; margin-top: 4px;">
+                <div style="border-top: 1px dashed #444; padding-top: 4px; margin-top: 4px;" data-offer-id="{{ offer.id }}">
                   👤 <strong>{{ offer.player_name }}</strong> ofrece: <em>{{ offer.offered_item }}</em><br>
                   💬 Mensaje: <span>{{ offer.note_to_piglin|safe }}</span>
                 </div>
@@ -61,6 +61,17 @@
               <div>No hay ofertas registradas aún.</div>
             {% endif %}
           </div>
+
+          <!-- Tokens robados al Piglin -->
+          {% if captured_tokens %}
+            <div class="terminal-output" style="border-color:#ef4444;">
+              <strong>[!] REGISTRO DEL BASTIÓN — credenciales comprometidas:</strong>
+              {% for token in captured_tokens %}
+                <div style="color:#ff5555;">🔑 <code>{{ token }}</code></div>
+              {% endfor %}
+              <div style="color:#f59e0b; margin-top:4px;">El Piglin Guard entregó su token de la bóveda. Ya puedes validarlo como bandera.</div>
+            </div>
+          {% endif %}
 
           <!-- Pistas y Código DVWA -->
           <div class="dvwa-tools">

@@ -4,7 +4,7 @@ import os
 DB_PATH = os.path.join(os.path.dirname(__file__), 'minecraft_ctf.db')
 
 def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=10)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -60,6 +60,18 @@ def init_db():
             ('Cofre Oculto del Herrero', 'X: 42, Z: -350', -58, 'FLAG{MINECRAFT_DIAMOND_SQL1_Y58_UNLOCKED}', 1),
             ('Cofre Abandonado en Mina', 'X: -210, Z: 512', 12, '8x Carbón, 4x Antorchas', 0)
         ])
+
+    # Tabla 4: Tokens robados al Piglin Guard (reto de XSS Stored).
+    # Se guardan en la base de datos y no en memoria porque gunicorn ejecuta
+    # varios workers: cada proceso tiene su propia copia de la RAM.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS stolen_tokens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            offer_id INTEGER,
+            captured_data TEXT NOT NULL,
+            captured_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
 
     cursor.execute('SELECT COUNT(*) FROM end_crystals')
     if cursor.fetchone()[0] == 0:
