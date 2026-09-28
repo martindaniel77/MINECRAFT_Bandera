@@ -4,7 +4,7 @@ import base64
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, send_from_directory
 from werkzeug.utils import secure_filename
 
-from database import init_db, get_db_connection
+from database import get_db_connection
 from bot import bot_instance, PIGLIN_SECRET_TOKEN
 from sandbox import run_sandboxed
 
@@ -15,6 +15,7 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
 
 # ------------------------------------------------------------------------------
 # DICCIONARIO OFICIAL DE BANDERAS DEL CTF
@@ -369,17 +370,9 @@ def victory_view():
 # INICIALIZACIÓN
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    # Inicializar Base de Datos SQLite
-    init_db()
-    
-    # Inicializar assets estáticos
-    try:
-        from init_assets import create_stego_map, create_portal_blueprints, create_svg_icons
-        create_stego_map()
-        create_portal_blueprints()
-        create_svg_icons()
-    except Exception as e:
-        print(f"[*] Aviso al generar assets: {e}")
+    from bootstrap import bootstrap
+
+    bootstrap()
 
     print("[+] Servidor Minecraft CTF listo en http://0.0.0.0:8080")
     app.run(host='0.0.0.0', port=8080, debug=False)

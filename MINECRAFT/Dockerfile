@@ -55,4 +55,4 @@ EXPOSE 8080
 ENV FLASK_ENV=production
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "app.py"]
+CMD ["gunicorn", "--preload", "--workers", "2", "--threads", "4", "--timeout", "30", "--bind", "0.0.0.0:8080", "wsgi:app"]
