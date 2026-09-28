@@ -4,12 +4,16 @@ services:
   minecraft-ctf:
     build: .
     container_name: minecraft_ctf_dvwa
-    restart: unless-stopped
+    restart: on-failure:3
     ports:
       - "8080:8080"
     environment:
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
+    mem_limit: 768m
+    mem_reservation: 256m
+    cpus: "1.00"
+    pids_limit: 128
     networks:
       - ctf_net
 

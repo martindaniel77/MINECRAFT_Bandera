@@ -12,16 +12,23 @@ class PiglinGuardBot:
     def __init__(self, base_url="http://127.0.0.1:8080"):
         self.base_url = base_url
         self.captured_tokens = []
+        self._visit_in_progress = False
+        self._visit_lock = threading.Lock()
 
     def trigger_visit(self):
         """Ejecuta una visita del bot en un hilo separado para no bloquear la petición"""
+        with self._visit_lock:
+            if self._visit_in_progress:
+                return
+            self._visit_in_progress = True
+
         thread = threading.Thread(target=self._simulate_admin_check)
         thread.daemon = True
         thread.start()
 
     def _simulate_admin_check(self):
-        time.sleep(1) # Simula el tiempo que tarda el Piglin en revisar la oferta
         try:
+            time.sleep(1) # Simula el tiempo que tarda el Piglin en revisar la oferta
             cookies = {
                 'piglin_session_role': 'piglin_treasurer',
                 'piglin_gold_vault_token': PIGLIN_SECRET_TOKEN,
@@ -34,5 +41,8 @@ class PiglinGuardBot:
         except Exception as e:
             # Ignorar si el servidor está iniciando
             pass
+        finally:
+            with self._visit_lock:
+                self._visit_in_progress = False
 
 bot_instance = PiglinGuardBot()

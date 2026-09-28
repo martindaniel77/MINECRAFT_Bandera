@@ -89,6 +89,8 @@ class RetroAudioEngine {
 
 const mcAudio = new RetroAudioEngine();
 
+const HOTBAR_ORDER = ['iron', 'diamond', 'portal', 'gold', 'blaze', 'pearl', 'crystals', 'dragon', 'egg'];
+
 // Reproducir sonido al hacer click en cualquier botón mc-btn
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.mc-btn').forEach(btn => {
@@ -114,7 +116,46 @@ function toggleSource(challengeId) {
   }
 }
 
-// 3. Envío Asíncrono de Flags y Actualización de HUD
+// 3. Aviso de dimension completada sin bloquear el hilo con alert()
+function showCelebration(message) {
+  const overlay = document.createElement('div');
+  overlay.className = 'mc-celebration';
+  const box = document.createElement('div');
+  box.className = 'mc-celebration-box';
+  box.textContent = message;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.remove(), 2400);
+}
+
+// 4. Refleja el ítem desbloqueado en el DOM sin recargar la página
+function markItemUnlocked(step) {
+  const index = HOTBAR_ORDER.indexOf(step);
+  if (index === -1) return;
+
+  const slotEl = document.getElementById(`slot-${index + 1}`);
+  if (slotEl) {
+    slotEl.classList.remove('locked');
+    slotEl.classList.add('unlocked');
+  }
+
+  const inputEl = document.getElementById(`flag-input-${step}`);
+  if (!inputEl) return;
+
+  inputEl.setAttribute('readonly', 'readonly');
+  const form = inputEl.closest('form');
+  if (form) {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '✅';
+    }
+  }
+  const cardEl = inputEl.closest('.challenge-card');
+  if (cardEl) cardEl.classList.add('unlocked');
+}
+
+// 5. Envío Asíncrono de Flags y Actualización de HUD
 async function submitFlag(dimension, step, event) {
   if (event) event.preventDefault();
   mcAudio.playClick();
@@ -144,17 +185,24 @@ async function submitFlag(dimension, step, event) {
       if (feedbackEl) {
         feedbackEl.innerHTML = `<div class="mc-alert mc-alert-success">✨ ${data.message}</div>`;
       }
+      markItemUnlocked(step);
+
       setTimeout(() => {
         syncInventoryHUD();
-        // Si desbloquea el portal o termina la dimensión
+
+        if (data.all_completed) {
+          mcAudio.playLevelUp();
+          showCelebration('🏆 ¡JUEGO COMPLETADO! Redirigiendo a la pantalla de victoria...');
+          setTimeout(() => { window.location.href = '/victory'; }, 1800);
+          return;
+        }
+
         if (data.dimension_completed) {
           mcAudio.playLevelUp();
-          alert(`🎉 ¡Has completado la dimensión ${dimension.toUpperCase()}! Se ha desbloqueado la siguiente etapa.`);
-          window.location.reload();
-        } else {
-          window.location.reload();
+          showCelebration(`🎉 ¡Has completado la dimensión ${dimension.toUpperCase()}!`);
+          setTimeout(() => window.location.reload(), 1800);
         }
-      }, 1000);
+      }, 900);
     } else {
       if (feedbackEl) {
         feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">❌ ${data.message}</div>`;
@@ -167,14 +215,14 @@ async function submitFlag(dimension, step, event) {
   }
 }
 
-// 4. Sincronización del Inventario HUD en Vivo
+// 6. Sincronización del Inventario HUD en Vivo
 async function syncInventoryHUD() {
   try {
     const res = await fetch('/api/inventory');
     const data = await res.json();
-    
+
     // Actualizar slots de inventario
-    const items = ['iron', 'diamond', 'portal', 'gold', 'blaze', 'pearl', 'crystals', 'dragon', 'egg'];
+    const items = HOTBAR_ORDER;
     let count = 0;
 
     items.forEach((item, index) => {
