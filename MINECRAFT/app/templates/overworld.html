@@ -109,7 +109,7 @@ payload = base64.b64encode(rot13.encode()).decode()
               <strong>[+] Resultados de la consulta:</strong>
               {% if sql_results %}
                 {% for row in sql_results %}
-                  <div>📦 <strong>{{ row.chest_name }}</strong> (Profundidad: Y={{ row.depth_level }}) -> Botín: <span style="color:#55ff55;">{{ row.secret_loot }}</span></div>
+                  <div>📦 <strong>{{ row.chest_name }}</strong>{% if row.is_locked %} 🔒 <span style="color:#f59e0b;">(PROTEGIDO)</span>{% endif %} (Profundidad: Y={{ row.depth_level }}) -> Botín: <span style="color:#55ff55;">{{ row.secret_loot }}</span></div>
                 {% endfor %}
               {% else %}
                 <span style="color:#ef4444;">[!] No se encontraron cofres con ese término.</span>
@@ -130,7 +130,7 @@ payload = base64.b64encode(rot13.encode()).decode()
             </div>
             <div id="source-diamond" class="source-box">
               <strong>Código Vulnerable en Python/Flask:</strong>
-              <pre class="source-code-block">query = f"SELECT * FROM villager_chests WHERE chest_name LIKE '%{user_input}%'"
+              <pre class="source-code-block">query = f"SELECT * FROM villager_chests WHERE is_locked = 0 AND chest_name LIKE '%{user_input}%'"
 cursor.execute(query) # Vulnerable a inyección directa!</pre>
             </div>
           </div>

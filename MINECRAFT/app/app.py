@@ -103,11 +103,7 @@ def api_submit_flag():
     if dimension not in FLAGS or step not in FLAGS[dimension]:
         return jsonify({'success': False, 'message': 'Desafío no válido.'}), 400
 
-    expected_flag = FLAGS[dimension][step]
-    is_valid = (submitted_flag == expected_flag) or (step == 'iron' and submitted_flag in [
-        'FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}',
-        'FLAG{MINCERAT_IRON_INGTT_C3S4R_X0R_M1N3D}'
-    ])
+    is_valid = submitted_flag == FLAGS[dimension][step]
 
     if is_valid:
         inv = get_inventory()
@@ -152,7 +148,8 @@ def overworld_diamond_search():
     cursor = conn.cursor()
     
     # VULNERABILIDAD: Inyección SQL clásica (concatenación directa sin parametrizar)
-    raw_sql = f"SELECT * FROM villager_chests WHERE chest_name LIKE '%{chest_query}%'"
+    # El filtro is_locked oculta el cofre del herrero; hay que romperlo con la inyección.
+    raw_sql = f"SELECT * FROM villager_chests WHERE is_locked = 0 AND chest_name LIKE '%{chest_query}%'"
     try:
         cursor.execute(raw_sql)
         results = cursor.fetchall()
@@ -180,7 +177,8 @@ def nether_view():
     offers = cursor.fetchall()
     conn.close()
 
-    return render_template('nether.html', current_dimension='nether', trade_offers=offers)
+    return render_template('nether.html', current_dimension='nether', trade_offers=offers,
+                           captured_tokens=bot_instance.get_captured_tokens())
 
 @app.route('/nether/gold/submit_offer', methods=['POST'])
 def nether_gold_submit_offer():
@@ -209,16 +207,25 @@ def nether_gold_offers():
     cursor.execute('SELECT * FROM piglin_trade_offers ORDER BY id DESC LIMIT 10')
     offers = cursor.fetchall()
     conn.close()
-    return render_template('nether.html', current_dimension='nether', trade_offers=offers)
+    return render_template('nether.html', current_dimension='nether', trade_offers=offers,
+                           captured_tokens=bot_instance.get_captured_tokens())
 
 @app.route('/nether/gold/leak')
 def nether_gold_leak():
-    # Receptor para robo de cookies en pruebas de XSS
+    # Receptor para robo de cookies en pruebas de XSS.
+    # Solo entrega la flag si el token real del Piglin Guard llega en los datos
+    # exfiltrados: el endpoint no regala la bandera por ser consultado.
     leaked_data = request.args.get('cookie') or request.args.get('c') or request.args.get('data') or ''
+    token_verified = PIGLIN_SECRET_TOKEN in leaked_data
+
+    if token_verified:
+        bot_instance.record_capture(leaked_data)
+
     return jsonify({
         'status': 'captured',
         'received': leaked_data,
-        'flag_if_piglin_token_present': PIGLIN_SECRET_TOKEN if 'piglin' in leaked_data.lower() or not leaked_data else PIGLIN_SECRET_TOKEN
+        'token_verified': token_verified,
+        'flag': PIGLIN_SECRET_TOKEN if token_verified else None
     })
 
 @app.route('/nether/blaze/upload', methods=['POST'])

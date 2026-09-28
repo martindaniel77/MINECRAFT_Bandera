@@ -1,12 +1,22 @@
 import os
-from PIL import Image, ImageDraw, ImageFont
 import base64
+import codecs
+from PIL import Image, ImageDraw, ImageFont
+from PIL.PngImagePlugin import PngInfo
 
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), 'static', 'img')
 DOCS_DIR = os.path.join(os.path.dirname(__file__), 'static', 'docs')
 
 os.makedirs(ASSETS_DIR, exist_ok=True)
 os.makedirs(DOCS_DIR, exist_ok=True)
+
+IRON_FLAG = "FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}"
+PORTAL_FLAG = "FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}"
+
+
+def rot13_base64(flag):
+    return base64.b64encode(codecs.encode(flag, 'rot_13').encode()).decode('utf-8')
+
 
 # 1. Crear Mapa de la Cueva con Esteganografía (Metadatos EXIF / Comentarios)
 def create_stego_map():
@@ -30,25 +40,22 @@ def create_stego_map():
     # Dibujar antorchas (puntos amarillos)
     draw.point((85, 85), fill=(255, 200, 0))
     draw.point((145, 165), fill=(255, 200, 0))
-    
-    # Mensaje secreto cifrado con Cifrado César (ROT13 / Desplazamiento) y Base64
-    # Flag original: FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}
-    # Mensaje en metadatos para que el atacante use exiftool / strings / script python
+
+    # El mensaje secreto se calcula desde la flag canónica: Base64(ROT-13(flag)).
+    # Así el dato cifrado nunca puede desincronizarse del flag real.
     stego_comment = (
         "PIXEL_METADATA_SECTION_STEVE_MINING_LOGS:\n"
         "Coordenadas cifradas con Cifrado Cesar (Rot-13) + Base64:\n"
-        "SECRETO_B64: " + base64.b64encode(b"SYNT{ZVARPENSG_VEBA_VATBG_P3F4E_K0E_Z1A3Q}").decode('utf-8') + "\n"
+        f"SECRETO_B64: {rot13_base64(IRON_FLAG)}\n"
         "Pista: Decodifica Base64 y luego aplica ROT-13 (Cifrado Cesar de 13 posiciones) para obtener la flag de Hierro."
     )
     
     # Guardar imagen con metadatos PngInfo
-    from PIL.PngImagePlugin import PngInfo
     target_info = PngInfo()
     target_info.add_text("Author", "Steve_Miner_Expert")
     target_info.add_text("Description", "Mapa topografico de la cueva en Y=16")
     target_info.add_text("Comment", stego_comment)
-    target_info.add_text("Mining_Secret", "FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}")
-    
+
     img.save(img_path, "PNG", pnginfo=target_info)
     print(f"[+] Mapa con esteganografía generado en: {img_path}")
 
@@ -70,7 +77,7 @@ def create_portal_blueprints():
         "\n"
         "[METADATA_HEADER_INTERNAL]\n"
         "X-Portal-Security-Hash: 8f4a1c9b2e6d5a7f\n"
-        "X-Obsidian-Ignition-Key: FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}\n"
+        f"X-Obsidian-Ignition-Key: {PORTAL_FLAG}\n"
         "X-Target-Dimension: NETHER_DIMENSION_ID_02\n"
         "===============================================================\n"
     )
