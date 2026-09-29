@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Minecraft CTF - DVWA Platform{% endblock %}</title>
+  <title>{% block title %}Minecraft CTF{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}">
 </head>
 <body class="dimension-{{ current_dimension|default('overworld') }}">
@@ -11,8 +11,9 @@
   <!-- Barra de Navegación Superior -->
   <header class="mc-navbar">
     <a href="{{ url_for('index') }}" class="mc-logo">
+      <img src="{{ url_for('static', filename='img/creeper.svg') }}" class="mc-logo-creeper" alt="Creeper">
       <span>⛏️ MINECRAFT CTF</span>
-      <span class="mc-badge" style="background:#22c55e; color:#000;">DVWA LAB</span>
+      <span class="mc-badge mc-badge-lab">LAB SEGURIDAD</span>
     </a>
     <nav class="mc-nav-links">
       <a href="{{ url_for('overworld_view') }}" class="mc-btn mc-btn-green {% if current_dimension == 'overworld' %}active{% endif %}">

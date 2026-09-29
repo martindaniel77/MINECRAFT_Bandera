@@ -51,17 +51,17 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Código DVWA -->
-          <div class="dvwa-tools">
+          <!-- Pistas y Codigo Fuente -->
+          <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('crystals')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
               <button class="mc-btn" onclick="toggleSource('crystals')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
             </div>
             <div id="hint-crystals" class="hint-box">
-              <strong>Pista para Explotación (Kali Linux):</strong><br>
-              1. En la materia de 7º Semestre viste la explotación de backdoors de IRC y ProFTPD con secuencias mágicas.<br>
-              2. El disparador de backdoor en este servicio es enviar la secuencia <code>CVE-2026-OVERLOAD_CRYSTALS</code> o <code>AB;cat /secret/end_crystals.txt</code>.<br>
-              3. También puedes enviar por curl: <code>curl -X POST http://localhost:8080/end/crystals/exploit -d "exploit_payload=CVE-2026-OVERLOAD_CRYSTALS"</code>
+              <strong>Pista — Disparo de una backdoor:</strong><br>
+              1. No estás buscando un fallo de autenticación: estás buscando una <em>puerta atrás</em> que alguien dejó en el servicio. Así funcionaban los incidentes de IRC y ProFTPD que viste en 7º Semestre.<br>
+              2. Estas backdoors casi nunca se aleatorizan: comparan tu entrada contra un token fijo. El proveedor y el año suelen estar escritos en el propio token.<br>
+              3. El mismo campo cumple dos funciones: una es activar el disparador y la otra es entregar tu entrada a una shell. Piensa en un carácter de dos letras que precedía a los comandos en los protocolos antiguos, y en el operador que le sigue.
             </div>
             <div id="source-crystals" class="source-box">
               <strong>Lógica del Servicio Emulado:</strong>
@@ -119,17 +119,17 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Código DVWA -->
-          <div class="dvwa-tools">
+          <!-- Pistas y Codigo Fuente -->
+          <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('dragon')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
               <button class="mc-btn" onclick="toggleSource('dragon')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
             </div>
             <div id="hint-dragon" class="hint-box">
-              <strong>Pista para Command Injection (Kali Linux):</strong><br>
-              1. Concatena comandos con <code>;</code> o <code>&&</code> o <code>|</code>.<br>
-              2. Ejemplo: <code>100; cat /secret/dragon_slain.txt</code> o <code>100 && cat /secret/dragon_slain.txt</code>.<br>
-              3. El servidor ejecutará la orden en la shell de Linux del contenedor.
+              <strong>Pista — Inyección de comandos:</strong><br>
+              1. Tu valor (la potencia del impacto) se coloca dentro de una línea de comando que se ejecuta en una shell. La shell no sabe dónde acaba tu dato: cree que todo lo que sigue es parte de su trabajo.<br>
+              2. La clave es <em>terminar</em> tu comando antes de que lo termine el servidor, para que la shell interprete lo que venga como una orden nueva e independiente.<br>
+              3. Usa la opción de ver el código de esta misma tarjeta: te muestra exactamente cómo se construye la orden.
             </div>
             <div id="source-dragon" class="source-box">
               <strong>Código Vulnerable:</strong>
@@ -189,17 +189,17 @@ output = subprocess.check_output(cmd, shell=True) # Shell=True sin sanitizar!</p
             </div>
           {% endif %}
 
-          <!-- Pistas y Código DVWA -->
-          <div class="dvwa-tools">
+          <!-- Pistas y Codigo Fuente -->
+          <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('egg')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
               <button class="mc-btn" onclick="toggleSource('egg')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
             </div>
             <div id="hint-egg" class="hint-box">
-              <strong>Pista (Kali Linux):</strong><br>
-              1. Si consultas <code>honeypot/fake_egg.txt</code> caerás en la trampa del señuelo.<br>
-              2. Usa Directory Traversal / Path Traversal para leer el archivo del superusuario: <code>../../root/real_dragon_egg.txt</code>.<br>
-              3. URL: <code>http://localhost:8080/end/egg/inspect?altar_file=../../root/real_dragon_egg.txt</code>
+              <strong>Pista — Recorrido de rutas (Path Traversal):</strong><br>
+              1. El lector coge el nombre de fichero que le mandas, lo une a un directorio base y abre lo que salga. Si tú controlas el nombre, tal vez también controlas lo que se une.<br>
+              2. Ojo: hay <em>dos</em> ficheros que parecen el premio. Uno está colocado para que se encuentre demasiado fácil, y ese es un señuelo. ¿Cuál querría un defensor que cogieras?<br>
+              3. Para salir del directorio base necesitas subir directorios en la ruta. La respuesta a la pregunta 2 te dice en cuál estás.
             </div>
             <div id="source-egg" class="source-box">
               <strong>Código del Lector del Altar:</strong>
