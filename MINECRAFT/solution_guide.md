@@ -178,3 +178,64 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ## 🏆 PANTALLA FINAL DE VICTORIA
 Al ingresar las 9 banderas en sus respectivos desafíos, la barra HUD inferior se completará con los 9 ítems, desbloqueando el nivel 90 y redirigiendo automáticamente a `http://localhost:8080/victory` con el **Poema del End** y el resumen de competencias aprobadas.
+
+---
+
+# 📐 Criterio de diseño de las pistas
+
+> Este documento es la **guía del instructor** y sí contiene las soluciones completas.
+> Las pistas que se muestran dentro de la aplicación web son deliberadamente
+> **conceptuales**: describen *qué buscar y por qué*, nunca el payload, el string
+> mágico ni el comando listo para pegar.
+
+Razón pedagógica: un alumno que copia la pista no aprende la vulnerabilidad.
+Una pista útil le dice en qué dirección pensar y le deja el trabajo de recordar
+la sintaxis y construir el payload él mismo.
+
+| Antes (pista = respuesta) | Ahora (pista = concepto) |
+|---|---|
+| `' OR 1=1 --` listo para pegar | *"Hay dos condiciones unidas por un operador. Haz que la primera siempre sea cierta y comenta el resto"* |
+| `<script>fetch('/nether/gold/leak?cookie='+document.cookie)</script>` | *"La nota se renderiza como HTML. El bot ya expone un endpoint receptor en el propio servidor"* |
+| `CVE-2026-OVERLOAD_CRYSTALS` | *"El proveedor y el año suelen estar escritos en el propio token de la backdoor"* |
+| `../../root/real_dragon_egg.txt` | *"Hay dos ficheros que parecen el premio; uno es un señuelo colocado para que lo encuentres demasiado fácil"* |
+| `tr 'A-Za-z' 'N-ZA-Mn-za-m'` | *"Un cifrado por sustitución que lleva el nombre de un emperador romano"* |
+
+Los botones **🔍 Ver Código** se mantienen: la divulgación del código fuente vulnerable
+es en sí misma una vulnerabilidad real (information disclosure) y forma parte del
+reconocimiento que el alumno debe practicar.
+
+---
+
+# 🗳️ Decisiones pendientes de reunión
+
+Estas ideas se descartaron temporalmente y **están pendientes de decisión del equipo**; no se han implementado.
+
+### 1. Corazones al fallar una bandera
+Los corazones del HUD son hoy decorativos (`base.html`, `range(10)` fijo).
+- **A favor:** les daría significado real y añadiría tensión.
+- **En contra:** penaliza el error, que es justamente el comportamiento que un CTF
+  de seguridad debe premiar (probar → fallar → entender → reintentar). Tendería a
+  atraer al alumno a adivinar en lote o a rendirse y pedir la solución.
+- **Alternativa propuesta:** que los corazones sean un contador de *intentos* no
+  consumibles, o que el nivel de XP baje como marca visible al consultar una pista.
+
+### 2. Coste de consultar una pista
+Hoy el XP es decorativo: `NIVEL = banderas × 10`. No es un pool gastable.
+Para que "una pista cuesta 10 XP" tenga efecto haría falta un saldo real que
+descienda, o registrar el uso de pistas en la nota final del alumno.
+
+### 3. Formato de las banderas
+Las 9 banderas usan el envoltorio `FLAG{...}`, idéntico en todas.
+- **A favor de quitarlo:** se pierde la señal de "esto es una bandera" al hacer grep.
+- **En contra:** el envoltorio es la **garantía de resolubilidad**. Sin un patrón
+  reconocible, cuando el alumno deshaga el Base64+ROT13 y obtenga
+  `ZVARPENG_VEBA_VABG...` no tiene forma de saber si lo encontró o si le falta un
+  trozo. En un entorno académico eso se traduce en tiempo perdido o en la
+  conclusión de que el CTF está roto.
+- **Alternativa propuesta:** mantener el valor interno `FLAG{...}` para la validación
+  pero cambiar la envoltura **visual** en pantalla. Se pierde la señal del grep sin
+  arriesgar la resolubilidad.
+
+> Nota: tras la corrección de P3.2 el PNG **ya no contiene la bandera en texto plano**,
+> así que `strings` no la delata. El prefijo solo confirma que el alumno acertó, que es
+> precisamente el trabajo que debe hacer él.

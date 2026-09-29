@@ -73,17 +73,18 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Código DVWA -->
-          <div class="dvwa-tools">
+          <!-- Pistas y Codigo Fuente -->
+          <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('gold')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
               <button class="mc-btn" onclick="toggleSource('gold')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
             </div>
             <div id="hint-gold" class="hint-box">
-              <strong>Pista para XSS (Kali Linux):</strong><br>
-              1. Inyecta: <code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code> en la nota.<br>
-              2. O roba la cookie del Piglin enviándola al endpoint de fuga: <code>&lt;script&gt;fetch('/nether/gold/leak?cookie='+document.cookie)&lt;/script&gt;</code>.<br>
-              3. También puedes revisar la cookie de sesión local con las herramientas de desarrollador de Kali (F12 -> Storage -> Cookies).
+              <strong>Pista — XSS almacenado y robo de sesión:</strong><br>
+              1. Fíjate en que la nota se pinta en el tablón de ofertas. Pregúntate si el navegador la trata como texto plano o si está interpretando etiquetas. Si el servidor la inserta sin escapar, tú decides qué se renderiza.<br>
+              2. El premio no es la oferta: es la sesión del Piglin Guard. Repsa qué información maneja el <em>lado del cliente</em> de una web y a qué no llega una petición normal hecha por otra persona.<br>
+              3. En el propio servidor ya existe un endpoint pensado para recibir datos enviados por el navegador. Búscalo entre las rutas de la aplicación: no hace falta inventarlo.<br>
+              4. F12 → Almacenamiento te deja ver las cookies de tu propia sesión; las del bot no están ahí, por eso necesitas otro canal.
             </div>
             <div id="source-gold" class="source-box">
               <strong>Código Vulnerable en la plantilla:</strong>
@@ -152,17 +153,17 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Código DVWA -->
-          <div class="dvwa-tools">
+          <!-- Pistas y Codigo Fuente -->
+          <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('blaze')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
               <button class="mc-btn" onclick="toggleSource('blaze')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
             </div>
             <div id="hint-blaze" class="hint-box">
-              <strong>Pista para File Upload (Kali Linux):</strong><br>
-              1. Crea un script en Python (<code>exploit.py</code>) con:
-              <code>import os; print(open('/secret/blaze_rod.txt').read())</code><br>
-              2. Súbelo mediante el formulario y haz clic en "Ejecutar receta" para obtener la flag.
+              <strong>Pista — Subida de archivo sin restricción:</strong><br>
+              1. El servidor guarda el archivo con el nombre y el tipo que tú indiques, y además ofrece una forma de ejecutarlo. No hace ninguna comprobación de la extensión.<br>
+              2. Pregúntate qué hace un intérprete de Python con un fichero que nadie ha revisado. No necesitas más que un archivo de texto con unas pocas líneas.<br>
+              3. El objetivo <em>no está</em> en la carpeta de subidas. Piensa en un directorio del sistema que el proceso web pueda leer, y en cómo referenciar una ruta absoluta desde Python.
             </div>
             <div id="source-blaze" class="source-box">
               <strong>Código Vulnerable en backend:</strong>
@@ -220,16 +221,17 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Código DVWA -->
-          <div class="dvwa-tools">
+          <!-- Pistas y Codigo Fuente -->
+          <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('pearl')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
               <button class="mc-btn" onclick="toggleSource('pearl')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
             </div>
             <div id="hint-pearl" class="hint-box">
-              <strong>Pista (Kali Linux):</strong><br>
-              1. En la URL o en Burp Suite cambia el parámetro <code>user_role=guest_traveler</code> a <code>user_role=ender_master</code> o <code>user_role=bastion_overlord</code>.<br>
-              2. Consulta: <code>curl "http://localhost:8080/nether/pearl/altar?user_role=ender_master"</code>
+              <strong>Pista — Control de acceso defectuoso:</strong><br>
+              1. El altar no comprueba quién eres: comprueba un dato que <em>tú</em> le envías en cada petición. Eso es un Decide by Client, y el cliente siempre puede mentir.<br>
+              2. Observa qué rango tiene tu sesión ahora mismo y compáralo con los rangos que la propia aplicación menciona en su interfaz.<br>
+              3. Edita la petición con el Burp Suite de Kali, en la pestaña de Proxy, en lugar de usar la barra de direcciones: así practicas el mismo método que en un pentest real.
             </div>
             <div id="source-pearl" class="source-box">
               <strong>Código Vulnerable:</strong>

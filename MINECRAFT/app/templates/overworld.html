@@ -41,16 +41,17 @@
             </a>
           </div>
 
-          <!-- Pistas y Código DVWA -->
-          <div class="dvwa-tools">
+          <!-- Pistas y Codigo Fuente -->
+          <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('iron')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
               <button class="mc-btn" onclick="toggleSource('iron')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
             </div>
             <div id="hint-iron" class="hint-box">
-              <strong>Pista (Kali Linux):</strong><br>
-              Usa <code>exiftool mapa_cueva.png</code> o <code>strings mapa_cueva.png | grep -i SECRETO</code>.<br>
-              Decodifica la cadena con <code>echo '...' | base64 -d</code> y luego pásala por <code>tr 'A-Za-z' 'N-ZA-Mn-za-m'</code> (Cifrado César de 13 posiciones).
+              <strong>Pista — Esteganografía en metadatos:</strong><br>
+              1. El secreto <em>no está en los píxeles</em>: no modifiques la imagen, no la amplíes y no busques colores raros. Piensa en qué más viaja dentro de un PNG que el ojo no ve.<br>
+              2. El formato admite campos de texto libres que cualquier herramienta de análisis forense puede volcar. Kali puede enumerarlos por ti.<br>
+              3. Lo que encuentres no es aleatorio: es una capa de transporte (Base64) que envuelve un cifrado por sustitución clásico. Ese cifrado lleva el nombre de un emperador romano. Averigua cuánto desplaza y aplica el mismo desplazamiento en sentido inverso.
             </div>
             <div id="source-iron" class="source-box">
               <strong>Código Python de cifrado del reto:</strong>
@@ -117,16 +118,18 @@ payload = base64.b64encode(rot13.encode()).decode()
             </div>
           {% endif %}
 
-          <!-- Pistas y Código DVWA -->
-          <div class="dvwa-tools">
+          <!-- Pistas y Codigo Fuente -->
+          <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('diamond')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
               <button class="mc-btn" onclick="toggleSource('diamond')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
             </div>
             <div id="hint-diamond" class="hint-box">
-              <strong>Pistas para SQLi (Kali Linux):</strong><br>
-              1. Prueba con <code>' OR 1=1 --</code> para volcar todos los cofres de la aldea.<br>
-              2. O usa <code>sqlmap -u "http://localhost:8080/overworld/diamond/search" --data="chest_query=test" --dump</code>.
+              <strong>Pista — Inyección SQL:</strong><br>
+              1. Lo que escribas no se trata como texto: se concatena dentro de la cláusula <code>WHERE</code>. Escribe siempre entre comillas simples y observa cómo cambia el error.<br>
+              2. La consulta tiene <em>dos</em> condiciones unidas por un operador lógico. Necesitas dos cosas: que la primera deje de restringir resultados (una condición que siempre es cierta) y que la segunda deje de leerse.<br>
+              3. Para ignorar el resto de la línea existe un comentario de SQL de dos guiones. Colócalo al final de tu entrada.<br>
+              4. Alternativa: <code>sqlmap</code> puede localizar la inyección por ti si le indicas la URL y el parámetro.
             </div>
             <div id="source-diamond" class="source-box">
               <strong>Código Vulnerable en Python/Flask:</strong>
@@ -174,15 +177,17 @@ cursor.execute(query) # Vulnerable a inyección directa!</pre>
             </a>
           </div>
 
-          <!-- Pistas y Código DVWA -->
-          <div class="dvwa-tools">
+          <!-- Pistas y Codigo Fuente -->
+          <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('portal')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
               <button class="mc-btn" onclick="toggleSource('portal')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
             </div>
             <div id="hint-portal" class="hint-box">
-              <strong>Pista (Kali Linux):</strong><br>
-              Abre el documento de planos o inspecciona los encabezados HTTP con <code>curl -I http://localhost:8080/static/docs/planos_portal_nether.txt</code> o busca dentro del texto la clave <code>X-Obsidian-Ignition-Key</code>.
+              <strong>Pista — Datos escondidos en un documento:</strong><br>
+              1. El reto no es criptografía: es el hábito de guardar información en sitios que las herramientas leen y los humanos se saltan.<br>
+              2. Lee el documento <em>entero</em>, incluidas las partes que parecen relleno administrativo.<br>
+              3. Si lo descargas con <code>curl</code>, recuerda que puedes pedir ver solo las cabeceras de la respuesta en lugar del cuerpo. Los metadatos también viajan ahí.
             </div>
             <div id="source-portal" class="source-box">
               <strong>Estructura de Metadatos:</strong>

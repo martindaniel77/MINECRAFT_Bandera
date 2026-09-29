@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
   syncInventoryHUD();
 });
 
-// 2. Control de Pistas y Código Fuente (Estilo DVWA)
+// 2. Control de Pistas y Codigo Fuente (acordeon)
 function toggleHint(challengeId) {
   mcAudio.playClick();
   const hintEl = document.getElementById(`hint-${challengeId}`);
