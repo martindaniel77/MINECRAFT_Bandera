@@ -11,8 +11,8 @@
   <!-- Barra de Navegación Superior -->
   <header class="mc-navbar">
     <a href="{{ url_for('index') }}" class="mc-logo">
-      {% if logo_src %}<img src="{{ url_for('static', filename=logo_src) }}" class="mc-logo-creeper" alt="Creeper">{% endif %}
       <span>⛏️ MINECRAFT CTF</span>
+      {% if logo_src %}<img src="{{ url_for('static', filename=logo_src) }}" class="mc-logo-creeper" alt="Creeper">{% endif %}
     </a>
     <nav class="mc-nav-links">
       <a href="{{ url_for('overworld_view') }}" class="mc-btn mc-btn-green {% if current_dimension == 'overworld' %}active{% endif %}">
