@@ -17,6 +17,18 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
 
+@app.context_processor
+def inject_brand_logo():
+    """
+    Logo de la cabecera: app/static/img/logo_creeper.<ext>.
+    El asset va versionado en el repo, asi que normalmente siempre existe; si
+    faltara, se omite la imagen en vez de dejar un <img> roto.
+    """
+    for ext in ('png', 'webp', 'jpg', 'jpeg', 'svg', 'gif'):
+        if os.path.exists(os.path.join(app.static_folder, 'img', f'logo_creeper.{ext}')):
+            return {'logo_src': f'img/logo_creeper.{ext}'}
+    return {'logo_src': None}
+
 # ------------------------------------------------------------------------------
 # DICCIONARIO OFICIAL DE BANDERAS DEL CTF
 # ------------------------------------------------------------------------------
