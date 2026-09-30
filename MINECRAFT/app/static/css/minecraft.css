@@ -169,28 +169,20 @@ body.dimension-the_end {
   text-transform: uppercase;
 }
 
-/* Badge del laboratorio: verde creeper en vez del verde plano */
-.mc-badge-lab {
-  background: linear-gradient(180deg, #6fbf3f 0%, #4f9a2a 100%);
-  color: #06210a;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.25);
-}
-
 /* Cabeza de creeper junto al logo de la barra superior */
 .mc-logo-creeper {
   width: 32px;
   height: 32px;
-  image-rendering: pixelated;
+  /* Suavizado: el logo propio es una imagen raster de alta resolucion y
+     con "pixelated" el reescalado a 32px producia aliasing duro. */
+  image-rendering: auto;
   filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.85));
   flex-shrink: 0;
+  transition: transform 0.15s ease;
 }
 
 .mc-logo:hover .mc-logo-creeper {
   transform: scale(1.12);
-}
-
-.mc-logo-creeper {
-  transition: transform 0.15s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -145,12 +145,6 @@ def create_svg_icons():
             <path fill="#4a044e" d="M12 8h4v2h-4zM8 12h4v2H8zM20 16h4v4h-4zM10 20h4v2h-4z"/>
             <path fill="#c026d3" d="M14 10h2v2h-2zM10 14h2v2h-2zM22 18h2v2h-2z"/>
         </svg>''',
-        'creeper.svg': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="48" height="48" shape-rendering="crispEdges">
-            <path fill="#4f9a2a" d="M1 1h14v2H1zM1 13h14v2H1zM1 1h2v14H1zM13 1h2v14h-2z"/>
-            <path fill="#6fbf3f" d="M1 1h14v1H1zM1 1h1v14H1z"/>
-            <path fill="#3d7a20" d="M1 14h14v1H1zM14 1h1v14h-1z"/>
-            <path fill="#0d1a08" d="M3 3h2v1h-2zM11 3h2v1h-2zM3 4h2v1h-2zM11 4h2v1h-2zM3 5h2v1h-2zM11 5h2v1h-2zM3 6h2v1h-2zM11 6h2v1h-2zM6 8h4v1h-4zM6 9h4v1h-4zM2 10h13v1h-13zM2 11h13v1h-13zM6 12h4v1h-4zM6 13h4v1h-4z"/>
-        </svg>''',
         'heart.svg': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="24" height="24" shape-rendering="crispEdges">
             <path fill="#000" d="M2 1h4v1h4V1h4v1h1v4h-1v2h-1v2h-2v2h-2v2H7v-2H5v-2H3V8H2V6H1V2h1z"/>
             <path fill="#e11d48" d="M2 2h3v1h1v2H2zM10 2h3v1h1v3h-1v1h-1v2h-2v2H7v-2H5V9H4V6h1V5h1V3h4z"/>
