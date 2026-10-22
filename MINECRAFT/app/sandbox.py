@@ -16,7 +16,6 @@ MAX_CONCURRENT_EXECUTIONS = 1
 
 CPU_SECONDS = 2
 FILE_SIZE_BYTES = 1024 * 1024
-PROCESS_COUNT = 64
 OPEN_FILES = 32
 
 _execution_slots = threading.BoundedSemaphore(MAX_CONCURRENT_EXECUTIONS)
@@ -27,7 +26,6 @@ def _limit_child():
         return None
     resource.setrlimit(resource.RLIMIT_CPU, (CPU_SECONDS, CPU_SECONDS))
     resource.setrlimit(resource.RLIMIT_FSIZE, (FILE_SIZE_BYTES, FILE_SIZE_BYTES))
-    resource.setrlimit(resource.RLIMIT_NPROC, (PROCESS_COUNT, PROCESS_COUNT))
     resource.setrlimit(resource.RLIMIT_NOFILE, (OPEN_FILES, OPEN_FILES))
     return None
 
