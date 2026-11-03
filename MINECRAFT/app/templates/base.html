@@ -23,7 +23,7 @@
           🔴 Nether
         </a>
       {% else %}
-        <button class="mc-btn mc-btn-disabled" title="Debes completar el Overworld para desbloquear el Nether">
+        <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '¡Debes completar el Overworld y encender el portal!')" title="Debes completar el Overworld para desbloquear el Nether">
           🔒 Nether
         </button>
       {% endif %}
@@ -33,7 +33,7 @@
           🟣 The End
         </a>
       {% else %}
-        <button class="mc-btn mc-btn-disabled" title="Debes craftear el Ojo de Ender en el Nether">
+        <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '¡Debes forjar el Ojo de Ender en el Nether!')" title="Debes craftear el Ojo de Ender en el Nether">
           🔒 The End
         </button>
       {% endif %}
@@ -57,19 +57,28 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- HUD INVENTARIO MINECRAFT FIJO AL PIE DE PÁGINA (9 SLOTS) -->
+  <!-- HUD INVENTARIO MINECRAFT FIJO AL PIE DE PÁGINA (9 SLOTS CON BARRA DE XP) -->
   <footer class="mc-hud-bottom">
     <div class="mc-stats-bar">
       <!-- Corazones de vida de Steve -->
-      <div class="mc-hearts">
+      <div class="mc-hearts" title="Vida de Steve">
         {% for i in range(10) %}
           <img src="{{ url_for('static', filename='img/heart.svg') }}" class="mc-heart" alt="heart">
         {% endfor %}
       </div>
-      <!-- Nivel de Experiencia -->
-      <div class="mc-level-badge" id="mc-xp-level">
-        NIVEL {{ (session.get('inventory', [])|length) * 10 }}
+      <!-- Badge de Nivel / Saldo de Experiencia -->
+      <div class="mc-level-badge" id="mc-xp-level" title="Experiencia actual. Ganas +50 XP por cada bandera correcta y gastas 20 XP al solicitar pistas.">
+        XP {{ session.get('xp', 30) }}
       </div>
+    </div>
+
+    <!-- Barra de Experiencia Minecraft Oficial (Animada y Consumible) -->
+    <div class="mc-xp-bar-wrapper" title="Barra de XP: Consigue banderas para recargarla y úsala para desbloquear pistas">
+      <div class="mc-xp-bar-track">
+        <div class="mc-xp-bar-progress" id="mc-xp-bar-progress" style="width: {{ [100, (session.get('xp', 30) % 100)]|max(5) }}%;"></div>
+        <div class="mc-xp-bar-segments"></div>
+      </div>
+      <span class="mc-xp-number" id="mc-xp-number">{{ session.get('xp', 30) }}</span>
     </div>
 
     <!-- Hotbar de 9 ranuras -->

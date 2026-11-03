@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sqlite3
 import base64
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, send_from_directory
@@ -67,6 +67,20 @@ def get_inventory():
         session['inventory'] = []
     return session['inventory']
 
+XP_PER_FLAG = 50
+HINT_COST = 20
+INITIAL_XP = 30
+
+def get_xp():
+    if 'xp' not in session:
+        session['xp'] = INITIAL_XP
+    return session['xp']
+
+def get_unlocked_hints():
+    if 'unlocked_hints' not in session:
+        session['unlocked_hints'] = []
+    return session['unlocked_hints']
+
 @app.errorhandler(413)
 def upload_too_large(error):
     flash("El archivo supera el limite permitido de 2 MB para las recetas del caldero.", "error")
@@ -89,12 +103,15 @@ def index():
                            current_dimension='overworld',
                            overworld_count=overworld_count,
                            nether_count=nether_count,
-                           end_count=end_count)
+                           end_count=end_count,
+                           xp=get_xp())
 
 @app.route('/reset')
 def reset_session():
     session.clear()
     session['inventory'] = []
+    session['xp'] = INITIAL_XP
+    session['unlocked_hints'] = []
     flash("Juego y progreso reiniciados correctamente.", "info")
     return redirect(url_for('index'))
 
@@ -102,7 +119,50 @@ def reset_session():
 def api_inventory():
     return jsonify({
         'inventory': get_inventory(),
-        'count': len(get_inventory())
+        'count': len(get_inventory()),
+        'xp': get_xp(),
+        'unlocked_hints': get_unlocked_hints(),
+        'hint_cost': HINT_COST
+    })
+
+@app.route('/api/unlock_hint', methods=['POST'])
+def api_unlock_hint():
+    data = request.get_json() or {}
+    challenge = (data.get('challenge') or '').strip()
+    if not challenge:
+        return jsonify({'success': False, 'message': 'Desafío no especificado.'}), 400
+
+    hints = get_unlocked_hints()
+    current_xp = get_xp()
+
+    if challenge in hints:
+        return jsonify({
+            'success': True,
+            'already_unlocked': True,
+            'xp': current_xp,
+            'message': 'Esta pista ya ha sido desbloqueada.'
+        })
+
+    if current_xp < HINT_COST:
+        return jsonify({
+            'success': False,
+            'xp': current_xp,
+            'message': f'XP insuficiente. Necesitas {HINT_COST} XP para desbloquear esta pista (tienes {current_xp} XP). ¡Consigue banderas para ganar XP!'
+        }), 400
+
+    new_xp = current_xp - HINT_COST
+    session['xp'] = new_xp
+    if challenge not in hints:
+        hints.append(challenge)
+    session['unlocked_hints'] = hints
+    session.modified = True
+
+    return jsonify({
+        'success': True,
+        'already_unlocked': False,
+        'xp': new_xp,
+        'cost': HINT_COST,
+        'message': f'¡Pista desbloqueada! Se consumieron {HINT_COST} XP.'
     })
 
 @app.route('/api/submit_flag', methods=['POST'])
@@ -119,9 +179,12 @@ def api_submit_flag():
 
     if is_valid:
         inv = get_inventory()
+        earned_xp = 0
         if step not in inv:
             inv.append(step)
             session['inventory'] = inv
+            session['xp'] = get_xp() + XP_PER_FLAG
+            earned_xp = XP_PER_FLAG
             session.modified = True
 
         # Verificar si completó la dimensión
@@ -132,20 +195,23 @@ def api_submit_flag():
         if len(inv) == 9:
             return jsonify({
                 'success': True,
-                'message': f'¡BANDERA CORRECTA! Has desbloqueado: {ITEM_NAMES.get(step, step)}. ¡JUEGO COMPLETADO!',
+                'message': f'¡BANDERA CORRECTA! Has desbloqueado: {ITEM_NAMES.get(step, step)}. (+{earned_xp} XP) ¡JUEGO COMPLETADO!',
                 'dimension_completed': True,
-                'all_completed': True
+                'all_completed': True,
+                'xp': get_xp(),
+                'earned_xp': earned_xp
             })
 
         return jsonify({
             'success': True,
-            'message': f'¡BANDERA CORRECTA! Has desbloqueado: {ITEM_NAMES.get(step, step)}',
+            'message': f'¡BANDERA CORRECTA! Has desbloqueado: {ITEM_NAMES.get(step, step)} (+{earned_xp} XP)',
             'dimension_completed': dimension_completed,
-            'all_completed': False
+            'all_completed': False,
+            'xp': get_xp(),
+            'earned_xp': earned_xp
         })
     else:
         return jsonify({'success': False, 'message': 'Bandera incorrecta. Inténtalo de nuevo.'}), 400
-
 # ------------------------------------------------------------------------------
 # DIMENSIÓN 1: OVERWORLD (FÁCIL)
 # ------------------------------------------------------------------------------

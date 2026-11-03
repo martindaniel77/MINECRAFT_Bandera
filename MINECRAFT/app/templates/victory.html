@@ -1,20 +1,20 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}¡Victoria! - Minecraft CTF{% endblock %}
 
 {% block content %}
 <div class="mc-box victory-hero">
-  <div style="font-size: 3rem; margin-bottom: 10px;">🏆 🐉 🥚</div>
-  <h1 class="mc-title" style="color: #facc15; justify-content: center; font-size: 2.2rem;">
+  <div class="victory-trophy-cluster">🏆 🐉 🥚</div>
+  <h1 class="victory-title-epic">
     ¡HAS LIBERADO EL END!
   </h1>
-  <p style="color: #4ade80; font-size: 1.1rem; font-weight: bold; margin-bottom: 20px;">
+  <p style="color: #4ade80; font-size: 1.15rem; font-weight: bold; margin-bottom: 20px; text-shadow: 1px 1px 0 #000, 0 0 10px rgba(74, 222, 128, 0.4);">
     ¡Felicitaciones, Hacker de Minecraft! Has completado con éxito los 9 desafíos del CTF.
   </p>
 
   <!-- Caja del Poema del End -->
   <div class="end-poem-box">
-    <p style="color: #a855f7; font-weight: bold; margin-bottom: 12px;">[ TELEMETRÍA DEL UNIVERSO: EL POEMA DEL END ]</p>
+    <p style="color: #c084fc; font-weight: bold; margin-bottom: 14px; font-size: 1rem; letter-spacing: 1px;">[ TELEMETRÍA DEL UNIVERSO: EL POEMA DEL END ]</p>
     <p>
       <em>"Veo al jugador de quien hablas...</em><br>
       <em>Superó la cueva del Overworld dominando la esteganografía y el cifrado César.</em><br>
@@ -25,7 +25,7 @@
     </p>
   </div>
 
-  <div style="display: flex; justify-content: center; gap: 16px; margin-top: 24px;">
+  <div style="display: flex; justify-content: center; gap: 16px; margin-top: 28px;">
     <a href="{{ url_for('index') }}" class="mc-btn mc-btn-green" style="padding: 12px 24px; font-size: 1rem;">
       🏠 Volver al Inicio
     </a>

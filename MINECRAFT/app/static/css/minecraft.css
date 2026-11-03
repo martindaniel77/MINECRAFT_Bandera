@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MINECRAFT CTF - STYLESHEET
+   MINECRAFT CTF - STYLESHEET (ENHANCED & GAMIFIED)
    ========================================================================== */
 
 :root {
@@ -16,6 +16,8 @@
   --mc-dark-red: #aa0000;
   --mc-purple: #aa00aa;
   --mc-cyan: #55ffff;
+  --mc-xp-green: #80ff20;
+  --mc-xp-shadow: #143d00;
   --mc-font: 'Minecraftia', 'Courier New', 'Lucida Console', monospace;
 }
 
@@ -33,46 +35,167 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 145px; /* Espacio para el HUD con barra de XP */
   background-image: radial-gradient(#222 15%, transparent 16%), radial-gradient(#1a1a1a 15%, transparent 16%);
   background-size: 32px 32px;
   background-position: 0 0, 16px 16px;
-  padding-bottom: 120px; /* Space for HUD hotbar */
 }
 
-/* Dimension Themes */
+/* ==========================================================================
+   1 & 2. GRADIENTES ANIMADOS Y PARTÍCULAS AMBIENTALES CSS PURO
+   ========================================================================== */
+
+/* OVERWORLD: Bosque verde profundo con esporas que flotan suavemente */
 body.dimension-overworld {
-  background-color: #1a2e1a;
-  background-image: linear-gradient(rgba(10, 25, 10, 0.9), rgba(10, 25, 10, 0.9));
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: linear-gradient(135deg, #0e2010, #18331a, #0b1c0e, #142e17);
+  background-size: 300% 300%;
+  animation: dimension-breathe 20s ease infinite alternate;
 }
 
+body.dimension-overworld::before,
+body.dimension-overworld::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+body.dimension-overworld::before {
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #81c784, transparent),
+    radial-gradient(3px 3px at 80px 140px, #55ff55, transparent),
+    radial-gradient(2px 2px at 150px 70px, #a5d6a7, transparent),
+    radial-gradient(3px 3px at 220px 210px, #66bb6a, transparent),
+    radial-gradient(2px 2px at 310px 120px, #81c784, transparent),
+    radial-gradient(2px 2px at 400px 280px, #4caf50, transparent);
+  background-size: 450px 450px;
+  animation: overworld-particles-fall 16s linear infinite;
+  opacity: 0.45;
+}
+
+body.dimension-overworld::after {
+  background-image: 
+    radial-gradient(2px 2px at 50px 100px, #c8e6c9, transparent),
+    radial-gradient(2px 2px at 180px 240px, #81c784, transparent),
+    radial-gradient(3px 3px at 340px 60px, #69f0ae, transparent);
+  background-size: 380px 380px;
+  animation: overworld-particles-fall 22s linear infinite reverse;
+  opacity: 0.35;
+}
+
+/* NETHER: Fuego, brasas y cenizas ardientes subiendo del inframundo */
 body.dimension-nether {
-  background-color: #2e0d0d;
-  background-image: linear-gradient(rgba(35, 8, 8, 0.92), rgba(20, 5, 5, 0.95));
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: linear-gradient(135deg, #240707, #3b0d0d, #1c0505, #2b0808);
+  background-size: 300% 300%;
+  animation: dimension-breathe 16s ease infinite alternate;
 }
 
+body.dimension-nether::before,
+body.dimension-nether::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+body.dimension-nether::before {
+  background-image: 
+    radial-gradient(2px 2px at 40px 150px, #ffaa00, transparent),
+    radial-gradient(3px 3px at 110px 60px, #ff5555, transparent),
+    radial-gradient(2px 2px at 230px 190px, #f97316, transparent),
+    radial-gradient(3px 3px at 300px 20px, #ef4444, transparent),
+    radial-gradient(2px 2px at 390px 140px, #fbbf24, transparent);
+  background-size: 420px 420px;
+  animation: nether-embers-rise 11s linear infinite;
+  opacity: 0.55;
+}
+
+body.dimension-nether::after {
+  background-image: 
+    radial-gradient(3px 3px at 70px 220px, #ff4500, transparent),
+    radial-gradient(2px 2px at 190px 40px, #ffa07a, transparent),
+    radial-gradient(2px 2px at 330px 200px, #ff6347, transparent);
+  background-size: 350px 350px;
+  animation: nether-embers-rise 15s linear infinite reverse;
+  opacity: 0.4;
+}
+
+/* THE END: Niebla púrpura del vacío cósmico con partículas de ender */
 body.dimension-the_end {
-  background-color: #12091f;
-  background-image: linear-gradient(rgba(18, 9, 31, 0.93), rgba(8, 4, 15, 0.97));
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: linear-gradient(135deg, #11061c, #1f0b33, #0a0312, #180826);
+  background-size: 300% 300%;
+  animation: dimension-breathe 22s ease infinite alternate;
 }
 
-/* Header & Navbar */
+body.dimension-the_end::before,
+body.dimension-the_end::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+body.dimension-the_end::before {
+  background-image: 
+    radial-gradient(2px 2px at 30px 80px, #c084fc, transparent),
+    radial-gradient(3px 3px at 120px 220px, #e879f9, transparent),
+    radial-gradient(2px 2px at 250px 50px, #a855f7, transparent),
+    radial-gradient(3px 3px at 340px 170px, #d946ef, transparent);
+  background-size: 400px 400px;
+  animation: the-end-particles 14s ease-in-out infinite alternate;
+  opacity: 0.5;
+}
+
+body.dimension-the_end::after {
+  background-image: 
+    radial-gradient(2px 2px at 80px 140px, #f0abfc, transparent),
+    radial-gradient(2px 2px at 200px 260px, #9333ea, transparent),
+    radial-gradient(3px 3px at 310px 70px, #c084fc, transparent);
+  background-size: 320px 320px;
+  animation: the-end-particles 18s ease-in-out infinite alternate-reverse;
+  opacity: 0.35;
+}
+
+@keyframes dimension-breathe {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes overworld-particles-fall {
+  0% { transform: translateY(-450px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes nether-embers-rise {
+  0% { transform: translateY(420px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes the-end-particles {
+  0% { transform: translateY(0) scale(0.9); }
+  50% { transform: translateY(-25px) scale(1.1); }
+  100% { transform: translateY(15px) scale(0.95); }
+}
+
+/* ==========================================================================
+   5. HEADER & NAVBAR (GLASSMORPHISM & ESTILO PULIDO)
+   ========================================================================== */
 .mc-navbar {
-  background-color: #2b2b2b;
-  border-bottom: 4px solid #111111;
-  padding: 12px 24px;
+  background-color: rgba(36, 36, 36, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 3px solid #141414;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  padding: 12px 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -86,112 +209,186 @@ body.dimension-the_end {
   color: #ffffff;
   font-size: 1.25rem;
   font-weight: bold;
-  text-shadow: 2px 2px 0 #000;
+  text-shadow: 2px 2px 0 #000, 0 0 12px rgba(255, 255, 255, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.mc-logo:hover {
+  transform: scale(1.02);
+}
+
+.mc-logo-creeper {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.85));
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mc-logo:hover .mc-logo-creeper {
+  transform: rotate(-10deg) scale(1.2);
 }
 
 .mc-nav-links {
   display: flex;
+  align-items: center;
   gap: 12px;
 }
 
+/* ==========================================================================
+   6. BOTONES CON TRANSICIONES DINÁMICAS Y SHAKE
+   ========================================================================== */
 .mc-btn {
   font-family: var(--mc-font);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: #4a4a4a;
+  background: #444444;
   color: #ffffff;
   text-decoration: none;
   padding: 8px 16px;
   font-size: 0.9rem;
   font-weight: bold;
   cursor: pointer;
-  border-top: 2px solid #888888;
-  border-left: 2px solid #888888;
-  border-right: 2px solid #111111;
-  border-bottom: 2px solid #111111;
-  box-shadow: inset 1px 1px 0 #ffffff22;
+  border-top: 2px solid #777777;
+  border-left: 2px solid #777777;
+  border-right: 2px solid #161616;
+  border-bottom: 2px solid #161616;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.18), 0 2px 5px rgba(0, 0, 0, 0.4);
   text-shadow: 1px 1px 0 #000000;
-  transition: filter 0.1s, transform 0.05s;
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1), filter 0.15s ease, box-shadow 0.15s ease;
 }
 
-.mc-btn:hover {
+.mc-btn:hover:not(.mc-btn-disabled) {
+  transform: translateY(-2px) scale(1.02);
   filter: brightness(1.2);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3), 0 5px 12px rgba(0, 0, 0, 0.6);
 }
 
-.mc-btn:active {
-  border-top: 2px solid #111111;
-  border-left: 2px solid #111111;
-  border-right: 2px solid #888888;
-  border-bottom: 2px solid #888888;
-  transform: translate(1px, 1px);
+.mc-btn:active:not(.mc-btn-disabled) {
+  border-top: 2px solid #161616;
+  border-left: 2px solid #161616;
+  border-right: 2px solid #777777;
+  border-bottom: 2px solid #777777;
+  transform: translateY(1px) scale(0.99);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.mc-btn-green { background: #2e7d32; border-color: #4caf50 #4caf50 #1b5e20 #1b5e20; }
-.mc-btn-red { background: #c62828; border-color: #ef5350 #ef5350 #8e0000 #8e0000; }
-.mc-btn-purple { background: #6a1b9a; border-color: #ab47bc #ab47bc #38006b #38006b; }
-.mc-btn-gold { background: #f57f17; border-color: #ffca28 #ffca28 #b26a00 #b26a00; color: #000; text-shadow: none; }
-.mc-btn-disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+.mc-btn-green { 
+  background: #2e7d32; 
+  border-color: #4caf50 #4caf50 #1b5e20 #1b5e20; 
+}
+.mc-btn-green:hover:not(.mc-btn-disabled) {
+  box-shadow: 0 4px 14px rgba(76, 175, 80, 0.4);
+}
 
-/* Main Container */
+.mc-btn-red { 
+  background: #c62828; 
+  border-color: #ef5350 #ef5350 #8e0000 #8e0000; 
+}
+.mc-btn-red:hover:not(.mc-btn-disabled) {
+  box-shadow: 0 4px 14px rgba(239, 83, 80, 0.4);
+}
+
+.mc-btn-purple { 
+  background: #6a1b9a; 
+  border-color: #ab47bc #ab47bc #38006b #38006b; 
+}
+.mc-btn-purple:hover:not(.mc-btn-disabled) {
+  box-shadow: 0 4px 14px rgba(171, 71, 188, 0.4);
+}
+
+.mc-btn-gold { 
+  background: #f57f17; 
+  border-color: #ffca28 #ffca28 #b26a00 #b26a00; 
+  color: #000; 
+  text-shadow: none; 
+}
+.mc-btn-gold:hover:not(.mc-btn-disabled) {
+  box-shadow: 0 4px 14px rgba(255, 202, 40, 0.4);
+}
+
+.mc-btn-disabled { 
+  opacity: 0.55; 
+  cursor: not-allowed; 
+  filter: grayscale(0.85); 
+}
+
+.mc-btn-locked:hover {
+  filter: grayscale(0.7) brightness(0.9);
+}
+
+/* Animación de Shake al hacer clic en elementos bloqueados o sin XP */
+.mc-btn-shake {
+  animation: mc-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  border-color: #ef4444 !important;
+}
+
+@keyframes mc-shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(3px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* ==========================================================================
+   MAIN CONTAINER & MINECRAFT BOX
+   ========================================================================== */
 .mc-container {
   max-width: 1200px;
-  margin: 30px auto;
+  margin: 28px auto;
   padding: 0 20px;
   width: 100%;
+  position: relative;
+  z-index: 2;
 }
 
-/* Minecraft Window / Box */
 .mc-box {
-  background-color: #333333;
-  border: 4px solid #1e1e1e;
-  box-shadow: inset -4px -4px 0 #181818, inset 4px 4px 0 #555555, 0 8px 24px rgba(0,0,0,0.7);
+  background-color: #2e2e2e;
+  border: 4px solid #1a1a1a;
+  box-shadow: inset -4px -4px 0 #141414, inset 4px 4px 0 #4a4a4a, 0 10px 30px rgba(0, 0, 0, 0.8);
   padding: 24px;
   margin-bottom: 30px;
   border-radius: 2px;
 }
 
+/* ==========================================================================
+   7. TIPOGRAFÍA Y TÍTULOS CON GLOW POR DIMENSIÓN
+   ========================================================================== */
 .mc-title {
-  font-size: 1.6rem;
-  text-shadow: 2px 2px 0 #000000;
+  font-size: 1.65rem;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
+.dimension-overworld .mc-title {
+  text-shadow: 2px 2px 0 #000, 0 0 14px rgba(129, 199, 132, 0.65);
+}
+
+.dimension-nether .mc-title {
+  text-shadow: 2px 2px 0 #000, 0 0 14px rgba(239, 83, 80, 0.65);
+}
+
+.dimension-the_end .mc-title {
+  text-shadow: 2px 2px 0 #000, 0 0 14px rgba(192, 132, 252, 0.7);
+}
+
 .mc-badge {
   font-size: 0.75rem;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border: 1px solid #000;
   text-shadow: 1px 1px 0 #000;
   text-transform: uppercase;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-/* Cabeza de creeper junto al logo de la barra superior */
-.mc-logo-creeper {
-  width: 32px;
-  height: 32px;
-  /* Suavizado: el logo propio es una imagen raster de alta resolucion y
-     con "pixelated" el reescalado a 32px producia aliasing duro. */
-  image-rendering: auto;
-  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.85));
-  flex-shrink: 0;
-  transition: transform 0.15s ease;
-}
-
-.mc-logo:hover .mc-logo-creeper {
-  transform: scale(1.12);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mc-logo:hover .mc-logo-creeper {
-    transform: none;
-  }
-}
-
-/* Challenge Grid */
+/* ==========================================================================
+   3. TARJETAS DE RETO CON GLOW Y RESPLANDOR
+   ========================================================================== */
 .challenges-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -199,19 +396,45 @@ body.dimension-the_end {
 }
 
 .challenge-card {
-  background-color: #272727;
+  background-color: #242424;
   border: 3px solid #141414;
-  box-shadow: inset -2px -2px 0 #101010, inset 2px 2px 0 #444444;
+  box-shadow: inset -2px -2px 0 #0f0f0f, inset 2px 2px 0 #3d3d3d, 0 4px 12px rgba(0, 0, 0, 0.5);
   padding: 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
+/* Glow en Hover según la dimensión */
+.dimension-overworld .challenge-card:hover {
+  transform: translateY(-5px);
+  border-color: #388e3c;
+  box-shadow: inset -2px -2px 0 #0f0f0f, inset 2px 2px 0 #4caf50, 0 10px 24px rgba(76, 175, 80, 0.35);
+}
+
+.dimension-nether .challenge-card:hover {
+  transform: translateY(-5px);
+  border-color: #d32f2f;
+  box-shadow: inset -2px -2px 0 #0f0f0f, inset 2px 2px 0 #ef5350, 0 10px 24px rgba(239, 68, 68, 0.35);
+}
+
+.dimension-the_end .challenge-card:hover {
+  transform: translateY(-5px);
+  border-color: #7b1fa2;
+  box-shadow: inset -2px -2px 0 #0f0f0f, inset 2px 2px 0 #ab47bc, 0 10px 24px rgba(171, 71, 188, 0.4);
+}
+
+/* Tarjeta Desbloqueada (Victoria de Reto) */
 .challenge-card.unlocked {
   border-color: var(--mc-green);
-  box-shadow: inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #81c784, 0 0 12px rgba(76, 175, 80, 0.4);
+  box-shadow: inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #81c784, 0 0 18px rgba(76, 175, 80, 0.45);
+}
+
+.challenge-card.unlocked:hover {
+  transform: translateY(-5px);
+  box-shadow: inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #81c784, 0 10px 28px rgba(76, 175, 80, 0.6);
 }
 
 .challenge-card.locked {
@@ -224,19 +447,25 @@ body.dimension-the_end {
   align-items: center;
   gap: 12px;
   margin-bottom: 14px;
-  border-bottom: 2px solid #3a3a3a;
+  border-bottom: 2px solid #363636;
   padding-bottom: 10px;
 }
 
 .challenge-icon {
   width: 48px;
   height: 48px;
-  background-color: #1e1e1e;
+  background-color: #1a1a1a;
   border: 2px solid #444;
-  padding: 4px;
+  padding: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.challenge-card:hover .challenge-icon {
+  transform: scale(1.08) rotate(3deg);
 }
 
 .challenge-icon img, .challenge-icon svg {
@@ -247,24 +476,17 @@ body.dimension-the_end {
 .challenge-body {
   margin-bottom: 16px;
   font-size: 0.88rem;
-  color: #cccccc;
+  color: #d1d5db;
+  line-height: 1.6;
 }
 
 .challenge-body p {
   margin-bottom: 10px;
 }
 
-.syllabus-tag {
-  display: inline-block;
-  background-color: #1e3a5f;
-  color: #90caf9;
-  border: 1px solid #1565c0;
-  font-size: 0.72rem;
-  padding: 2px 6px;
-  margin-bottom: 8px;
-}
-
-/* Panel de Pistas y Codigo (acordeon) */
+/* ==========================================================================
+   PISTAS, CÓDIGO Y ENTRADAS
+   ========================================================================== */
 .lab-tools {
   margin-top: 12px;
   display: flex;
@@ -273,17 +495,20 @@ body.dimension-the_end {
 }
 
 .hint-box, .source-box {
-  background: #191919;
+  background: #161616;
   border: 1px solid #444;
-  padding: 10px;
-  font-size: 0.8rem;
-  color: #ffdd88;
+  border-left: 3px solid #facc15;
+  padding: 12px;
+  font-size: 0.82rem;
+  color: #fef08a;
   display: none;
-  word-break: break-all;
+  word-break: break-word;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  animation: mc-fade-in 0.2s ease-out;
 }
 
 .source-code-block {
-  background: #0d0d0d;
+  background: #0a0a0a;
   color: #a3e635;
   padding: 10px;
   font-family: 'Consolas', monospace;
@@ -294,54 +519,58 @@ body.dimension-the_end {
   margin-top: 6px;
 }
 
-/* Interactive Forms inside Challenges */
 .mc-input {
   width: 100%;
   font-family: var(--mc-font);
-  background: #1a1a1a;
-  border: 2px solid #555555;
+  background: #171717;
+  border: 2px solid #525252;
   color: #ffffff;
-  padding: 8px 10px;
+  padding: 9px 12px;
   font-size: 0.85rem;
   margin-bottom: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .mc-input:focus {
   outline: none;
   border-color: var(--mc-green);
+  box-shadow: 0 0 8px rgba(85, 255, 85, 0.35);
 }
 
-/* Flag Submit Modal / Box */
 .flag-form {
   display: flex;
   gap: 6px;
   margin-top: 10px;
 }
 
-/* HUD & HOTBAR FIXED AT BOTTOM (Minecraft Style) */
+/* ==========================================================================
+   4. HUD Y BARRA DE EXPERIENCIA (MINECRAFT AUTHENTIC UI)
+   ========================================================================== */
 .mc-hud-bottom {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #141414;
-  border-top: 4px solid #111;
-  padding: 10px 0 16px 0;
+  background-color: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 3px solid #111111;
+  padding: 8px 0 14px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   z-index: 1000;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.85);
 }
 
 .mc-stats-bar {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 24px;
 }
 
-.mc-hearts, .mc-armor {
+.mc-hearts {
   display: flex;
   gap: 3px;
 }
@@ -349,18 +578,85 @@ body.dimension-the_end {
 .mc-heart {
   width: 18px;
   height: 18px;
+  filter: drop-shadow(1px 1px 0 #000);
+  transition: transform 0.15s ease;
+}
+
+.mc-heart:hover {
+  transform: scale(1.2);
 }
 
 .mc-level-badge {
-  background: #000;
-  color: #55ff55;
-  border: 2px solid #55ff55;
+  background: #000000;
+  color: var(--mc-xp-green);
+  border: 2px solid var(--mc-xp-green);
   padding: 2px 10px;
   font-size: 0.85rem;
   font-weight: bold;
-  text-shadow: 1px 1px 0 #000;
+  text-shadow: 1px 1px 0 #000, 0 0 8px rgba(128, 255, 32, 0.6);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(128, 255, 32, 0.3);
 }
 
+/* Contenedor de Barra de XP Minecraft */
+.mc-xp-bar-wrapper {
+  position: relative;
+  width: 450px;
+  max-width: 92vw;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mc-xp-bar-track {
+  width: 100%;
+  height: 10px;
+  background-color: #171d14;
+  border: 2px solid #080a06;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.mc-xp-bar-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #60d600, #80ff20, #a3f743);
+  box-shadow: 0 0 10px rgba(128, 255, 32, 0.8);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Líneas de segmentación de la barra de XP Minecraft */
+.mc-xp-bar-segments {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 22px,
+    #080a06 22px,
+    #080a06 24px
+  );
+  opacity: 0.65;
+}
+
+.mc-xp-number {
+  position: absolute;
+  top: -14px;
+  font-size: 0.82rem;
+  font-weight: bold;
+  color: var(--mc-xp-green);
+  text-shadow: 
+    -1px -1px 0 #000,  
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000,
+     0 0 8px rgba(128, 255, 32, 0.9);
+  pointer-events: none;
+}
+
+/* HOTBAR */
 .mc-hotbar {
   display: flex;
   background-color: #8b8b8b;
@@ -381,15 +677,15 @@ body.dimension-the_end {
   justify-content: center;
   position: relative;
   cursor: pointer;
+  transition: transform 0.1s ease;
 }
 
-.mc-slot.active {
-  background-color: #3b82f633;
-  box-shadow: inset 0 0 8px #60a5fa, inset -2px -2px 0 #ffffff, inset 2px 2px 0 #555555;
+.mc-slot:hover {
+  transform: translateY(-2px);
 }
 
 .mc-slot.unlocked {
-  box-shadow: inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #81c784, 0 0 8px rgba(255, 255, 255, 0.55);
+  box-shadow: inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #81c784, 0 0 10px rgba(85, 255, 85, 0.6);
 }
 
 .mc-slot.unlocked img, .mc-slot.unlocked svg {
@@ -423,6 +719,7 @@ body.dimension-the_end {
   pointer-events: none;
   z-index: 1010;
   text-shadow: 1px 1px 0 #000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
 }
 
 .mc-slot:hover .mc-slot-name {
@@ -431,10 +728,12 @@ body.dimension-the_end {
 
 @keyframes pulse-item {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
+  50% { transform: scale(1.1); }
 }
 
-/* Terminal / Output Box */
+/* ==========================================================================
+   TERMINAL OUTPUT
+   ========================================================================== */
 .terminal-output {
   background: #09090b;
   border: 2px solid #27272a;
@@ -447,27 +746,75 @@ body.dimension-the_end {
   overflow-y: auto;
   white-space: pre-wrap;
   margin-top: 10px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
 }
 
-/* Victory Page Styling */
+/* ==========================================================================
+   8. PANTALLA DE VICTORIA ÉPICA
+   ========================================================================== */
 .victory-hero {
   text-align: center;
-  padding: 40px 20px;
+  padding: 44px 24px;
+  animation: victory-entrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.victory-trophy-cluster {
+  font-size: 3.8rem;
+  margin-bottom: 16px;
+  display: inline-block;
+  animation: trophy-aura 3s ease-in-out infinite;
+}
+
+.victory-title-epic {
+  font-size: 2.6rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  background: linear-gradient(90deg, #facc15, #fef08a, #ca8a04, #facc15);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gold-shimmer 4s linear infinite;
+  filter: drop-shadow(2px 2px 0 #000);
 }
 
 .end-poem-box {
-  background: #08040d;
-  border: 3px solid #7e22ce;
+  background: rgba(10, 4, 18, 0.95);
+  border: 3px solid #9333ea;
   padding: 30px;
-  color: #c084fc;
+  color: #d8b4fe;
   font-size: 0.95rem;
-  line-height: 1.8;
-  max-width: 800px;
-  margin: 20px auto;
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+  line-height: 1.9;
+  max-width: 820px;
+  margin: 24px auto;
+  box-shadow: 0 0 35px rgba(147, 51, 234, 0.4), inset 0 0 20px rgba(147, 51, 234, 0.15);
+  border-radius: 2px;
 }
 
-/* Alert notifications */
+@keyframes victory-entrance {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes trophy-aura {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.5));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 35px rgba(250, 204, 21, 0.95));
+    transform: scale(1.06);
+  }
+}
+
+@keyframes gold-shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 250% center; }
+}
+
+/* ==========================================================================
+   ALERTAS Y TOASTS RETRO
+   ========================================================================== */
 .mc-alert {
   padding: 10px 14px;
   margin-bottom: 14px;
@@ -476,38 +823,71 @@ body.dimension-the_end {
   display: flex;
   align-items: center;
   gap: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 .mc-alert-success { background: #14532d; border-color: #22c55e; color: #bbf7d0; }
 .mc-alert-error { background: #7f1d1d; border-color: #ef4444; color: #fecaca; }
 .mc-alert-info { background: #1e3a8a; border-color: #3b82f6; color: #bfdbfe; }
 
-/* Celebration Overlay (reemplaza al alert() bloqueante del navegador) */
+/* Toasts flotantes modernos estilo Minecraft */
+.mc-toast-notification {
+  position: fixed;
+  top: 75px;
+  right: 25px;
+  background: #222222;
+  border: 3px solid #444444;
+  box-shadow: inset -2px -2px 0 #111111, inset 2px 2px 0 #666666, 0 8px 24px rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  padding: 12px 20px;
+  font-size: 0.88rem;
+  font-weight: bold;
+  z-index: 2500;
+  text-shadow: 1px 1px 0 #000;
+  animation: toast-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mc-toast-success { border-color: #22c55e; color: #86efac; }
+.mc-toast-warning { border-color: #f59e0b; color: #fde047; }
+.mc-toast-error { border-color: #ef4444; color: #fca5a5; }
+
+.mc-toast-notification.fade-out {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes toast-enter {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Overlay de celebración al completar fase */
 .mc-celebration {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
   pointer-events: none;
   animation: mc-fade-in 0.2s ease-out;
 }
 
 .mc-celebration-box {
-  background-color: #333333;
-  border: 4px solid #1e1e1e;
-  box-shadow: inset -4px -4px 0 #181818, inset 4px 4px 0 #555555, 0 8px 24px rgba(0, 0, 0, 0.7);
+  background-color: #2b2b2b;
+  border: 4px solid #141414;
+  box-shadow: inset -4px -4px 0 #101010, inset 4px 4px 0 #555555, 0 10px 30px rgba(0, 0, 0, 0.9);
   color: #facc15;
-  padding: 20px 28px;
+  padding: 24px 36px;
   font-weight: bold;
+  font-size: 1.2rem;
   text-align: center;
-  text-shadow: 2px 2px 0 #000000;
+  text-shadow: 2px 2px 0 #000000, 0 0 14px rgba(250, 204, 21, 0.6);
   max-width: 80vw;
+  animation: scale-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes mc-fade-in {
@@ -515,7 +895,16 @@ body.dimension-the_end {
   to { opacity: 1; }
 }
 
+@keyframes scale-up {
+  from { transform: scale(0.85); }
+  to { transform: scale(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  body.dimension-overworld, body.dimension-nether, body.dimension-the_end { animation: none; }
+  body.dimension-overworld::before, body.dimension-overworld::after,
+  body.dimension-nether::before, body.dimension-nether::after,
+  body.dimension-the_end::before, body.dimension-the_end::after { animation: none; }
   .mc-slot.unlocked img, .mc-slot.unlocked svg { animation: none; }
-  .mc-celebration { animation: none; }
+  .victory-trophy-cluster, .victory-title-epic { animation: none; }
 }
