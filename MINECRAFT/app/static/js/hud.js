@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    MINECRAFT CTF - HUD JAVASCRIPT & RETRO SOUND ENGINE
    ========================================================================== */
 
@@ -11,7 +11,9 @@ class RetroAudioEngine {
   init() {
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new AudioCtx();
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
     }
   }
 
@@ -69,42 +71,140 @@ class RetroAudioEngine {
     });
   }
 
-  playExplosion() {
+  playXpConsume() {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(987.77, now); // B5
+    osc.frequency.exponentialRampToValueAtTime(440, now + 0.25); // A4
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(now + 0.28);
+  }
+
+  playError() {
     this.init();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(120, now);
-    osc.frequency.exponentialRampToValueAtTime(30, now + 0.5);
-    gain.gain.setValueAtTime(0.4, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+    osc.frequency.setValueAtTime(160, now);
+    osc.frequency.setValueAtTime(110, now + 0.08);
+    gain.gain.setValueAtTime(0.28, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start();
-    osc.stop(now + 0.55);
+    osc.stop(now + 0.26);
   }
 }
 
 const mcAudio = new RetroAudioEngine();
-
 const HOTBAR_ORDER = ['iron', 'diamond', 'portal', 'gold', 'blaze', 'pearl', 'crystals', 'dragon', 'egg'];
+window.unlockedHints = new Set();
+window.currentXp = 30;
 
 // Reproducir sonido al hacer click en cualquier botón mc-btn
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.mc-btn').forEach(btn => {
+  document.querySelectorAll('.mc-btn:not(.mc-btn-disabled)').forEach(btn => {
     btn.addEventListener('click', () => mcAudio.playClick());
   });
   syncInventoryHUD();
 });
 
-// 2. Control de Pistas y Codigo Fuente (acordeon)
-function toggleHint(challengeId) {
-  mcAudio.playClick();
+// Función para sacudir botones bloqueados con sonido de error
+function triggerLockedShake(buttonEl, message) {
+  mcAudio.playError();
+  if (buttonEl) {
+    buttonEl.classList.remove('mc-btn-shake');
+    void buttonEl.offsetWidth; // retrigger reflow
+    buttonEl.classList.add('mc-btn-shake');
+    setTimeout(() => buttonEl.classList.remove('mc-btn-shake'), 450);
+  }
+  if (message) {
+    showToast(message, 'warning');
+  }
+}
+
+// Toast de notificación retro no bloqueante
+function showToast(message, type = 'info') {
+  const existing = document.querySelector('.mc-toast-notification');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = `mc-toast-notification mc-toast-${type}`;
+  toast.innerHTML = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 400);
+  }, 2600);
+}
+
+// 2. Control de Pistas con Consumo de XP (Gamificado)
+async function toggleHint(challengeId) {
   const hintEl = document.getElementById(`hint-${challengeId}`);
-  if (hintEl) {
-    hintEl.style.display = hintEl.style.display === 'block' ? 'none' : 'block';
+  const btn = document.querySelector(`button[onclick*="toggleHint('${challengeId}')"]`);
+
+  if (!hintEl) return;
+
+  // Si ya está visible, alternar para cerrar gratis
+  if (hintEl.style.display === 'block') {
+    mcAudio.playClick();
+    hintEl.style.display = 'none';
+    return;
+  }
+
+  // Si ya fue desbloqueada en esta sesión, abrir gratis
+  if (window.unlockedHints.has(challengeId)) {
+    mcAudio.playClick();
+    hintEl.style.display = 'block';
+    return;
+  }
+
+  // Intentar desbloquear consumiendo XP en el servidor
+  try {
+    const res = await fetch('/api/unlock_hint', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ challenge: challengeId })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      window.unlockedHints.add(challengeId);
+      window.currentXp = data.xp;
+      mcAudio.playXpConsume();
+      hintEl.style.display = 'block';
+      
+      if (btn) {
+        btn.textContent = '💡 Ver Pista';
+        btn.classList.add('mc-btn-unlocked');
+      }
+
+      updateXpDisplay(data.xp);
+      showToast(`✨ ¡Pista desbloqueada! Se consumieron ${data.cost || 20} XP.`, 'success');
+    } else {
+      mcAudio.playError();
+      if (btn) {
+        btn.classList.remove('mc-btn-shake');
+        void btn.offsetWidth;
+        btn.classList.add('mc-btn-shake');
+        setTimeout(() => btn.classList.remove('mc-btn-shake'), 450);
+      }
+      showToast(`⚠️ ${data.message}`, 'error');
+    }
+  } catch (err) {
+    mcAudio.playError();
+    showToast('⚠️ Error de conexión con el servidor.', 'error');
   }
 }
 
@@ -116,19 +216,19 @@ function toggleSource(challengeId) {
   }
 }
 
-// 3. Aviso de dimension completada sin bloquear el hilo con alert()
+// 3. Aviso de dimensión completada sin bloquear el hilo
 function showCelebration(message) {
   const overlay = document.createElement('div');
   overlay.className = 'mc-celebration';
   const box = document.createElement('div');
   box.className = 'mc-celebration-box';
-  box.textContent = message;
+  box.innerHTML = message;
   overlay.appendChild(box);
   document.body.appendChild(overlay);
-  setTimeout(() => overlay.remove(), 2400);
+  setTimeout(() => overlay.remove(), 2600);
 }
 
-// 4. Refleja el ítem desbloqueado en el DOM sin recargar la página
+// 4. Refleja el ítem desbloqueado en el DOM
 function markItemUnlocked(step) {
   const index = HOTBAR_ORDER.indexOf(step);
   if (index === -1) return;
@@ -187,31 +287,58 @@ async function submitFlag(dimension, step, event) {
       }
       markItemUnlocked(step);
 
+      if (data.xp !== undefined) {
+        updateXpDisplay(data.xp);
+      }
+
       setTimeout(() => {
         syncInventoryHUD();
 
         if (data.all_completed) {
           mcAudio.playLevelUp();
-          showCelebration('🏆 ¡JUEGO COMPLETADO! Redirigiendo a la pantalla de victoria...');
-          setTimeout(() => { window.location.href = '/victory'; }, 1800);
+          showCelebration('🏆 ¡JUEGO COMPLETADO!<br>Redirigiendo a la pantalla de victoria...');
+          setTimeout(() => { window.location.href = '/victory'; }, 2000);
           return;
         }
 
         if (data.dimension_completed) {
           mcAudio.playLevelUp();
-          showCelebration(`🎉 ¡Has completado la dimensión ${dimension.toUpperCase()}!`);
-          setTimeout(() => window.location.reload(), 1800);
+          showCelebration(`🎉 ¡Has completado la dimensión ${dimension.toUpperCase()}! (+50 XP)`);
+          setTimeout(() => window.location.reload(), 1900);
         }
-      }, 900);
+      }, 700);
     } else {
+      mcAudio.playError();
       if (feedbackEl) {
         feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">❌ ${data.message}</div>`;
       }
     }
   } catch (err) {
+    mcAudio.playError();
     if (feedbackEl) {
       feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">⚠️ Error de conexión con el servidor.</div>`;
     }
+  }
+}
+
+// Actualiza barra y textos de XP
+function updateXpDisplay(xp) {
+  window.currentXp = xp;
+  const levelBadge = document.getElementById('mc-xp-level');
+  if (levelBadge) {
+    levelBadge.textContent = `XP ${xp}`;
+  }
+
+  const xpNum = document.getElementById('mc-xp-number');
+  if (xpNum) {
+    xpNum.textContent = `${xp}`;
+  }
+
+  const progressBar = document.getElementById('mc-xp-bar-progress');
+  if (progressBar) {
+    // Calculamos un porcentaje relativo (ej. base 100 XP por ciclo de nivel)
+    const pct = Math.min(100, Math.max(0, (xp % 100 === 0 && xp > 0 ? 100 : (xp % 100))));
+    progressBar.style.width = `${pct}%`;
   }
 }
 
@@ -223,15 +350,12 @@ async function syncInventoryHUD() {
 
     // Actualizar slots de inventario
     const items = HOTBAR_ORDER;
-    let count = 0;
-
     items.forEach((item, index) => {
       const slotEl = document.getElementById(`slot-${index + 1}`);
       if (slotEl) {
         if (data.inventory.includes(item)) {
           slotEl.classList.remove('locked');
           slotEl.classList.add('unlocked');
-          count++;
         } else {
           slotEl.classList.remove('unlocked');
           slotEl.classList.add('locked');
@@ -239,10 +363,20 @@ async function syncInventoryHUD() {
       }
     });
 
-    // Actualizar nivel de experiencia (XP Level)
-    const levelEl = document.getElementById('mc-xp-level');
-    if (levelEl) {
-      levelEl.textContent = `NIVEL ${count * 10}`;
+    // Actualizar XP y pistas desbloqueadas
+    if (data.xp !== undefined) {
+      updateXpDisplay(data.xp);
+    }
+
+    if (Array.isArray(data.unlocked_hints)) {
+      window.unlockedHints = new Set(data.unlocked_hints);
+      data.unlocked_hints.forEach(challengeId => {
+        const btn = document.querySelector(`button[onclick*="toggleHint('${challengeId}')"]`);
+        if (btn) {
+          btn.textContent = '💡 Ver Pista';
+          btn.classList.add('mc-btn-unlocked');
+        }
+      });
     }
   } catch (e) {
     console.error("Error sincronizando inventario HUD:", e);

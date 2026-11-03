@@ -4,17 +4,17 @@
 
 {% block content %}
 <div class="mc-box victory-hero">
-  <div style="font-size: 3rem; margin-bottom: 10px;">🏆 🐉 🥚</div>
-  <h1 class="mc-title" style="color: #facc15; justify-content: center; font-size: 2.2rem;">
+  <div class="victory-trophy-cluster">🏆 🐉 🥚</div>
+  <h1 class="victory-title-epic">
     ¡HAS LIBERADO EL END!
   </h1>
-  <p style="color: #4ade80; font-size: 1.1rem; font-weight: bold; margin-bottom: 20px;">
+  <p style="color: #4ade80; font-size: 1.15rem; font-weight: bold; margin-bottom: 20px; text-shadow: 1px 1px 0 #000, 0 0 10px rgba(74, 222, 128, 0.4);">
     ¡Felicitaciones, Hacker de Minecraft! Has completado con éxito los 9 desafíos del CTF.
   </p>
 
   <!-- Caja del Poema del End -->
   <div class="end-poem-box">
-    <p style="color: #a855f7; font-weight: bold; margin-bottom: 12px;">[ TELEMETRÍA DEL UNIVERSO: EL POEMA DEL END ]</p>
+    <p style="color: #c084fc; font-weight: bold; margin-bottom: 14px; font-size: 1rem; letter-spacing: 1px;">[ TELEMETRÍA DEL UNIVERSO: EL POEMA DEL END ]</p>
     <p>
       <em>"Veo al jugador de quien hablas...</em><br>
       <em>Superó la cueva del Overworld dominando la esteganografía y el cifrado César.</em><br>
@@ -25,17 +25,7 @@
     </p>
   </div>
 
-  <!-- Resumen de Competencias de Seguridad Demostradas -->
-  <div style="background: #1e1e1e; border: 2px solid #333; padding: 20px; text-align: left; max-width: 800px; margin: 20px auto;">
-    <h3 style="color: #60a5fa; margin-bottom: 12px; text-align: center;">🎓 Competencias Demostradas (6º, 7º y 8º Semestre):</h3>
-    <ul style="color: #ccc; font-size: 0.9rem; line-height: 1.8; padding-left: 20px;">
-      <li>✅ <strong>6. Semestre:</strong> Esteganografía, Cifrado César/XOR en Python, Principio de Mínimo Privilegio y Evasión de Honeypots.</li>
-      <li>✅ <strong>7. Semestre:</strong> Análisis de Metadatos (FOCA/ExifTool), Reconocimiento y Explotación de CVEs con metodologías Metasploit.</li>
-      <li>✅ <strong>8. Semestre:</strong> SQL Injection (SQLi), Stored XSS y Robo de Cookies, Arbitrary File Upload a RCE, Command Injection y Despliegue en Kali Linux.</li>
-    </ul>
-  </div>
-
-  <div style="display: flex; justify-content: center; gap: 16px; margin-top: 24px;">
+  <div style="display: flex; justify-content: center; gap: 16px; margin-top: 28px;">
     <a href="{{ url_for('index') }}" class="mc-btn mc-btn-green" style="padding: 12px 24px; font-size: 1rem;">
       🏠 Volver al Inicio
     </a>

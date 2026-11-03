@@ -7,72 +7,73 @@
   <h1 class="mc-title">
     <span>⚔️ MINECRAFT CTF: VULNERABLE SECURITY LAB</span>
   </h1>
-  <p style="margin-bottom: 16px; color: #ddd; font-size: 0.95rem;">
+  <p style="margin-bottom: 20px; color: #d1d5db; font-size: 0.95rem; line-height: 1.6;">
     Bienvenido al laboratorio de seguridad interactivo con temática de Minecraft.
     Tu objetivo como atacante en <strong>Kali Linux</strong> es superar los 9 desafíos de seguridad organizados en 3 dimensiones para derrotar al Ender Dragón y capturar la bandera final.
   </p>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 24px 0;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px; margin: 24px 0;">
     
     <!-- Tarjeta Overworld -->
-    <div style="background:#1e331e; border: 2px solid #2e7d32; padding: 16px;">
-      <h3 style="color:#81c784; margin-bottom: 8px;">🟢 1. Overworld (Fácil)</h3>
-      <p style="font-size:0.85rem; color:#c8e6c9;">
-        Fundamentos de esteganografía, cifrado César/XOR, inyecciones SQL y análisis de metadatos.
+    <div class="challenge-card" style="background:#1a2b1a; border: 2px solid #2e7d32; padding: 20px; box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25);">
+      <h3 style="color:#81c784; margin-bottom: 10px; font-size: 1.15rem; text-shadow: 0 0 10px rgba(129, 199, 132, 0.5);">🟢 1. Overworld (Fácil)</h3>
+      <p style="font-size:0.86rem; color:#d1fae5; line-height: 1.5; margin-bottom: 14px;">
+        Fundamentos de esteganografía, cifrado César/XOR, inyecciones SQL y análisis de metadatos forenses.
       </p>
-      <div style="margin-top: 12px;">
+      <div>
         <span class="mc-badge" style="background:#2e7d32; color:#fff;">
           Progreso: {{ overworld_count|default(0) }}/3
         </span>
       </div>
-      <a href="{{ url_for('overworld_view') }}" class="mc-btn mc-btn-green" style="margin-top: 12px; width: 100%;">
+      <a href="{{ url_for('overworld_view') }}" class="mc-btn mc-btn-green" style="margin-top: 14px; width: 100%;">
         Entrar al Overworld ➔
       </a>
     </div>
 
     <!-- Tarjeta Nether -->
-    <div style="background:#331a1a; border: 2px solid #c62828; padding: 16px;">
-      <h3 style="color:#ef5350; margin-bottom: 8px;">🔴 2. Nether (Medio)</h3>
-      <p style="font-size:0.85rem; color:#ffcdd2;">
-        Explotación web avanzada: Stored XSS con robo de cookies, subida de archivos maliciosos (Webshell RCE) y violación de mínimo privilegio.
+    <div class="challenge-card" style="background:#2d1515; border: 2px solid #c62828; padding: 20px; box-shadow: 0 4px 14px rgba(198, 40, 40, 0.25);">
+      <h3 style="color:#ef5350; margin-bottom: 10px; font-size: 1.15rem; text-shadow: 0 0 10px rgba(239, 83, 80, 0.5);">🔴 2. Nether (Medio)</h3>
+      <p style="font-size:0.86rem; color:#fee2e2; line-height: 1.5; margin-bottom: 14px;">
+        Explotación web: Stored XSS con robo de cookies de Piglins, subida de scripts maliciosos (Webshell RCE) y escalada de privilegios.
       </p>
-      <div style="margin-top: 12px;">
+      <div>
         <span class="mc-badge" style="background:#c62828; color:#fff;">
           Progreso: {{ nether_count|default(0) }}/3
         </span>
       </div>
       {% if 'portal' in session.get('inventory', []) %}
-        <a href="{{ url_for('nether_view') }}" class="mc-btn mc-btn-red" style="margin-top: 12px; width: 100%;">
+        <a href="{{ url_for('nether_view') }}" class="mc-btn mc-btn-red" style="margin-top: 14px; width: 100%;">
           Entrar al Nether ➔
         </a>
       {% else %}
-        <button class="mc-btn mc-btn-disabled" style="margin-top: 12px; width: 100%;">
+        <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '¡Debes completar el Overworld para desbloquear el Nether!')" style="margin-top: 14px; width: 100%;">
           🔒 Bloqueado (Falta Portal)
         </button>
       {% endif %}
     </div>
 
     <!-- Tarjeta The End -->
-    <div style="background:#221333; border: 2px solid #7e22ce; padding: 16px;">
-      <h3 style="color:#c084fc; margin-bottom: 8px;">🟣 3. The End (Difícil)</h3>
-      <p style="font-size:0.85rem; color:#e9d5ff;">
-        Explotación de servicios de red (CVEs estilo Metasploit), inyección de comandos en telemetría y evasión de Honeypots.
+    <div class="challenge-card" style="background:#21122e; border: 2px solid #7e22ce; padding: 20px; box-shadow: 0 4px 14px rgba(126, 34, 206, 0.25);">
+      <h3 style="color:#c084fc; margin-bottom: 10px; font-size: 1.15rem; text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);">🟣 3. The End (Difícil)</h3>
+      <p style="font-size:0.86rem; color:#f3e8ff; line-height: 1.5; margin-bottom: 14px;">
+        Explotación de servicios de red (CVEs emulados), inyección de comandos en telemetría y evasión de Honeypots para reclamar el Huevo.
       </p>
-      <div style="margin-top: 12px;">
+      <div>
         <span class="mc-badge" style="background:#7e22ce; color:#fff;">
           Progreso: {{ end_count|default(0) }}/3
         </span>
       </div>
       {% if 'pearl' in session.get('inventory', []) %}
-        <a href="{{ url_for('the_end_view') }}" class="mc-btn mc-btn-purple" style="margin-top: 12px; width: 100%;">
+        <a href="{{ url_for('the_end_view') }}" class="mc-btn mc-btn-purple" style="margin-top: 14px; width: 100%;">
           Entrar a The End ➔
         </a>
       {% else %}
-        <button class="mc-btn mc-btn-disabled" style="margin-top: 12px; width: 100%;">
+        <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '¡Debes forjar el Ojo de Ender en el Nether!')" style="margin-top: 14px; width: 100%;">
           🔒 Bloqueado (Falta Ojo)
         </button>
       {% endif %}
     </div>
 
   </div>
+</div>
 {% endblock %}
