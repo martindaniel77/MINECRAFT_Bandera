@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Overworld - Minecraft CTF{% endblock %}
 
@@ -13,6 +13,7 @@
   <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
     Comienzas tu aventura en el mundo superior. Para llegar al Nether necesitas craftear herramientas y conseguir los materiales básicos: 
     <strong>Hierro</strong> para tu armadura, <strong>Diamante</strong> para tu pico y encender el <strong>Portal de Obsidiana</strong>.
+    (Recuerda que todas las banderas tienen el formato <code>Flag{...}</code>).
   </p>
 
   <div class="challenges-grid">
@@ -66,7 +67,7 @@ payload = base64.b64encode(rot13.encode()).decode()
 
       <!-- Formulario de Bandera -->
       <form class="flag-form" onsubmit="submitFlag('overworld', 'iron', event)">
-        <input type="text" id="flag-input-iron" class="mc-input" placeholder="FLAG{...}" 
+        <input type="text" id="flag-input-iron" class="mc-input" placeholder="Flag{...}" 
                value="{% if 'iron' in session.get('inventory', []) %}FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}{% endif %}"
                {% if 'iron' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'iron' in session.get('inventory', []) %}disabled{% endif %}>
@@ -140,7 +141,7 @@ cursor.execute(query) # Vulnerable a inyección directa!</pre>
 
       <!-- Formulario de Bandera -->
       <form class="flag-form" onsubmit="submitFlag('overworld', 'diamond', event)">
-        <input type="text" id="flag-input-diamond" class="mc-input" placeholder="FLAG{...}"
+        <input type="text" id="flag-input-diamond" class="mc-input" placeholder="Flag{...}"
                value="{% if 'diamond' in session.get('inventory', []) %}FLAG{MINECRAFT_DIAMOND_SQL1_Y58_UNLOCKED}{% endif %}"
                {% if 'diamond' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'diamond' in session.get('inventory', []) %}disabled{% endif %}>
@@ -197,7 +198,7 @@ X-Obsidian-Ignition-Key: FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}</pre>
 
       <!-- Formulario de Bandera -->
       <form class="flag-form" onsubmit="submitFlag('overworld', 'portal', event)">
-        <input type="text" id="flag-input-portal" class="mc-input" placeholder="FLAG{...}"
+        <input type="text" id="flag-input-portal" class="mc-input" placeholder="Flag{...}"
                value="{% if 'portal' in session.get('inventory', []) %}FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}{% endif %}"
                {% if 'portal' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'portal' in session.get('inventory', []) %}disabled{% endif %}>

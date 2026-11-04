@@ -1,5 +1,9 @@
 FROM python:3.11-slim
 
+LABEL maintainer="Thorfinn777, Martyn777, Sassyjack777"
+LABEL authors="Thorfinn777, Martyn777, Sassyjack777"
+LABEL description="Minecraft CTF Security Lab Platform"
+
 # Instalar herramientas básicas del sistema para el entorno CTF
 RUN apt-get update && apt-get install -y --no-install-recommends \
     sqlite3 \
@@ -18,7 +22,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Crear directorios de secretos y desafíos en el sistema de archivos del contenedor
 RUN mkdir -p /secret /var/www/honeypot /root
 
-# Configuración de las banderas del sistema en el contenedor
+# Configuración de las banderas del sistema en el contenedor (Formato Flag{...})
 RUN echo "FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}" > /secret/iron_ingot.txt && \
     echo "FLAG{MINECRAFT_DIAMOND_SQL1_Y58_UNLOCKED}" > /secret/diamond_vault.txt && \
     echo "FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}" > /secret/portal_key.txt && \

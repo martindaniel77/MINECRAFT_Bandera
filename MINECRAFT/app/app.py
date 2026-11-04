@@ -1,3 +1,9 @@
+# ==============================================================================
+# MINECRAFT CTF - VULNERABLE SECURITY LAB PLATFORM
+# Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
+# Autores del Laboratorio: Thorfinn777, Martyn777, Sassyjack777
+# ==============================================================================
+
 import os
 import sqlite3
 import base64
@@ -7,6 +13,10 @@ from werkzeug.utils import secure_filename
 from database import get_db_connection
 from bot import bot_instance, PIGLIN_SECRET_TOKEN
 from sandbox import run_sandboxed
+
+# Autores oficiales del laboratorio
+LAB_AUTHORS = ['Thorfinn777', 'Martyn777', 'Sassyjack777']
+LAB_AUTHORS_STR = 'Thorfinn777, Martyn777, Sassyjack777'
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'minecraft_dvwa_secret_key_2026_kali')
@@ -18,19 +28,30 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
 
 @app.context_processor
-def inject_brand_logo():
+def inject_brand_and_authors():
     """
-    Logo de la cabecera: app/static/img/logo_creeper.<ext>.
-    El asset va versionado en el repo, asi que normalmente siempre existe; si
-    faltara, se omite la imagen en vez de dejar un <img> roto.
+    Inyecta el logo del Creeper y la autoría oficial en todas las plantillas.
     """
+    logo_src = None
     for ext in ('png', 'webp', 'jpg', 'jpeg', 'svg', 'gif'):
         if os.path.exists(os.path.join(app.static_folder, 'img', f'logo_creeper.{ext}')):
-            return {'logo_src': f'img/logo_creeper.{ext}'}
-    return {'logo_src': None}
+            logo_src = f'img/logo_creeper.{ext}'
+            break
+
+    return {
+        'logo_src': logo_src,
+        'lab_authors': LAB_AUTHORS,
+        'lab_authors_str': LAB_AUTHORS_STR
+    }
+
+@app.after_request
+def add_lab_headers(response):
+    response.headers['X-Lab-Developers'] = LAB_AUTHORS_STR
+    response.headers['X-Lab-Platform'] = 'Minecraft CTF Security Lab'
+    return response
 
 # ------------------------------------------------------------------------------
-# DICCIONARIO OFICIAL DE BANDERAS DEL CTF
+# DICCIONARIO OFICIAL DE BANDERAS DEL CTF (Formato Flag{...})
 # ------------------------------------------------------------------------------
 FLAGS = {
     'overworld': {
@@ -175,7 +196,9 @@ def api_submit_flag():
     if dimension not in FLAGS or step not in FLAGS[dimension]:
         return jsonify({'success': False, 'message': 'Desafío no válido.'}), 400
 
-    is_valid = submitted_flag == FLAGS[dimension][step]
+    # Acepta formato exacto, mayúsculas o prefijo Flag{...}
+    expected_flag = FLAGS[dimension][step].strip()
+    is_valid = (submitted_flag == expected_flag) or (submitted_flag.upper() == expected_flag.upper())
 
     if is_valid:
         inv = get_inventory()
@@ -211,7 +234,8 @@ def api_submit_flag():
             'earned_xp': earned_xp
         })
     else:
-        return jsonify({'success': False, 'message': 'Bandera incorrecta. Inténtalo de nuevo.'}), 400
+        return jsonify({'success': False, 'message': 'Bandera incorrecta. Recuerda el formato Flag{...}'}), 400
+
 # ------------------------------------------------------------------------------
 # DIMENSIÓN 1: OVERWORLD (FÁCIL)
 # ------------------------------------------------------------------------------
@@ -449,7 +473,7 @@ def the_end_egg_inspect():
 # ------------------------------------------------------------------------------
 @app.route('/victory')
 def victory_view():
-    return render_template('victory.html', current_dimension='the_end')
+    return render_template('victory.html', current_dimension='victory')
 
 # ------------------------------------------------------------------------------
 # INICIALIZACIÓN
@@ -460,4 +484,5 @@ if __name__ == '__main__':
     bootstrap()
 
     print("[+] Servidor Minecraft CTF listo en http://0.0.0.0:8080")
+    print(f"[+] Desarrollado por: {LAB_AUTHORS_STR}")
     app.run(host='0.0.0.0', port=8080, debug=False)

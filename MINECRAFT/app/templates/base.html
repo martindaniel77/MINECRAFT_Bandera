@@ -1,12 +1,18 @@
+<!-- ==========================================================================
+     MINECRAFT CTF - BASE TEMPLATE
+     Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
+     ========================================================================== -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Thorfinn777, Martyn777, Sassyjack777">
+  <meta name="description" content="Laboratorio de Ciberseguridad Minecraft CTF desarrollado por Thorfinn777, Martyn777, Sassyjack777">
   <title>{% block title %}Minecraft CTF{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}">
 </head>
-<body class="dimension-{{ current_dimension|default('overworld') }}">
+<body class="dimension-{{ current_dimension|default('overworld') }}" data-dimension="{{ current_dimension|default('overworld') }}">
 
   <!-- Barra de Navegación Superior -->
   <header class="mc-navbar">
@@ -14,7 +20,19 @@
       <span>⛏️ MINECRAFT CTF</span>
       {% if logo_src %}<img src="{{ url_for('static', filename=logo_src) }}" class="mc-logo-creeper" alt="Creeper">{% endif %}
     </a>
+
+    <!-- MARCA DE AGUA VISUAL 1: IDENTIFICACIÓN DE AUTORÍA EN NAVBAR -->
+    <div class="mc-watermark-navbar" title="Laboratorio desarrollado por Thorfinn777, Martyn777, Sassyjack777">
+      <span class="mc-wm-tag">🛡️ Creadores:</span>
+      <span class="mc-wm-names"><strong>Thorfinn777</strong> • <strong>Martyn777</strong> • <strong>Sassyjack777</strong></span>
+    </div>
+
     <nav class="mc-nav-links">
+      <!-- Botón de Sonido Ambiental de la Dimensión -->
+      <button type="button" class="mc-btn mc-btn-sound" onclick="mcAudio.playDimensionSound('{{ current_dimension|default('overworld') }}')" title="Reproducir sonido característico de esta dimensión">
+        🔊 Sonido
+      </button>
+
       <a href="{{ url_for('overworld_view') }}" class="mc-btn mc-btn-green {% if current_dimension == 'overworld' %}active{% endif %}">
         🟢 Overworld
       </a>
@@ -59,6 +77,11 @@
 
   <!-- HUD INVENTARIO MINECRAFT FIJO AL PIE DE PÁGINA (9 SLOTS CON BARRA DE XP) -->
   <footer class="mc-hud-bottom">
+    <!-- MARCA DE AGUA VISUAL 2: AUTORÍA PERMANENTE EN EL HUD DE JUEGO -->
+    <div class="mc-watermark-hud">
+      <span>⛏️ Laboratorio Minecraft CTF</span> | Desarrollado por: <strong>Thorfinn777</strong> &bull; <strong>Martyn777</strong> &bull; <strong>Sassyjack777</strong>
+    </div>
+
     <div class="mc-stats-bar">
       <!-- Corazones de vida de Steve -->
       <div class="mc-hearts" title="Vida de Steve">

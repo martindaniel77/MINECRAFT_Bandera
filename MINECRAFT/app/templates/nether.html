@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Nether - Minecraft CTF{% endblock %}
 
@@ -14,6 +14,7 @@
     Has cruzado el portal al inframundo. El calor de la lava y los monstruos acechan. 
     Para abrir el portal al End necesitas conseguir <strong>Oro</strong> para comerciar con los Piglins, 
     derrotar a los Blazes para obtener sus <strong>Varas de Blaze</strong> y recolectar una <strong>Ender Pearl</strong> para craftear el Ojo de Ender.
+    (Recuerda que todas las banderas tienen el formato <code>Flag{...}</code>).
   </p>
 
   <div class="challenges-grid">
@@ -81,7 +82,7 @@
             <div id="hint-gold" class="hint-box">
               <strong>Pista — XSS almacenado y robo de sesión:</strong><br>
               1. Fíjate en que la nota se pinta en el tablón de ofertas. Pregúntate si el navegador la trata como texto plano o si está interpretando etiquetas. Si el servidor la inserta sin escapar, tú decides qué se renderiza.<br>
-              2. El premio no es la oferta: es la sesión del Piglin Guard. Repsa qué información maneja el <em>lado del cliente</em> de una web y a qué no llega una petición normal hecha por otra persona.<br>
+              2. El premio no es la oferta: es la sesión del Piglin Guard. Repasa qué información maneja el <em>lado del cliente</em> de una web y a qué no llega una petición normal hecha por otra persona.<br>
               3. En el propio servidor ya existe un endpoint pensado para recibir datos enviados por el navegador. Búscalo entre las rutas de la aplicación: no hace falta inventarlo.<br>
               4. F12 → Almacenamiento te deja ver las cookies de tu propia sesión; las del bot no están ahí, por eso necesitas otro canal.
             </div>
@@ -96,7 +97,7 @@
 
       <!-- Formulario de Bandera -->
       <form class="flag-form" onsubmit="submitFlag('nether', 'gold', event)">
-        <input type="text" id="flag-input-gold" class="mc-input" placeholder="FLAG{...}"
+        <input type="text" id="flag-input-gold" class="mc-input" placeholder="Flag{...}"
                value="{% if 'gold' in session.get('inventory', []) %}FLAG{MINECRAFT_PIGLIN_XSS_GOLD_BARTERED}{% endif %}"
                {% if 'gold' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'gold' in session.get('inventory', []) %}disabled{% endif %}>
@@ -174,7 +175,7 @@
 
       <!-- Formulario de Bandera -->
       <form class="flag-form" onsubmit="submitFlag('nether', 'blaze', event)">
-        <input type="text" id="flag-input-blaze" class="mc-input" placeholder="FLAG{...}"
+        <input type="text" id="flag-input-blaze" class="mc-input" placeholder="Flag{...}"
                value="{% if 'blaze' in session.get('inventory', []) %}FLAG{MINECRAFT_BLAZE_ROD_WEBSHELL_RCE}{% endif %}"
                {% if 'blaze' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'blaze' in session.get('inventory', []) %}disabled{% endif %}>
@@ -242,7 +243,7 @@ if role in ['ender_master', 'admin', 'root']:
 
       <!-- Formulario de Bandera -->
       <form class="flag-form" onsubmit="submitFlag('nether', 'pearl', event)">
-        <input type="text" id="flag-input-pearl" class="mc-input" placeholder="FLAG{...}"
+        <input type="text" id="flag-input-pearl" class="mc-input" placeholder="Flag{...}"
                value="{% if 'pearl' in session.get('inventory', []) %}FLAG{MINECRAFT_ENDER_PEARL_PRIV_ESCALATION}{% endif %}"
                {% if 'pearl' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'pearl' in session.get('inventory', []) %}disabled{% endif %}>

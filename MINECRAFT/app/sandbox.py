@@ -1,3 +1,8 @@
+# ==============================================================================
+# MINECRAFT CTF - PROCESS SANDBOX RUNNER
+# Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
+# ==============================================================================
+
 import subprocess
 import threading
 import time

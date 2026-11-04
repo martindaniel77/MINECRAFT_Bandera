@@ -908,3 +908,101 @@ body.dimension-the_end::after {
   .mc-slot.unlocked img, .mc-slot.unlocked svg { animation: none; }
   .victory-trophy-cluster, .victory-title-epic { animation: none; }
 }
+
+
+/* ==========================================================================
+   MARCAS DE AGUA Y AUTORÍA DE LOS DESARROLLADORES
+   Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
+   ========================================================================== */
+
+/* MARCA DE AGUA 1: Navbar Top */
+.mc-watermark-navbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #444444;
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  color: #cccccc;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.mc-watermark-navbar .mc-wm-tag {
+  color: #facc15;
+  font-weight: bold;
+}
+
+.mc-watermark-navbar .mc-wm-names strong {
+  color: #86efac;
+  letter-spacing: 0.5px;
+}
+
+/* MARCA DE AGUA 2: HUD Bottom Permanente */
+.mc-watermark-hud {
+  font-size: 0.76rem;
+  color: #94a3b8;
+  text-align: center;
+  padding: 2px 14px;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  text-shadow: 1px 1px 0 #000;
+}
+
+.mc-watermark-hud span {
+  color: #e2e8f0;
+  font-weight: bold;
+}
+
+.mc-watermark-hud strong {
+  color: #facc15;
+}
+
+/* Botón de Sonido en Navbar */
+.mc-btn-sound {
+  background: #374151;
+  border-color: #4b5563 #4b5563 #1f2937 #1f2937;
+  color: #fde047;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.mc-btn-sound:hover:not(.mc-btn-disabled) {
+  filter: brightness(1.25);
+  box-shadow: 0 0 10px rgba(253, 224, 71, 0.5);
+}
+
+/* Tarjeta de Créditos en Pantalla de Victoria */
+.victory-credits-card {
+  margin-top: 24px;
+  padding: 18px 24px;
+  background: rgba(20, 20, 25, 0.85);
+  border: 2px solid #6b21a8;
+  box-shadow: inset 0 0 15px rgba(107, 33, 168, 0.4), 0 8px 25px rgba(0, 0, 0, 0.7);
+  text-align: center;
+}
+
+.mc-author-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1e1b4b;
+  border: 1px solid #818cf8;
+  padding: 8px 16px;
+  color: #e0e7ff;
+  font-size: 0.92rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease;
+}
+
+.mc-author-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  border-color: #c084fc;
+}
+
+.mc-author-icon {
+  font-size: 1.1rem;
+}
