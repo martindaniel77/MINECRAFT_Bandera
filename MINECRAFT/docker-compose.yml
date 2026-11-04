@@ -10,10 +10,20 @@ services:
     environment:
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
-    mem_limit: 768m
-    mem_reservation: 256m
-    cpus: "1.00"
+      - PYTHONDONTWRITEBYTECODE=1
+      - MALLOC_ARENA_MAX=2
+    # Optimizado para VM en VirtualBox (4GB RAM, 2 vCPUs):
+    # - cpus: "1.50" deja CPU disponible para evitar congelamientos en Kali (XFCE, Firefox, Burp Suite)
+    # - mem_limit: 512m y mem_reservation: 128m aseguran rendimiento sin acaparar la RAM de la VM
+    mem_limit: 512m
+    mem_reservation: 128m
+    cpus: "1.50"
     pids_limit: 128
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - ctf_net
 

@@ -2,6 +2,13 @@
 
 Laboratorio interactivo de Ciberseguridad con temática de **Minecraft**, diseñado para ejecutarse sobre **Docker** en **Kali Linux** y resolverse 100% mediante navegador web y herramientas de pentesting.
 
+> ⚡ **Perfil de Optimización para VirtualBox:**
+> Configurado y afinado específicamente para máquinas virtuales con **4048 MB de RAM (4 GB)** y **2 procesadores (vCPUs)**.
+> - **Límite de CPU a 1.5 vCPUs:** Evita que el contenedor sature ambos núcleos al 100% y congele la interfaz de usuario (XFCE, LightDM) o el navegador de la VM.
+> - **Límite de RAM a 512 MB (128 MB garantizados):** La app consume únicamente ~80 MB en reposo, dejando más de 3.5 GB libres para Kali Linux, Firefox, Burp Suite y herramientas de auditoría.
+> - **Gunicorn Preload (2 workers + 2 threads):** Memoria compartida vía Copy-on-Write (COW) y reciclaje de memoria periódico (`--max-requests 500`).
+> - **SQLite en modo WAL + synchronous NORMAL:** Reduce dramáticamente las operaciones de I/O y `fsync` en el disco virtual de VirtualBox.
+
 ---
 
 ## 🚀 Despliegue Rápido en Kali Linux

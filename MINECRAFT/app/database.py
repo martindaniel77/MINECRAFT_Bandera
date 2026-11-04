@@ -1,11 +1,21 @@
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'minecraft_ctf.db')
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'minecraft_ctf.db')
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH, timeout=10)
     conn.row_factory = sqlite3.Row
+    # Optimizaciones de SQLite para bajo I/O en máquinas virtuales (VirtualBox):
+    # - WAL (Write-Ahead Logging): lectura y escritura concurrentes sin bloqueo
+    # - synchronous=NORMAL: reduce llamadas costosas a fsync en discos virtuales
+    # - temp_store=MEMORY: almacena ordenamientos y tablas temporales en memoria
+    # - cache_size=-2000: caché en RAM de ~2MB
+    conn.execute('PRAGMA journal_mode = WAL;')
+    conn.execute('PRAGMA synchronous = NORMAL;')
+    conn.execute('PRAGMA busy_timeout = 5000;')
+    conn.execute('PRAGMA temp_store = MEMORY;')
+    conn.execute('PRAGMA cache_size = -2000;')
     return conn
 
 def init_db():
@@ -62,8 +72,6 @@ def init_db():
         ])
 
     # Tabla 4: Tokens robados al Piglin Guard (reto de XSS Stored).
-    # Se guardan en la base de datos y no en memoria porque gunicorn ejecuta
-    # varios workers: cada proceso tiene su propia copia de la RAM.
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS stolen_tokens (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

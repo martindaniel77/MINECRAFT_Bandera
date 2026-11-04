@@ -2,6 +2,7 @@
 # ==============================================================================
 # MINECRAFT CTF - DVWA STYLE DEPLOYMENT SCRIPT
 # Kali Linux Automatización de Despliegue (8. Semestre - Seguridad App)
+# Optimizado para VirtualBox (4GB RAM, 2 vCPUs)
 # ==============================================================================
 
 GREEN='\033[0;32m'
@@ -49,9 +50,11 @@ if ! systemctl is-active --quiet docker; then
     sleep 2
 fi
 
-echo -e "${CYAN}[*] Limpiando contenedores previos si existen...${NC}"
+echo -e "${CYAN}[*] Limpiando contenedores e imágenes huérfanas previas...${NC}"
 $SUDO docker rm -f minecraft_ctf_dvwa 2>/dev/null || true
 $SUDO docker-compose down 2>/dev/null || true
+$SUDO docker compose down 2>/dev/null || true
+$SUDO docker image prune -f 2>/dev/null || true
 
 echo -e "${CYAN}[*] Construyendo y levantando la imagen Docker...${NC}"
 
@@ -76,11 +79,14 @@ if [ "$DEPLOYED" = false ]; then
     fi
 fi
 
-# Intento 3: Docker build y run nativo (100% infalible)
+# Intento 3: Docker build y run nativo con límites de recursos para VirtualBox
 if [ "$DEPLOYED" = false ]; then
     echo -e "${YELLOW}[*] Desplegando directamente con Docker nativo (build + run)...${NC}"
     $SUDO docker build -t minecraft_ctf_dvwa .
-    if $SUDO docker run -d --name minecraft_ctf_dvwa --restart unless-stopped -p 8080:8080 minecraft_ctf_dvwa; then
+    if $SUDO docker run -d --name minecraft_ctf_dvwa --restart unless-stopped \
+        --cpus="1.50" --memory="512m" --memory-reservation="128m" --pids-limit=128 \
+        --log-opt max-size=10m --log-opt max-file=3 \
+        -p 8080:8080 minecraft_ctf_dvwa; then
         DEPLOYED=true
     fi
 fi

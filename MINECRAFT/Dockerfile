@@ -43,6 +43,11 @@ COPY app/ /app/
 # Crear carpeta de subidas para el reto de File Upload
 RUN mkdir -p /app/static/uploads
 
+# Pre-generar bytecode, base de datos y assets durante el build
+# Esto evita consumo de CPU y latencia de disco virtual (VirtualBox) en el arranque
+RUN python -m compileall -q /app && \
+    python /app/bootstrap.py
+
 # Ejecutar la aplicación sin privilegios de root
 RUN useradd --create-home --shell /usr/sbin/nologin mcuser && \
     chown -R mcuser:mcuser /app
@@ -54,5 +59,11 @@ EXPOSE 8080
 
 ENV FLASK_ENV=production
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV MALLOC_ARENA_MAX=2
 
-CMD ["gunicorn", "--preload", "--workers", "2", "--threads", "4", "--timeout", "30", "--bind", "0.0.0.0:8080", "wsgi:app"]
+# Configuración de Gunicorn afinada para 2 vCPUs y bajo consumo de RAM:
+# - 2 workers (1 por vCPU) con 2 threads = 4 solicitudes concurrentes sin contención de CPU
+# - --preload para compartir memoria física entre workers vía Copy-on-Write (COW)
+# - --max-requests y --max-requests-jitter para reciclar memoria periódicamente sin caída de servicio
+CMD ["gunicorn", "--preload", "--workers", "2", "--threads", "2", "--max-requests", "500", "--max-requests-jitter", "50", "--timeout", "30", "--bind", "0.0.0.0:8080", "wsgi:app"]
