@@ -19,37 +19,38 @@ def rot13_base64(flag):
 
 
 # 1. Crear Mapa de la Cueva con Esteganografía (Metadatos EXIF / Comentarios)
-def create_stego_map():
+def create_stego_map(force=False):
     img_path = os.path.join(ASSETS_DIR, 'mapa_cueva.png')
-    
+    if not force and os.path.exists(img_path) and os.path.getsize(img_path) > 0:
+        return
+
     # Crear una imagen pixel-art estilo mapa de Minecraft (256x256)
     img = Image.new('RGB', (256, 256), color=(40, 30, 20))
     draw = ImageDraw.Draw(img)
-    
+
     # Dibujar cuadrícula y cueva simulada
     for x in range(0, 256, 16):
         draw.line([(x, 0), (x, 256)], fill=(50, 40, 30), width=1)
     for y in range(0, 256, 16):
         draw.line([(0, y), (256, y)], fill=(50, 40, 30), width=1)
-        
+
     # Dibujar vetas de mineral de hierro (color arena/óxido)
     draw.rectangle([80, 80, 112, 112], fill=(138, 120, 100), outline=(80, 70, 60))
     draw.rectangle([140, 160, 180, 190], fill=(138, 120, 100), outline=(80, 70, 60))
     draw.rectangle([16, 200, 48, 230], fill=(180, 140, 110), outline=(100, 80, 60)) # Veta de Hierro
-    
+
     # Dibujar antorchas (puntos amarillos)
     draw.point((85, 85), fill=(255, 200, 0))
     draw.point((145, 165), fill=(255, 200, 0))
 
     # El mensaje secreto se calcula desde la flag canónica: Base64(ROT-13(flag)).
-    # Así el dato cifrado nunca puede desincronizarse del flag real.
     stego_comment = (
         "PIXEL_METADATA_SECTION_STEVE_MINING_LOGS:\n"
         "Coordenadas cifradas con Cifrado Cesar (Rot-13) + Base64:\n"
         f"SECRETO_B64: {rot13_base64(IRON_FLAG)}\n"
         "Pista: Decodifica Base64 y luego aplica ROT-13 (Cifrado Cesar de 13 posiciones) para obtener la flag de Hierro."
     )
-    
+
     # Guardar imagen con metadatos PngInfo
     target_info = PngInfo()
     target_info.add_text("Author", "Steve_Miner_Expert")
@@ -60,8 +61,11 @@ def create_stego_map():
     print(f"[+] Mapa con esteganografía generado en: {img_path}")
 
 # 2. Crear archivo de planos del portal (Metadatos FOCA / ExifTool)
-def create_portal_blueprints():
+def create_portal_blueprints(force=False):
     doc_path = os.path.join(DOCS_DIR, 'planos_portal_nether.txt')
+    if not force and os.path.exists(doc_path) and os.path.getsize(doc_path) > 0:
+        return
+
     content = (
         "===============================================================\n"
         " DOCUMENTO OFICIAL: PLANOS DE CONSTRUCCION DEL PORTAL AL NETHER \n"
@@ -86,7 +90,7 @@ def create_portal_blueprints():
     print(f"[+] Planos del portal generados en: {doc_path}")
 
 # 3. Generar iconos SVG en pixel art para cada uno de los 9 ítems de Minecraft
-def create_svg_icons():
+def create_svg_icons(force=False):
     icons = {
         'iron_ingot.svg': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="64" height="64" shape-rendering="crispEdges">
             <path fill="#2c2c2c" d="M10 6h12v2h2v12h-2v2H10v-2H8V8h2z"/>
@@ -116,7 +120,7 @@ def create_svg_icons():
             <path fill="#eab308" d="M10 10h8v8h-8z"/>
         </svg>''',
         'blaze_rod.svg': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="64" height="64" shape-rendering="crispEdges">
-            <path fill="#78350f" d="M22 4h4v4h-2v2h-2v2h-2v2h-2v2h-2v2h-2v2h-2v2h-2v2H8v4H4v-4h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2V8h2V4z"/>
+            <path fill="#78350f" d="M22 4h4v4h-2v2h-2v2h-2v2h-2v2h-2v2h-2v2h-2v2h-2v2H8v4H4v-4h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2V8h2V4z"/>
             <path fill="#f59e0b" d="M22 6h2v2h-2v2h-2v2h-2v2h-2v2h-2v2h-2v2h-2v2H8v2H6v-2h2v-2h2v-2h2v-2h2v-2h2v-2h2V8h2V6z"/>
             <path fill="#fef08a" d="M22 6h1v1h-1zM18 10h1v1h-1zM14 14h1v1h-1zM10 18h1v1h-1zM6 22h1v1H6z"/>
         </svg>''',
@@ -151,6 +155,10 @@ def create_svg_icons():
             <path fill="#ffffff" d="M2 2h2v2H2z"/>
         </svg>'''
     }
+
+    if not force and all(os.path.exists(os.path.join(ASSETS_DIR, name)) and os.path.getsize(os.path.join(ASSETS_DIR, name)) > 0 for name in icons):
+        return
+
     for name, content in icons.items():
         file_path = os.path.join(ASSETS_DIR, name)
         with open(file_path, 'w', encoding='utf-8') as f:

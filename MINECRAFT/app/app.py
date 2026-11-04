@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sqlite3
 import base64
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, send_from_directory
