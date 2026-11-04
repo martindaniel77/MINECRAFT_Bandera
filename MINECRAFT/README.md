@@ -2,6 +2,11 @@
 
 Laboratorio interactivo de Ciberseguridad con temática de **Minecraft**, diseñado para ejecutarse sobre **Docker** en **Kali Linux** y resolverse 100% mediante navegador web y herramientas de pentesting.
 
+## Instalacion del Docker
+```bash
+sudo apt install -y docker.io docker-compose  
+```
+
 > ⚡ **Perfil de Optimización para VirtualBox:**
 > Configurado y afinado específicamente para máquinas virtuales con **4048 MB de RAM (4 GB)** y **2 procesadores (vCPUs)**.
 > - **Límite de CPU a 1.5 vCPUs:** Evita que el contenedor sature ambos núcleos al 100% y congele la interfaz de usuario (XFCE, LightDM) o el navegador de la VM.
@@ -20,6 +25,7 @@ cd /ruta/a/MINECRAFT
 
 ### 2. Dar permisos y ejecutar el script de despliegue automático:
 ```bash
+sed -i 's/\r$//' deploy.sh
 chmod +x deploy.sh
 ./deploy.sh
 ```
