@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}The End - Minecraft CTF{% endblock %}
 
@@ -14,6 +14,7 @@
     Has colocado los 12 Ojos de Ender y cruzado el portal hacia el Vacío. 
     Te encuentras en la isla central frente al <strong>Ender Dragón</strong>. 
     Para liberar el End debes <strong>destruir los Cristales de las Torres</strong>, <strong>asestar el golpe final al Dragón</strong> y <strong>capturar el Huevo legítimo evadiendo los señuelos (Honeypots)</strong>.
+    (Recuerda que todas las banderas tienen el formato <code>Flag{...}</code>).
   </p>
 
   <div class="challenges-grid">
@@ -73,7 +74,7 @@
 
       <!-- Formulario de Bandera -->
       <form class="flag-form" onsubmit="submitFlag('the_end', 'crystals', event)">
-        <input type="text" id="flag-input-crystals" class="mc-input" placeholder="FLAG{...}"
+        <input type="text" id="flag-input-crystals" class="mc-input" placeholder="Flag{...}"
                value="{% if 'crystals' in session.get('inventory', []) %}FLAG{MINECRAFT_END_CRYSTALS_CVE_SHATTERED}{% endif %}"
                {% if 'crystals' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'crystals' in session.get('inventory', []) %}disabled{% endif %}>
@@ -140,7 +141,7 @@ output = subprocess.check_output(cmd, shell=True) # Shell=True sin sanitizar!</p
 
       <!-- Formulario de Bandera -->
       <form class="flag-form" onsubmit="submitFlag('the_end', 'dragon', event)">
-        <input type="text" id="flag-input-dragon" class="mc-input" placeholder="FLAG{...}"
+        <input type="text" id="flag-input-dragon" class="mc-input" placeholder="Flag{...}"
                value="{% if 'dragon' in session.get('inventory', []) %}FLAG{MINECRAFT_ENDER_DRAGON_SLAIN_COMMAND_INJECTION}{% endif %}"
                {% if 'dragon' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'dragon' in session.get('inventory', []) %}disabled{% endif %}>
@@ -210,7 +211,7 @@ filepath = os.path.join(base_path, altar_file)
 
       <!-- Formulario de Bandera -->
       <form class="flag-form" onsubmit="submitFlag('the_end', 'egg', event)">
-        <input type="text" id="flag-input-egg" class="mc-input" placeholder="FLAG{...}"
+        <input type="text" id="flag-input-egg" class="mc-input" placeholder="Flag{...}"
                value="{% if 'egg' in session.get('inventory', []) %}FLAG{MINECRAFT_FINAL_DRAGON_EGG_VICTORY_GG}{% endif %}"
                {% if 'egg' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'egg' in session.get('inventory', []) %}disabled{% endif %}>

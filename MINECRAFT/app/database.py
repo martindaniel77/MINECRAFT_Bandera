@@ -1,3 +1,8 @@
+# ==============================================================================
+# MINECRAFT CTF - DATABASE INITIALIZER & MODELS
+# Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
+# ==============================================================================
+
 import sqlite3
 import os
 
@@ -99,3 +104,4 @@ def init_db():
 if __name__ == '__main__':
     init_db()
     print("[+] Base de datos SQLite de Minecraft CTF inicializada con éxito.")
+    print("[+] Desarrollado por: Thorfinn777, Martyn777, Sassyjack777")

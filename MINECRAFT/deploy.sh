@@ -1,6 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # MINECRAFT CTF - DVWA STYLE DEPLOYMENT SCRIPT
+# Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
 # Kali Linux Automatización de Despliegue (8. Semestre - Seguridad App)
 # Optimizado para VirtualBox (4GB RAM, 2 vCPUs)
 # ==============================================================================
@@ -22,6 +23,7 @@ echo "    ██║╚██╔╝██║██║██║╚██╗██�
 echo "    ██║ ╚═╝ ██║██║██║ ╚████║███████╗╚██████╗██║  ██║██║  ██║██║        ██║   "
 echo "    ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝   "
 echo "                    [ CAPTURE THE FLAG - DVWA STYLE ]                 "
+echo "          Desarrollado por: Thorfinn777, Martyn777, Sassyjack777      "
 echo "======================================================================"
 echo -e "${NC}"
 
@@ -102,6 +104,7 @@ if $SUDO docker ps | grep -q "minecraft_ctf_dvwa"; then
     echo -e "${PURPLE}======================================================================${NC}"
     echo -e "${YELLOW}  🌐 URL de Acceso Local : ${CYAN}http://localhost:8080${NC}"
     echo -e "${YELLOW}  🌐 URL en Red (VM)     : ${CYAN}http://$(hostname -I 2>/dev/null | awk '{print $1}'):8080${NC}"
+    echo -e "${YELLOW}  👨‍💻 Autores            : ${CYAN}Thorfinn777, Martyn777, Sassyjack777${NC}"
     echo -e "${PURPLE}======================================================================${NC}"
     echo -e "${NC}  Dimensiones disponibles:${NC}"
     echo -e "   1. ${GREEN}Overworld${NC} (Fácil)   : Hierro -> Diamante -> Portal Nether"

@@ -1,3 +1,8 @@
+# ==============================================================================
+# MINECRAFT CTF - PIGLIN GUARD SIMULATED BOT
+# Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
+# ==============================================================================
+
 import re
 import threading
 import time

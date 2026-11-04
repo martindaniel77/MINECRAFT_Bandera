@@ -1,3 +1,8 @@
+# ==============================================================================
+# MINECRAFT CTF - BOOTSTRAPPER & ASSET INITIALIZER
+# Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
+# ==============================================================================
+
 import os
 import sys
 
@@ -47,3 +52,4 @@ def bootstrap():
 if __name__ == '__main__':
     bootstrap()
     print("[+] Base de datos y assets de Minecraft CTF inicializados correctamente.")
+    print("[+] Creadores: Thorfinn777, Martyn777, Sassyjack777")

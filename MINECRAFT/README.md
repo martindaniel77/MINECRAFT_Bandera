@@ -2,7 +2,30 @@
 
 Laboratorio interactivo de Ciberseguridad con temática de **Minecraft**, diseñado para ejecutarse sobre **Docker** en **Kali Linux** y resolverse 100% mediante navegador web y herramientas de pentesting.
 
-## Instalacion del Docker
+---
+
+## 👨‍💻 Desarrolladores y Autores
+Este laboratorio fue desarrollado por:
+- **Thorfinn777**
+- **Martyn777**
+- **Sassyjack777**
+
+---
+
+## 🚩 Formato de las Banderas (Flags)
+> ⚠️ **IMPORTANTE:**
+> Todas las banderas dentro de este laboratorio siguen el formato estándar:
+> ```text
+> Flag{...}
+> ```
+> *(El sistema de validación también acepta el formato en mayúsculas `FLAG{...}` para comodidad del participante).*
+>
+> **Ejemplo:**
+> `Flag{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}`
+
+---
+
+## ⚙️ Instalación de Docker y Requisitos
 ```bash
 sudo apt install -y docker.io docker-compose  
 ```
