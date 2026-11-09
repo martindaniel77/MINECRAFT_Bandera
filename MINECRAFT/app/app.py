@@ -72,15 +72,15 @@ FLAGS = {
 }
 
 ITEM_NAMES = {
-    'iron': '⛏️ Lingote de Hierro',
-    'diamond': '💎 Diamante',
-    'portal': '🟣 Portal al Nether',
-    'gold': '🟡 Lingote de Oro',
-    'blaze': '🔥 Vara de Blaze',
-    'pearl': '👁️ Ojo de Ender',
-    'crystals': '💥 Cristales del End Destruidos',
-    'dragon': '🐉 Ender Dragón Derrotado',
-    'egg': '🥚 Huevo de Dragón'
+    'iron': ' Lingote de Hierro',
+    'diamond': ' Diamante',
+    'portal': ' Portal al Nether',
+    'gold': ' Lingote de Oro',
+    'blaze': ' Vara de Blaze',
+    'pearl': ' Ojo de Ender',
+    'crystals': ' Cristales del End Destruidos',
+    'dragon': ' Ender Dragón Derrotado',
+    'egg': ' Huevo de Dragón'
 }
 
 def get_inventory():
@@ -270,7 +270,7 @@ def nether_view():
     inv = get_inventory()
     # Requiere haber conseguido el portal del Overworld
     if 'portal' not in inv and 'dev' not in request.args:
-        flash("🔒 Debes completar el Overworld y encender el Portal para entrar al Nether.", "error")
+        flash(" Debes completar el Overworld y encender el Portal para entrar al Nether.", "error")
         return redirect(url_for('overworld_view'))
 
     conn = get_db_connection()
@@ -379,7 +379,7 @@ def nether_pearl_altar():
     if user_role in ['ender_master', 'bastion_overlord', 'admin', 'root']:
         response_html = f'''
         <div style="color:#55ff55;">
-          ✨ <strong>¡ACCESO CONCEDIDO AL ALTAR DEL ENDERMAN!</strong><br>
+           <strong>¡ACCESO CONCEDIDO AL ALTAR DEL ENDERMAN!</strong><br>
           Rol autenticado: <code>{user_role}</code> (Privilegios de Alto Nivel).<br>
           Has forjado el Ojo de Ender legítimo:<br>
           <strong style="color:#facc15; font-size:1.1rem;">FLAG{{MINECRAFT_ENDER_PEARL_PRIV_ESCALATION}}</strong>
@@ -388,7 +388,7 @@ def nether_pearl_altar():
     else:
         response_html = f'''
         <div style="color:#ef4444;">
-          ⛔ <strong>ACCESO DENEGADO</strong>: Tu rol actual es <code>{user_role}</code>.<br>
+           <strong>ACCESO DENEGADO</strong>: Tu rol actual es <code>{user_role}</code>.<br>
           Solo los usuarios con rol <code>ender_master</code> o <code>bastion_overlord</code> pueden forjar el Ojo de Ender.
         </div>
         '''
@@ -401,7 +401,7 @@ def nether_pearl_altar():
 def the_end_view():
     inv = get_inventory()
     if 'pearl' not in inv and 'dev' not in request.args:
-        flash("🔒 Debes completar el Nether y craftear el Ojo de Ender para entrar a The End.", "error")
+        flash(" Debes completar el Nether y craftear el Ojo de Ender para entrar a The End.", "error")
         return redirect(url_for('nether_view'))
 
     return render_template('the_end.html', current_dimension='the_end')
@@ -420,7 +420,7 @@ def the_end_crystals_exploit():
         
         result_html = f'''
         <div style="color:#55ff55;">
-          💥 <strong>¡BOOM! EXPLOTACIÓN DE SERVICIO EXITOSA</strong><br>
+           <strong>¡BOOM! EXPLOTACIÓN DE SERVICIO EXITOSA</strong><br>
           La sobrecarga de telemetría provocó la detonación en cadena de los 4 cristales de curación.<br>
           Bandera obtenida: <strong style="color:#facc15;">{flag}</strong>
         </div>
@@ -428,7 +428,7 @@ def the_end_crystals_exploit():
     else:
         result_html = f'''
         <div style="color:#ef4444;">
-          🛡️ Los escudos de los cristales rechazaron el payload: <code>{payload}</code>.<br>
+           Los escudos de los cristales rechazaron el payload: <code>{payload}</code>.<br>
           Los cristales siguen alimentando la vida del Ender Dragón.
         </div>
         '''
@@ -462,7 +462,7 @@ def the_end_egg_inspect():
         if 'real_dragon_egg' in altar_file:
             content = FLAGS['the_end']['egg']
         elif 'fake_egg' in altar_file:
-            content = "FLAG{HONEYPOT_TRAP_NICE_TRY_LOOK_IN_ROOT} (⚠️ Señuelo detectado: Este no es el huevo real)"
+            content = "FLAG{HONEYPOT_TRAP_NICE_TRY_LOOK_IN_ROOT} ( Señuelo detectado: Este no es el huevo real)"
         else:
             content = f"Error leyendo archivo: {str(e)}"
 

@@ -10,57 +10,61 @@
   <meta name="author" content="Thorfinn777, Martyn777, Sassyjack777">
   <meta name="description" content="Laboratorio de Ciberseguridad Minecraft CTF desarrollado por Thorfinn777, Martyn777, Sassyjack777">
   <title>{% block title %}Minecraft CTF{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=2">
 </head>
 <body class="dimension-{{ current_dimension|default('overworld') }}" data-dimension="{{ current_dimension|default('overworld') }}">
 
-  <!-- Barra de Navegación Superior -->
-  <header class="mc-navbar">
-    <a href="{{ url_for('index') }}" class="mc-logo">
-      <span>⛏️ MINECRAFT CTF</span>
-      {% if logo_src %}<img src="{{ url_for('static', filename=logo_src) }}" class="mc-logo-creeper" alt="Creeper">{% endif %}
-    </a>
+  <!-- Botón para desplegar la barra lateral derecha -->
+  <button type="button" class="mc-sidebar-toggle" id="mc-sidebar-toggle" aria-expanded="false" aria-controls="mc-sidebar-right" title="Abrir menú de navegación">
+    Menú
+  </button>
+
+  <!-- Barra lateral desplegable a la derecha (reemplaza la barra superior) -->
+  <aside class="mc-sidebar-right" id="mc-sidebar-right" aria-hidden="true">
+    <div class="mc-sidebar-header">
+      <a href="{{ url_for('index') }}" class="mc-logo">
+        <span>MINECRAFT CTF</span>
+        {% if logo_src %}<img src="{{ url_for('static', filename=logo_src) }}" class="mc-logo-creeper" alt="Creeper">{% endif %}
+      </a>
+      <button type="button" class="mc-sidebar-close" id="mc-sidebar-close" aria-label="Cerrar menú">×</button>
+    </div>
 
     <!-- MARCA DE AGUA VISUAL 1: IDENTIFICACIÓN DE AUTORÍA EN NAVBAR -->
     <div class="mc-watermark-navbar" title="Laboratorio desarrollado por Thorfinn777, Martyn777, Sassyjack777">
-      <span class="mc-wm-tag">🛡️ Creadores:</span>
+      <span class="mc-wm-tag">Creadores:</span>
       <span class="mc-wm-names"><strong>Thorfinn777</strong> • <strong>Martyn777</strong> • <strong>Sassyjack777</strong></span>
     </div>
 
     <nav class="mc-nav-links">
-      <!-- Botón de Sonido Ambiental de la Dimensión -->
-      <button type="button" class="mc-btn mc-btn-sound" onclick="mcAudio.playDimensionSound('{{ current_dimension|default('overworld') }}')" title="Reproducir sonido característico de esta dimensión">
-        🔊 Sonido
-      </button>
-
       <a href="{{ url_for('overworld_view') }}" class="mc-btn mc-btn-green {% if current_dimension == 'overworld' %}active{% endif %}">
-        🟢 Overworld
+        Overworld
       </a>
       {% if 'portal' in session.get('inventory', []) %}
         <a href="{{ url_for('nether_view') }}" class="mc-btn mc-btn-red {% if current_dimension == 'nether' %}active{% endif %}">
-          🔴 Nether
+          Nether
         </a>
       {% else %}
         <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '¡Debes completar el Overworld y encender el portal!')" title="Debes completar el Overworld para desbloquear el Nether">
-          🔒 Nether
+          Nether (Bloqueado)
         </button>
       {% endif %}
 
       {% if 'pearl' in session.get('inventory', []) %}
         <a href="{{ url_for('the_end_view') }}" class="mc-btn mc-btn-purple {% if current_dimension == 'the_end' %}active{% endif %}">
-          🟣 The End
+          The End
         </a>
       {% else %}
         <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '¡Debes forjar el Ojo de Ender en el Nether!')" title="Debes craftear el Ojo de Ender en el Nether">
-          🔒 The End
+          The End (Bloqueado)
         </button>
       {% endif %}
 
       <a href="{{ url_for('reset_session') }}" class="mc-btn" onclick="return confirm('¿Reiniciar todo el progreso del juego?')">
-        🔄 Reiniciar
+        Reiniciar
       </a>
     </nav>
-  </header>
+  </aside>
+  <div class="mc-sidebar-backdrop" id="mc-sidebar-backdrop"></div>
 
   <!-- Contenido Principal -->
   <main class="mc-container">
@@ -75,11 +79,16 @@
     {% block content %}{% endblock %}
   </main>
 
+  <!-- Botón para mostrar/ocultar la barra inferior (HUD) -->
+  <button type="button" class="mc-hud-toggle" id="mc-hud-toggle" aria-expanded="true" aria-controls="mc-hud-bottom">
+     Ocultar HUD
+  </button>
+
   <!-- HUD INVENTARIO MINECRAFT FIJO AL PIE DE PÁGINA (9 SLOTS CON BARRA DE XP) -->
-  <footer class="mc-hud-bottom">
+  <footer class="mc-hud-bottom" id="mc-hud-bottom">
     <!-- MARCA DE AGUA VISUAL 2: AUTORÍA PERMANENTE EN EL HUD DE JUEGO -->
     <div class="mc-watermark-hud">
-      <span>⛏️ Laboratorio Minecraft CTF</span> | Desarrollado por: <strong>Thorfinn777</strong> &bull; <strong>Martyn777</strong> &bull; <strong>Sassyjack777</strong>
+      <span>Laboratorio Minecraft CTF</span> | Desarrollado por: <strong>Thorfinn777</strong> &bull; <strong>Martyn777</strong> &bull; <strong>Sassyjack777</strong>
     </div>
 
     <div class="mc-stats-bar">
@@ -163,6 +172,6 @@
     </div>
   </footer>
 
-  <script src="{{ url_for('static', filename='js/hud.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/hud.js') }}?v=2"></script>
 </body>
 </html>

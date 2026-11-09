@@ -656,6 +656,48 @@ body.dimension-the_end::after {
   pointer-events: none;
 }
 
+/* Botón para mostrar/ocultar el HUD inferior */
+.mc-hud-toggle {
+  position: fixed;
+  bottom: 150px;
+  right: 18px;
+  z-index: 1300;
+  font-family: var(--mc-font);
+  background: rgba(36, 36, 36, 0.92);
+  color: #ffffff;
+  border: 2px solid #777777;
+  border-right-color: #161616;
+  border-bottom-color: #161616;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.mc-hud-toggle:hover {
+  filter: brightness(1.2);
+  transform: translateY(-2px);
+}
+
+/* Ocultar/mostrar HUD inferior */
+.mc-hud-bottom {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+body.hud-hidden .mc-hud-bottom {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.hud-hidden {
+  padding-bottom: 0;
+}
+
 /* HOTBAR */
 .mc-hotbar {
   display: flex;
@@ -959,6 +1001,117 @@ body.dimension-the_end::after {
 
 .mc-watermark-hud strong {
   color: #facc15;
+}
+
+/* ==========================================================================
+   BARRA LATERAL DESPLEGABLE A LA DERECHA (reemplaza la barra superior)
+   ========================================================================== */
+.mc-sidebar-toggle {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 1100;
+  font-family: var(--mc-font);
+  background: rgba(36, 36, 36, 0.9);
+  color: #ffffff;
+  border: 2px solid #777777;
+  border-right-color: #161616;
+  border-bottom-color: #161616;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.mc-sidebar-toggle:hover {
+  filter: brightness(1.2);
+  transform: translateY(-2px);
+}
+
+.mc-sidebar-right {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 320px;
+  max-width: 85vw;
+  background-color: rgba(36, 36, 36, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-left: 3px solid #141414;
+  box-shadow: -6px 0 24px rgba(0, 0, 0, 0.85);
+  padding: 16px 18px 24px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.mc-sidebar-right.open {
+  transform: translateX(0);
+}
+
+.mc-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #141414;
+}
+
+.mc-sidebar-close {
+  background: #444444;
+  color: #ffffff;
+  border: 2px solid #777777;
+  border-right-color: #161616;
+  border-bottom-color: #161616;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mc-sidebar-close:hover {
+  filter: brightness(1.2);
+}
+
+.mc-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1150;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.mc-sidebar-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* El contenido del sidebar se apila verticalmente */
+.mc-sidebar-right .mc-nav-links {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.mc-sidebar-right .mc-nav-links .mc-btn {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 /* Botón de Sonido en Navbar */

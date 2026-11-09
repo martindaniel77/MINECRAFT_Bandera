@@ -6,7 +6,7 @@
 <div class="mc-box">
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1 class="mc-title" style="color: #c084fc;">
-      <span>🟣 FASE 3: THE END (Nivel: Difícil - Boss Final)</span>
+      <span><img src="{{ url_for('static', filename='img/ender_pearl.svg') }}" alt="" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:6px;">FASE 3: THE END (Nivel: Difícil - Boss Final)</span>
     </h1>
     <span class="mc-badge" style="background:#7e22ce; color:#fff;">3 Desafíos</span>
   </div>
@@ -41,7 +41,7 @@
           <form method="POST" action="{{ url_for('the_end_crystals_exploit') }}" style="margin: 10px 0;">
             <input type="text" name="exploit_payload" class="mc-input" placeholder="Payload de explotación (ej. AB;shatter_crystals)" value="{{ request.form.get('exploit_payload', '') }}">
             <button type="submit" class="mc-btn mc-btn-purple" style="width:100%;">
-              💥 Enviar Exploit a los Cristales
+               Enviar Exploit a los Cristales
             </button>
           </form>
 
@@ -54,21 +54,15 @@
           <!-- Pistas y Codigo Fuente -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
-              <button class="mc-btn" onclick="toggleHint('crystals')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
-              <button class="mc-btn" onclick="toggleSource('crystals')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
-            </div>
+              <button class="mc-btn" onclick="toggleHint('crystals')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
+                          </div>
             <div id="hint-crystals" class="hint-box">
               <strong>Pista — Disparo de una backdoor:</strong><br>
               1. No estás buscando un fallo de autenticación: estás buscando una <em>puerta atrás</em> que alguien dejó en el servicio. Así funcionaban los incidentes de IRC y ProFTPD que se han documentado en la historia de la ciberseguridad.<br>
               2. Estas backdoors casi nunca se aleatorizan: comparan tu entrada contra un token fijo. El proveedor y el año suelen estar escritos en el propio token.<br>
               3. El mismo campo cumple dos funciones: una es activar el disparador y la otra es entregar tu entrada a una shell. Piensa en un carácter de dos letras que precedía a los comandos en los protocolos antiguos, y en el operador que le sigue.
             </div>
-            <div id="source-crystals" class="source-box">
-              <strong>Lógica del Servicio Emulado:</strong>
-              <pre class="source-code-block">if "CVE-2026-OVERLOAD" in payload or "AB;" in payload:
-    return "💥 BOOM! Cristales destruidos: " + read_flag('/secret/end_crystals.txt')</pre>
             </div>
-          </div>
         </div>
       </div>
 
@@ -78,7 +72,7 @@
                value="{% if 'crystals' in session.get('inventory', []) %}FLAG{MINECRAFT_END_CRYSTALS_CVE_SHATTERED}{% endif %}"
                {% if 'crystals' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'crystals' in session.get('inventory', []) %}disabled{% endif %}>
-          {% if 'crystals' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+          {% if 'crystals' in session.get('inventory', []) %}{% else %}Validar{% endif %}
         </button>
       </form>
       <div id="feedback-crystals"></div>
@@ -107,7 +101,7 @@
           <form method="POST" action="{{ url_for('the_end_dragon_damage') }}" style="margin: 10px 0;">
             <input type="text" name="shot_power" class="mc-input" placeholder="Potencia de disparo (ej. 100)" value="{{ request.form.get('shot_power', '100') }}">
             <button type="submit" class="mc-btn mc-btn-red" style="width:100%;">
-              🏹 Disparar Flecha Sónica
+               Disparar Flecha Sónica
             </button>
           </form>
 
@@ -121,21 +115,15 @@
           <!-- Pistas y Codigo Fuente -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
-              <button class="mc-btn" onclick="toggleHint('dragon')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
-              <button class="mc-btn" onclick="toggleSource('dragon')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
-            </div>
+              <button class="mc-btn" onclick="toggleHint('dragon')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
+                          </div>
             <div id="hint-dragon" class="hint-box">
               <strong>Pista — Inyección de comandos:</strong><br>
               1. Tu valor (la potencia del impacto) se coloca dentro de una línea de comando que se ejecuta en una shell. La shell no sabe dónde acaba tu dato: cree que todo lo que sigue es parte de su trabajo.<br>
               2. La clave es <em>terminar</em> tu comando antes de que lo termine el servidor, para que la shell interprete lo que venga como una orden nueva e independiente.<br>
               3. Usa la opción de ver el código de esta misma tarjeta: te muestra exactamente cómo se construye la orden.
             </div>
-            <div id="source-dragon" class="source-box">
-              <strong>Código Vulnerable:</strong>
-              <pre class="source-code-block">cmd = f"echo 'Calculando impacto: {shot_power}'"
-output = subprocess.check_output(cmd, shell=True) # Shell=True sin sanitizar!</pre>
             </div>
-          </div>
         </div>
       </div>
 
@@ -145,7 +133,7 @@ output = subprocess.check_output(cmd, shell=True) # Shell=True sin sanitizar!</p
                value="{% if 'dragon' in session.get('inventory', []) %}FLAG{MINECRAFT_ENDER_DRAGON_SLAIN_COMMAND_INJECTION}{% endif %}"
                {% if 'dragon' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'dragon' in session.get('inventory', []) %}disabled{% endif %}>
-          {% if 'dragon' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+          {% if 'dragon' in session.get('inventory', []) %}{% else %}Validar{% endif %}
         </button>
       </form>
       <div id="feedback-dragon"></div>
@@ -175,7 +163,7 @@ output = subprocess.check_output(cmd, shell=True) # Shell=True sin sanitizar!</p
             <div style="display:flex; gap:6px;">
               <input type="text" name="altar_file" class="mc-input" placeholder="Archivo del altar (ej. honeypot/fake_egg.txt)" value="{{ request.args.get('altar_file', 'honeypot/fake_egg.txt') }}">
               <button type="submit" class="mc-btn mc-btn-gold" style="white-space:nowrap;">
-                🥚 Leer Altar
+                 Leer Altar
               </button>
             </div>
           </form>
@@ -190,22 +178,15 @@ output = subprocess.check_output(cmd, shell=True) # Shell=True sin sanitizar!</p
           <!-- Pistas y Codigo Fuente -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
-              <button class="mc-btn" onclick="toggleHint('egg')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
-              <button class="mc-btn" onclick="toggleSource('egg')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
-            </div>
+              <button class="mc-btn" onclick="toggleHint('egg')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
+                          </div>
             <div id="hint-egg" class="hint-box">
               <strong>Pista — Recorrido de rutas (Path Traversal):</strong><br>
               1. El lector coge el nombre de fichero que le mandas, lo une a un directorio base y abre lo que salga. Si tú controlas el nombre, tal vez también controlas lo que se une.<br>
               2. Ojo: hay <em>dos</em> ficheros que parecen el premio. Uno está colocado para que se encuentre demasiado fácil, y ese es un señuelo. ¿Cuál querría un defensor que cogieras?<br>
               3. Para salir del directorio base necesitas subir directorios en la ruta. La respuesta a la pregunta 2 te dice en cuál estás.
             </div>
-            <div id="source-egg" class="source-box">
-              <strong>Código del Lector del Altar:</strong>
-              <pre class="source-code-block">base_path = "/var/www"
-filepath = os.path.join(base_path, altar_file)
-# No valida si el path sale de /var/www mediante ../../ !</pre>
             </div>
-          </div>
         </div>
       </div>
 
@@ -215,7 +196,7 @@ filepath = os.path.join(base_path, altar_file)
                value="{% if 'egg' in session.get('inventory', []) %}FLAG{MINECRAFT_FINAL_DRAGON_EGG_VICTORY_GG}{% endif %}"
                {% if 'egg' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'egg' in session.get('inventory', []) %}disabled{% endif %}>
-          {% if 'egg' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+          {% if 'egg' in session.get('inventory', []) %}{% else %}Validar{% endif %}
         </button>
       </form>
       <div id="feedback-egg"></div>
