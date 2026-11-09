@@ -6,7 +6,7 @@
 <div class="mc-box">
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1 class="mc-title" style="color: #ef5350;">
-      <span>🔴 FASE 2: NETHER (Nivel: Medio)</span>
+      <span><img src="{{ url_for('static', filename='img/gold_ingot.svg') }}" alt="" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:6px;">FASE 2: NETHER (Nivel: Medio)</span>
     </h1>
     <span class="mc-badge" style="background:#c62828; color:#fff;">3 Desafíos</span>
   </div>
@@ -43,7 +43,7 @@
             <input type="text" name="offered_item" class="mc-input" placeholder="Objeto que ofreces (ej. 5x Manzanas)" required>
             <textarea name="note_to_piglin" class="mc-input" rows="2" placeholder="Nota al Piglin (Permite HTML/JS)..." required></textarea>
             <button type="submit" class="mc-btn mc-btn-gold" style="width:100%;">
-              📜 Enviar Oferta al Bastión
+               Enviar Oferta al Bastión
             </button>
           </form>
 
@@ -53,8 +53,8 @@
             {% if trade_offers %}
               {% for offer in trade_offers %}
                 <div style="border-top: 1px dashed #444; padding-top: 4px; margin-top: 4px;" data-offer-id="{{ offer.id }}">
-                  👤 <strong>{{ offer.player_name }}</strong> ofrece: <em>{{ offer.offered_item }}</em><br>
-                  💬 Mensaje: <span>{{ offer.note_to_piglin|safe }}</span>
+                   <strong>{{ offer.player_name }}</strong> ofrece: <em>{{ offer.offered_item }}</em><br>
+                   Mensaje: <span>{{ offer.note_to_piglin|safe }}</span>
                 </div>
               {% endfor %}
             {% else %}
@@ -67,7 +67,7 @@
             <div class="terminal-output" style="border-color:#ef4444;">
               <strong>[!] REGISTRO DEL BASTIÓN — credenciales comprometidas:</strong>
               {% for token in captured_tokens %}
-                <div style="color:#ff5555;">🔑 <code>{{ token }}</code></div>
+                <div style="color:#ff5555;"> <code>{{ token }}</code></div>
               {% endfor %}
               <div style="color:#f59e0b; margin-top:4px;">El Piglin Guard entregó su token de la bóveda. Ya puedes validarlo como bandera.</div>
             </div>
@@ -76,9 +76,8 @@
           <!-- Pistas y Codigo Fuente -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
-              <button class="mc-btn" onclick="toggleHint('gold')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
-              <button class="mc-btn" onclick="toggleSource('gold')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
-            </div>
+              <button class="mc-btn" onclick="toggleHint('gold')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
+                          </div>
             <div id="hint-gold" class="hint-box">
               <strong>Pista — XSS almacenado y robo de sesión:</strong><br>
               1. Fíjate en que la nota se pinta en el tablón de ofertas. Pregúntate si el navegador la trata como texto plano o si está interpretando etiquetas. Si el servidor la inserta sin escapar, tú decides qué se renderiza.<br>
@@ -86,12 +85,7 @@
               3. En el propio servidor ya existe un endpoint pensado para recibir datos enviados por el navegador. Búscalo entre las rutas de la aplicación: no hace falta inventarlo.<br>
               4. F12 → Almacenamiento te deja ver las cookies de tu propia sesión; las del bot no están ahí, por eso necesitas otro canal.
             </div>
-            <div id="source-gold" class="source-box">
-              <strong>Código Vulnerable en la plantilla:</strong>
-              <pre class="source-code-block">{{ "{{ offer.note_to_piglin|safe }}" }} 
-# Al usar el filtro |safe se renderiza HTML y JS sin sanitizar!</pre>
             </div>
-          </div>
         </div>
       </div>
 
@@ -101,7 +95,7 @@
                value="{% if 'gold' in session.get('inventory', []) %}FLAG{MINECRAFT_PIGLIN_XSS_GOLD_BARTERED}{% endif %}"
                {% if 'gold' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'gold' in session.get('inventory', []) %}disabled{% endif %}>
-          {% if 'gold' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+          {% if 'gold' in session.get('inventory', []) %}{% else %}Validar{% endif %}
         </button>
       </form>
       <div id="feedback-gold"></div>
@@ -130,7 +124,7 @@
           <form method="POST" action="{{ url_for('nether_blaze_upload') }}" enctype="multipart/form-data" style="margin: 10px 0;">
             <input type="file" name="recipe_file" class="mc-input" required>
             <button type="submit" class="mc-btn mc-btn-red" style="width:100%;">
-              📤 Subir Receta al Caldero
+               Subir Receta al Caldero
             </button>
           </form>
 
@@ -155,21 +149,15 @@
           <!-- Pistas y Codigo Fuente -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
-              <button class="mc-btn" onclick="toggleHint('blaze')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
-              <button class="mc-btn" onclick="toggleSource('blaze')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
-            </div>
+              <button class="mc-btn" onclick="toggleHint('blaze')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
+                          </div>
             <div id="hint-blaze" class="hint-box">
               <strong>Pista — Subida de archivo sin restricción:</strong><br>
               1. El servidor guarda el archivo con el nombre y el tipo que tú indiques, y además ofrece una forma de ejecutarlo. No hace ninguna comprobación de la extensión.<br>
               2. Pregúntate qué hace un intérprete de Python con un fichero que nadie ha revisado. No necesitas más que un archivo de texto con unas pocas líneas.<br>
               3. El objetivo <em>no está</em> en la carpeta de subidas. Piensa en un directorio del sistema que el proceso web pueda leer, y en cómo referenciar una ruta absoluta desde Python.
             </div>
-            <div id="source-blaze" class="source-box">
-              <strong>Código Vulnerable en backend:</strong>
-              <pre class="source-code-block">file.save(os.path.join(UPLOAD_FOLDER, filename))
-# No hay lista blanca de extensiones ni validación de tipo MIME!</pre>
             </div>
-          </div>
         </div>
       </div>
 
@@ -179,7 +167,7 @@
                value="{% if 'blaze' in session.get('inventory', []) %}FLAG{MINECRAFT_BLAZE_ROD_WEBSHELL_RCE}{% endif %}"
                {% if 'blaze' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'blaze' in session.get('inventory', []) %}disabled{% endif %}>
-          {% if 'blaze' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+          {% if 'blaze' in session.get('inventory', []) %}{% else %}Validar{% endif %}
         </button>
       </form>
       <div id="feedback-blaze"></div>
@@ -208,7 +196,7 @@
             <div style="display:flex; gap:6px;">
               <input type="text" name="user_role" class="mc-input" placeholder="Rol actual: guest_traveler" value="{{ request.args.get('user_role', 'guest_traveler') }}">
               <button type="submit" class="mc-btn mc-btn-purple" style="white-space:nowrap;">
-                👁️ Activar Altar
+                 Activar Altar
               </button>
             </div>
           </form>
@@ -222,22 +210,15 @@
           <!-- Pistas y Codigo Fuente -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
-              <button class="mc-btn" onclick="toggleHint('pearl')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
-              <button class="mc-btn" onclick="toggleSource('pearl')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
-            </div>
+              <button class="mc-btn" onclick="toggleHint('pearl')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
+                          </div>
             <div id="hint-pearl" class="hint-box">
               <strong>Pista — Control de acceso defectuoso:</strong><br>
               1. El altar no comprueba quién eres: comprueba un dato que <em>tú</em> le envías en cada petición. Eso es un Decide by Client, y el cliente siempre puede mentir.<br>
               2. Observa qué rango tiene tu sesión ahora mismo y compáralo con los rangos que la propia aplicación menciona en su interfaz.<br>
               3. Edita la petición con el Burp Suite de Kali, en la pestaña de Proxy, en lugar de usar la barra de direcciones: así practicas el mismo método que en un pentest real.
             </div>
-            <div id="source-pearl" class="source-box">
-              <strong>Código Vulnerable:</strong>
-              <pre class="source-code-block">role = request.args.get('user_role') or request.cookies.get('user_role')
-if role in ['ender_master', 'admin', 'root']:
-    return flag # Confianza ciega en el input del cliente!</pre>
             </div>
-          </div>
         </div>
       </div>
 
@@ -247,7 +228,7 @@ if role in ['ender_master', 'admin', 'root']:
                value="{% if 'pearl' in session.get('inventory', []) %}FLAG{MINECRAFT_ENDER_PEARL_PRIV_ESCALATION}{% endif %}"
                {% if 'pearl' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'pearl' in session.get('inventory', []) %}disabled{% endif %}>
-          {% if 'pearl' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+          {% if 'pearl' in session.get('inventory', []) %}{% else %}Validar{% endif %}
         </button>
       </form>
       <div id="feedback-pearl"></div>

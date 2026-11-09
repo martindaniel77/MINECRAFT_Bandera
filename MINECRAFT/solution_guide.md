@@ -1,12 +1,12 @@
-# 📘 GUÍA DE SOLUCIONES Y WRITEUP OFICIAL: MINECRAFT CTF (DVWA STYLE)
+#  GUÍA DE SOLUCIONES Y WRITEUP OFICIAL: MINECRAFT CTF (DVWA STYLE)
 
 Este documento contiene la metodología de resolución paso a paso de los 9 desafíos del laboratorio **Minecraft CTF**, con los comandos y herramientas exactas de **Kali Linux**, además de la justificación académica de los temas cursados en **6º, 7º y 8º Semestre**.
 
 ---
 
-## 🟢 DIMENSIÓN 1: OVERWORLD (NIVEL: FÁCIL)
+##  DIMENSIÓN 1: OVERWORLD (NIVEL: FÁCIL)
 
-### ⛏️ Desafío 1: Lingote de Hierro
+###  Desafío 1: Lingote de Hierro
 - **Tema Académico:** *6º Semestre — Esteganografía y Cifrado César (ROT-13) / Base64.*
 - **Herramientas Kali Linux:** `exiftool`, `strings`, `base64`, `tr`.
 - **Procedimiento de Explotación:**
@@ -26,7 +26,7 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-### 💎 Desafío 2: Diamante en Y=-58
+###  Desafío 2: Diamante en Y=-58
 - **Tema Académico:** *8º Semestre — Inyección SQL (SQLi).*
 - **Herramientas Kali Linux:** Navegador web, Burp Suite, `sqlmap`, `curl`.
 - **Procedimiento de Explotación:**
@@ -51,7 +51,7 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-### 🟣 Desafío 3: Portal del Nether
+###  Desafío 3: Portal del Nether
 - **Tema Académico:** *7º Semestre — Análisis de Metadatos y Reconocimiento Semi-pasivo (FOCA / Exif).*
 - **Herramientas Kali Linux:** `curl`, `wget`, `grep`, Navegador.
 - **Procedimiento de Explotación:**
@@ -65,9 +65,9 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-## 🔴 DIMENSIÓN 2: NETHER (NIVEL: MEDIO)
+##  DIMENSIÓN 2: NETHER (NIVEL: MEDIO)
 
-### 🟡 Desafío 1: Lingote de Oro
+###  Desafío 1: Lingote de Oro
 - **Tema Académico:** *8º Semestre — Stored XSS y Robo de Cookies de Sesión.*
 - **Herramientas Kali Linux:** Navegador Firefox DevTools, Burp Suite, Netcat (`nc`).
 - **Procedimiento de Explotación:**
@@ -84,7 +84,7 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
   4. Al recargar `/nether`, el tablón muestra el **registro de credenciales comprometidas**
      con el token del Piglin:
      ```
-     🔑 piglin_gold_vault_token=FLAG{MINECRAFT_PIGLIN_XSS_GOLD_BARTERED}
+      piglin_gold_vault_token=FLAG{MINECRAFT_PIGLIN_XSS_GOLD_BARTERED}
      ```
   5. Ese token es la bandera. El endpoint de fuga **no** la entrega si solo se consulta:
      ```bash
@@ -97,7 +97,7 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-### 🔥 Desafío 2: Varas de Blaze
+###  Desafío 2: Varas de Blaze
 - **Tema Académico:** *8º Semestre — Arbitrary File Upload a Ejecución Remota de Código (RCE).*
 - **Herramientas Kali Linux:** Editor de texto (`nano`/`vim`), `curl`, Navegador.
 - **Procedimiento de Explotación:**
@@ -116,7 +116,7 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-### 👁️ Desafío 3: Ender Pearl / Ojo de Ender
+###  Desafío 3: Ender Pearl / Ojo de Ender
 - **Tema Académico:** *6º Semestre — Principio de Mínimo Privilegio y Parameter Tampering.*
 - **Herramientas Kali Linux:** Burp Suite, `curl`.
 - **Procedimiento de Explotación:**
@@ -131,9 +131,9 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-## 🟣 DIMENSIÓN 3: THE END (NIVEL: DIFÍCIL - BOSS FINAL)
+##  DIMENSIÓN 3: THE END (NIVEL: DIFÍCIL - BOSS FINAL)
 
-### 💥 Desafío 1: Cristales del End
+###  Desafío 1: Cristales del End
 - **Tema Académico:** *7º Semestre — Análisis de CVEs y Explotación con Metasploit.*
 - **Herramientas Kali Linux:** `curl`, Burp Suite.
 - **Procedimiento de Explotación:**
@@ -147,7 +147,7 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-### 🐉 Desafío 2: Derrotar al Dragón
+###  Desafío 2: Derrotar al Dragón
 - **Tema Académico:** *8º Semestre — Command Injection y RCE en el Sistema Operativo.*
 - **Herramientas Kali Linux:** `curl`, Burp Suite.
 - **Procedimiento de Explotación:**
@@ -162,7 +162,7 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-### 🥚 Desafío 3: Huevo de Dragón
+###  Desafío 3: Huevo de Dragón
 - **Tema Académico:** *6º Semestre — Evasión de Honeypots y Path Traversal (LFI).*
 - **Herramientas Kali Linux:** `curl`, Navegador.
 - **Procedimiento de Explotación:**
@@ -176,12 +176,12 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-## 🏆 PANTALLA FINAL DE VICTORIA
+##  PANTALLA FINAL DE VICTORIA
 Al ingresar las 9 banderas en sus respectivos desafíos, la barra HUD inferior se completará con los 9 ítems, desbloqueando el nivel 90 y redirigiendo automáticamente a `http://localhost:8080/victory` con el **Poema del End** y el resumen de competencias aprobadas.
 
 ---
 
-# 📐 Criterio de diseño de las pistas
+#  Criterio de diseño de las pistas
 
 > Este documento es la **guía del instructor** y sí contiene las soluciones completas.
 > Las pistas que se muestran dentro de la aplicación web son deliberadamente
@@ -200,13 +200,13 @@ la sintaxis y construir el payload él mismo.
 | `../../root/real_dragon_egg.txt` | *"Hay dos ficheros que parecen el premio; uno es un señuelo colocado para que lo encuentres demasiado fácil"* |
 | `tr 'A-Za-z' 'N-ZA-Mn-za-m'` | *"Un cifrado por sustitución que lleva el nombre de un emperador romano"* |
 
-Los botones **🔍 Ver Código** se mantienen: la divulgación del código fuente vulnerable
+Los botones ** Ver Código** se mantienen: la divulgación del código fuente vulnerable
 es en sí misma una vulnerabilidad real (information disclosure) y forma parte del
 reconocimiento que el alumno debe practicar.
 
 ---
 
-# 🗳️ Decisiones pendientes de reunión
+#  Decisiones pendientes de reunión
 
 Estas ideas se descartaron temporalmente y **están pendientes de decisión del equipo**; no se han implementado.
 

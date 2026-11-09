@@ -6,7 +6,7 @@
 <div class="mc-box">
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1 class="mc-title" style="color: #81c784;">
-      <span>🟢 FASE 1: OVERWORLD (Nivel: Fácil)</span>
+      <span><img src="{{ url_for('static', filename='img/iron_ingot.svg') }}" alt="" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:6px;">FASE 1: OVERWORLD (Nivel: Fácil)</span>
     </h1>
     <span class="mc-badge" style="background:#2e7d32; color:#fff;">3 Desafíos</span>
   </div>
@@ -37,31 +37,22 @@
           </p>
           <div style="margin: 12px 0;">
             <a href="{{ url_for('static', filename='img/mapa_cueva.png') }}" download class="mc-btn mc-btn-green" style="width:100%;">
-              📥 Descargar mapa_cueva.png
+              Descargar mapa_cueva.png
             </a>
           </div>
 
           <!-- Pistas y Codigo Fuente -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
-              <button class="mc-btn" onclick="toggleHint('iron')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
-              <button class="mc-btn" onclick="toggleSource('iron')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
-            </div>
+              <button class="mc-btn" onclick="toggleHint('iron')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
+                          </div>
             <div id="hint-iron" class="hint-box">
               <strong>Pista — Esteganografía en metadatos:</strong><br>
               1. El secreto <em>no está en los píxeles</em>: no modifiques la imagen, no la amplíes y no busques colores raros. Piensa en qué más viaja dentro de un PNG que el ojo no ve.<br>
               2. El formato admite campos de texto libres que cualquier herramienta de análisis forense puede volcar. Kali puede enumerarlos por ti.<br>
               3. Lo que encuentres no es aleatorio: es una capa de transporte (Base64) que envuelve un cifrado por sustitución clásico. Ese cifrado lleva el nombre de un emperador romano. Averigua cuánto desplaza y aplica el mismo desplazamiento en sentido inverso.
             </div>
-            <div id="source-iron" class="source-box">
-              <strong>Código Python de cifrado del reto:</strong>
-              <pre class="source-code-block"># Rot-13 + Base64
-flag = "FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}"
-rot13 = codecs.encode(flag, 'rot_13')
-payload = base64.b64encode(rot13.encode()).decode()
-# Insertado en PNG metadata: Comment</pre>
             </div>
-          </div>
         </div>
       </div>
 
@@ -71,7 +62,7 @@ payload = base64.b64encode(rot13.encode()).decode()
                value="{% if 'iron' in session.get('inventory', []) %}FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}{% endif %}"
                {% if 'iron' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'iron' in session.get('inventory', []) %}disabled{% endif %}>
-          {% if 'iron' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+          {% if 'iron' in session.get('inventory', []) %}{% else %}Validar{% endif %}
         </button>
       </form>
       <div id="feedback-iron"></div>
@@ -100,7 +91,7 @@ payload = base64.b64encode(rot13.encode()).decode()
           <form method="POST" action="{{ url_for('overworld_diamond_search') }}" style="margin: 10px 0;">
             <input type="text" name="chest_query" class="mc-input" placeholder="Buscar cofre (ej. Herrero)" value="{{ request.form.get('chest_query', '') }}">
             <button type="submit" class="mc-btn mc-btn-gold" style="width:100%;">
-              🔍 Consultar Base de Datos
+               Consultar Base de Datos
             </button>
           </form>
 
@@ -109,7 +100,7 @@ payload = base64.b64encode(rot13.encode()).decode()
               <strong>[+] Resultados de la consulta:</strong>
               {% if sql_results %}
                 {% for row in sql_results %}
-                  <div>📦 <strong>{{ row.chest_name }}</strong>{% if row.is_locked %} 🔒 <span style="color:#f59e0b;">(PROTEGIDO)</span>{% endif %} (Profundidad: Y={{ row.depth_level }}) -> Botín: <span style="color:#55ff55;">{{ row.secret_loot }}</span></div>
+                  <div> <strong>{{ row.chest_name }}</strong>{% if row.is_locked %}  <span style="color:#f59e0b;">(PROTEGIDO)</span>{% endif %} (Profundidad: Y={{ row.depth_level }}) -> Botín: <span style="color:#55ff55;">{{ row.secret_loot }}</span></div>
                 {% endfor %}
               {% else %}
                 <span style="color:#ef4444;">[!] No se encontraron cofres con ese término.</span>
@@ -120,9 +111,8 @@ payload = base64.b64encode(rot13.encode()).decode()
           <!-- Pistas y Codigo Fuente -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
-              <button class="mc-btn" onclick="toggleHint('diamond')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
-              <button class="mc-btn" onclick="toggleSource('diamond')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
-            </div>
+              <button class="mc-btn" onclick="toggleHint('diamond')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
+                          </div>
             <div id="hint-diamond" class="hint-box">
               <strong>Pista — Inyección SQL:</strong><br>
               1. Lo que escribas no se trata como texto: se concatena dentro de la cláusula <code>WHERE</code>. Escribe siempre entre comillas simples y observa cómo cambia el error.<br>
@@ -130,12 +120,7 @@ payload = base64.b64encode(rot13.encode()).decode()
               3. Para ignorar el resto de la línea existe un comentario de SQL de dos guiones. Colócalo al final de tu entrada.<br>
               4. Alternativa: <code>sqlmap</code> puede localizar la inyección por ti si le indicas la URL y el parámetro.
             </div>
-            <div id="source-diamond" class="source-box">
-              <strong>Código Vulnerable en Python/Flask:</strong>
-              <pre class="source-code-block">query = f"SELECT * FROM villager_chests WHERE is_locked = 0 AND chest_name LIKE '%{user_input}%'"
-cursor.execute(query) # Vulnerable a inyección directa!</pre>
             </div>
-          </div>
         </div>
       </div>
 
@@ -145,7 +130,7 @@ cursor.execute(query) # Vulnerable a inyección directa!</pre>
                value="{% if 'diamond' in session.get('inventory', []) %}FLAG{MINECRAFT_DIAMOND_SQL1_Y58_UNLOCKED}{% endif %}"
                {% if 'diamond' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'diamond' in session.get('inventory', []) %}disabled{% endif %}>
-          {% if 'diamond' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+          {% if 'diamond' in session.get('inventory', []) %}{% else %}Validar{% endif %}
         </button>
       </form>
       <div id="feedback-diamond"></div>
@@ -171,28 +156,22 @@ cursor.execute(query) # Vulnerable a inyección directa!</pre>
           </p>
           <div style="margin: 12px 0;">
             <a href="{{ url_for('static', filename='docs/planos_portal_nether.txt') }}" target="_blank" class="mc-btn mc-btn-purple" style="width:100%;">
-              📄 Inspeccionar Planos del Portal
+               Inspeccionar Planos del Portal
             </a>
           </div>
 
           <!-- Pistas y Codigo Fuente -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
-              <button class="mc-btn" onclick="toggleHint('portal')" style="font-size:0.75rem; flex:1;">💡 Ver Pista</button>
-              <button class="mc-btn" onclick="toggleSource('portal')" style="font-size:0.75rem; flex:1;">🔍 Ver Código</button>
-            </div>
+              <button class="mc-btn" onclick="toggleHint('portal')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
+                          </div>
             <div id="hint-portal" class="hint-box">
               <strong>Pista — Datos escondidos en un documento:</strong><br>
               1. El reto no es criptografía: es el hábito de guardar información en sitios que las herramientas leen y los humanos se saltan.<br>
               2. Lee el documento <em>entero</em>, incluidas las partes que parecen relleno administrativo.<br>
               3. Si lo descargas con <code>curl</code>, recuerda que puedes pedir ver solo las cabeceras de la respuesta en lugar del cuerpo. Los metadatos también viajan ahí.
             </div>
-            <div id="source-portal" class="source-box">
-              <strong>Estructura de Metadatos:</strong>
-              <pre class="source-code-block">[METADATA_HEADER_INTERNAL]
-X-Obsidian-Ignition-Key: FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}</pre>
             </div>
-          </div>
         </div>
       </div>
 
@@ -202,7 +181,7 @@ X-Obsidian-Ignition-Key: FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}</pre>
                value="{% if 'portal' in session.get('inventory', []) %}FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}{% endif %}"
                {% if 'portal' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'portal' in session.get('inventory', []) %}disabled{% endif %}>
-          {% if 'portal' in session.get('inventory', []) %}✅{% else %}Validar{% endif %}
+          {% if 'portal' in session.get('inventory', []) %}{% else %}Validar{% endif %}
         </button>
       </form>
       <div id="feedback-portal"></div>
