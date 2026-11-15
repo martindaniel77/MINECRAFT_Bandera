@@ -90,6 +90,18 @@ def create_portal_blueprints(force=False):
     print(f"[+] Planos del portal generados en: {doc_path}")
 
 # 3. Generar iconos SVG en pixel art para cada uno de los 9 ítems de Minecraft
+ICON_EXTENSIONS = ('.png', '.svg', '.webp', '.jpg', '.jpeg', '.gif')
+
+
+def icon_exists(stem):
+    """Devuelve True si ya existe un icono valido con ese nombre en cualquier formato."""
+    for ext in ICON_EXTENSIONS:
+        candidate = os.path.join(ASSETS_DIR, f'{stem}{ext}')
+        if os.path.exists(candidate) and os.path.getsize(candidate) > 0:
+            return True
+    return False
+
+
 def create_svg_icons(force=False):
     icons = {
         'iron_ingot.svg': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="64" height="64" shape-rendering="crispEdges">
@@ -156,14 +168,19 @@ def create_svg_icons(force=False):
         </svg>'''
     }
 
-    if not force and all(os.path.exists(os.path.join(ASSETS_DIR, name)) and os.path.getsize(os.path.join(ASSETS_DIR, name)) > 0 for name in icons):
-        return
-
+    created = 0
     for name, content in icons.items():
+        stem = os.path.splitext(name)[0]
+        if not force and icon_exists(stem):
+            continue
+
         file_path = os.path.join(ASSETS_DIR, name)
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content.strip())
-    print(f"[+] {len(icons)} Iconos SVG de Minecraft creados exitosamente.")
+        created += 1
+
+    if created:
+        print(f"[+] {created} Iconos SVG de Minecraft creados exitosamente.")
 
 if __name__ == '__main__':
     create_stego_map()

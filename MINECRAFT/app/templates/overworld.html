@@ -24,7 +24,7 @@
       <div>
         <div class="challenge-header">
           <div class="challenge-icon">
-            <img src="{{ url_for('static', filename='img/iron_ingot.svg') }}" alt="Hierro">
+            <img src="{{ url_for('static', filename='img/iron_ingot.png') }}" alt="Hierro">
           </div>
           <div>
             <h3 style="color:#ffffff; font-size:1.05rem;">1. Lingote de Hierro</h3>
@@ -35,7 +35,7 @@
             Steve dejó una copia del mapa de la cueva (<code>mapa_cueva.png</code>). Se rumorea que dentro de los metadatos de la imagen ocultó coordenadas de una veta de hierro usando <strong>Base64</strong> y <strong>Cifrado César (ROT-13)</strong>.
           </p>
           <div style="margin: 12px 0;">
-            <a href="{{ url_for('static', filename='img/mapa_cueva.png') }}" download class="mc-btn mc-btn-green" style="width:100%;">
+            <a href="{{ url_for('static', filename='img/mapa_cueva.png') }}?v=2" download class="mc-btn mc-btn-green" style="width:100%;">
               Descargar mapa_cueva.png
             </a>
           </div>
@@ -84,7 +84,7 @@ print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
       <div>
         <div class="challenge-header">
           <div class="challenge-icon">
-            <img src="{{ url_for('static', filename='img/diamond.svg') }}" alt="Diamante">
+            <img src="{{ url_for('static', filename='img/diamond.png') }}" alt="Diamante">
           </div>
           <div>
             <h3 style="color:#ffffff; font-size:1.05rem;">2. Diamante en Y=-58</h3>
