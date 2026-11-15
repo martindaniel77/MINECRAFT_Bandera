@@ -144,6 +144,13 @@ async function toggleHint(challengeId) {
   }
 }
 
+// 2b. Mostrar/ocultar código vulnerable (sin costo de XP)
+function toggleSource(challengeId) {
+  const sourceEl = document.getElementById(`source-${challengeId}`);
+  if (!sourceEl) return;
+  sourceEl.style.display = (sourceEl.style.display === 'block') ? 'none' : 'block';
+}
+
 // 3. Aviso de dimensión completada sin bloquear el hilo
 function showCelebration(message) {
   const overlay = document.createElement('div');

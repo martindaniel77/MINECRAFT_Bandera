@@ -3,19 +3,18 @@
 {% block title %}Nether - Minecraft CTF{% endblock %}
 
 {% block content %}
-<div class="mc-box">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h1 class="mc-title" style="color: #ef5350;">
-      <span><img src="{{ url_for('static', filename='img/gold_ingot.svg') }}" alt="" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:6px;">FASE 2: NETHER (Nivel: Medio)</span>
-    </h1>
-    <span class="mc-badge" style="background:#c62828; color:#fff;">3 Desafíos</span>
+<div class="ctf-page-container ctf-wide-layout">
+
+  <div class="ctf-page-header">
+    <div class="header-icon">🔥</div>
+    <h1 class="ctf-page-title">FASE 2: NETHER (Nivel: Medio)</h1>
+    <p class="ctf-page-desc">
+      Has cruzado el portal al inframundo. El calor de la lava y los monstruos acechan.
+      Para abrir el portal al End necesitas conseguir <strong>Oro</strong> para comerciar con los Piglins,
+      derrotar a los Blazes para obtener sus <strong>Varas de Blaze</strong> y recolectar una <strong>Ender Pearl</strong> para craftear el Ojo de Ender.
+      (Recuerda que todas las banderas tienen el formato <code>Flag{...}</code>).
+    </p>
   </div>
-  <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
-    Has cruzado el portal al inframundo. El calor de la lava y los monstruos acechan. 
-    Para abrir el portal al End necesitas conseguir <strong>Oro</strong> para comerciar con los Piglins, 
-    derrotar a los Blazes para obtener sus <strong>Varas de Blaze</strong> y recolectar una <strong>Ender Pearl</strong> para craftear el Ojo de Ender.
-    (Recuerda que todas las banderas tienen el formato <code>Flag{...}</code>).
-  </p>
 
   <div class="challenges-grid">
 
@@ -73,11 +72,12 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Codigo Fuente -->
+          <!-- Pistas, Código y Curiosidad -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('gold')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
-                          </div>
+              <button class="mc-btn" onclick="toggleSource('gold')" style="font-size:0.75rem; flex:1;">Ver Código</button>
+            </div>
             <div id="hint-gold" class="hint-box">
               <strong>Pista — XSS almacenado y robo de sesión:</strong><br>
               1. Fíjate en que la nota se pinta en el tablón de ofertas. Pregúntate si el navegador la trata como texto plano o si está interpretando etiquetas. Si el servidor la inserta sin escapar, tú decides qué se renderiza.<br>
@@ -85,7 +85,15 @@
               3. En el propio servidor ya existe un endpoint pensado para recibir datos enviados por el navegador. Búscalo entre las rutas de la aplicación: no hace falta inventarlo.<br>
               4. F12 → Almacenamiento te deja ver las cookies de tu propia sesión; las del bot no están ahí, por eso necesitas otro canal.
             </div>
+            <div id="source-gold" class="source-box" style="display:none;">
+              <strong>Código vulnerable:</strong>
+              <div class="source-code-block">note_to_piglin = request.form.get('note_to_piglin', '')
+# se renderiza con |safe en la plantilla</div>
             </div>
+            <div class="curiosity-box">
+              <strong>Curiosidad:</strong> El worm "Samy" en MySpace (2005) infectó a más de un millón de perfiles en una hora usando XSS almacenado.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -146,18 +154,28 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Codigo Fuente -->
+          <!-- Pistas, Código y Curiosidad -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('blaze')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
-                          </div>
+              <button class="mc-btn" onclick="toggleSource('blaze')" style="font-size:0.75rem; flex:1;">Ver Código</button>
+            </div>
             <div id="hint-blaze" class="hint-box">
               <strong>Pista — Subida de archivo sin restricción:</strong><br>
               1. El servidor guarda el archivo con el nombre y el tipo que tú indiques, y además ofrece una forma de ejecutarlo. No hace ninguna comprobación de la extensión.<br>
               2. Pregúntate qué hace un intérprete de Python con un fichero que nadie ha revisado. No necesitas más que un archivo de texto con unas pocas líneas.<br>
               3. El objetivo <em>no está</em> en la carpeta de subidas. Piensa en un directorio del sistema que el proceso web pueda leer, y en cómo referenciar una ruta absoluta desde Python.
             </div>
+            <div id="source-blaze" class="source-box" style="display:none;">
+              <strong>Código vulnerable:</strong>
+              <div class="source-code-block">filename = secure_filename(file.filename)
+file.save(os.path.join(UPLOAD_FOLDER, filename))
+# sin validar extensión ni contenido</div>
             </div>
+            <div class="curiosity-box">
+              <strong>Curiosidad:</strong> Un formulario de "subir avatar" sin validación ha sido la puerta de entrada de webshells en incidentes reales.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -207,18 +225,27 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Codigo Fuente -->
+          <!-- Pistas, Código y Curiosidad -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('pearl')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
-                          </div>
+              <button class="mc-btn" onclick="toggleSource('pearl')" style="font-size:0.75rem; flex:1;">Ver Código</button>
+            </div>
             <div id="hint-pearl" class="hint-box">
               <strong>Pista — Control de acceso defectuoso:</strong><br>
               1. El altar no comprueba quién eres: comprueba un dato que <em>tú</em> le envías en cada petición. Eso es un Decide by Client, y el cliente siempre puede mentir.<br>
               2. Observa qué rango tiene tu sesión ahora mismo y compáralo con los rangos que la propia aplicación menciona en su interfaz.<br>
               3. Edita la petición con el Burp Suite de Kali, en la pestaña de Proxy, en lugar de usar la barra de direcciones: así practicas el mismo método que en un pentest real.
             </div>
+            <div id="source-pearl" class="source-box" style="display:none;">
+              <strong>Código vulnerable:</strong>
+              <div class="source-code-block">user_role = request.args.get('user_role') or request.cookies.get('user_role', 'guest_traveler')
+if user_role in ['ender_master', ...]:  # sin validar identidad</div>
             </div>
+            <div class="curiosity-box">
+              <strong>Curiosidad:</strong> Cambiar un parámetro en la URL o en una cookie ha dado acceso de administrador en sistemas reales (IDOR / broken access control).
+            </div>
+          </div>
         </div>
       </div>
 

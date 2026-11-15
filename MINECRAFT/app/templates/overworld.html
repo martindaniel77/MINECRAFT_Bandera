@@ -3,18 +3,17 @@
 {% block title %}Overworld - Minecraft CTF{% endblock %}
 
 {% block content %}
-<div class="mc-box">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h1 class="mc-title" style="color: #81c784;">
-      <span><img src="{{ url_for('static', filename='img/iron_ingot.svg') }}" alt="" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:6px;">FASE 1: OVERWORLD (Nivel: Fácil)</span>
-    </h1>
-    <span class="mc-badge" style="background:#2e7d32; color:#fff;">3 Desafíos</span>
+<div class="ctf-page-container ctf-wide-layout">
+
+  <div class="ctf-page-header">
+    <div class="header-icon">🌲</div>
+    <h1 class="ctf-page-title">FASE 1: OVERWORLD (Nivel: Fácil)</h1>
+    <p class="ctf-page-desc">
+      Comienzas tu aventura en el mundo superior. Para llegar al Nether necesitas craftear herramientas y conseguir los materiales básicos:
+      <strong>Hierro</strong> para tu armadura, <strong>Diamante</strong> para tu pico y encender el <strong>Portal de Obsidiana</strong>.
+      (Recuerda que todas las banderas tienen el formato <code>Flag{...}</code>).
+    </p>
   </div>
-  <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
-    Comienzas tu aventura en el mundo superior. Para llegar al Nether necesitas craftear herramientas y conseguir los materiales básicos: 
-    <strong>Hierro</strong> para tu armadura, <strong>Diamante</strong> para tu pico y encender el <strong>Portal de Obsidiana</strong>.
-    (Recuerda que todas las banderas tienen el formato <code>Flag{...}</code>).
-  </p>
 
   <div class="challenges-grid">
 
@@ -41,18 +40,27 @@
             </a>
           </div>
 
-          <!-- Pistas y Codigo Fuente -->
+          <!-- Pistas, Código y Curiosidad -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('iron')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
-                          </div>
+              <button class="mc-btn" onclick="toggleSource('iron')" style="font-size:0.75rem; flex:1;">Ver Código</button>
+            </div>
             <div id="hint-iron" class="hint-box">
               <strong>Pista — Esteganografía en metadatos:</strong><br>
               1. El secreto <em>no está en los píxeles</em>: no modifiques la imagen, no la amplíes y no busques colores raros. Piensa en qué más viaja dentro de un PNG que el ojo no ve.<br>
               2. El formato admite campos de texto libres que cualquier herramienta de análisis forense puede volcar. Kali puede enumerarlos por ti.<br>
               3. Lo que encuentres no es aleatorio: es una capa de transporte (Base64) que envuelve un cifrado por sustitución clásico. Ese cifrado lleva el nombre de un emperador romano. Averigua cuánto desplaza y aplica el mismo desplazamiento en sentido inverso.
             </div>
+            <div id="source-iron" class="source-box" style="display:none;">
+              <strong>Código vulnerable (ejemplo):</strong>
+              <div class="source-code-block">metadata = png.get_text('Comment')
+print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
             </div>
+            <div class="curiosity-box">
+              <strong>Curiosidad:</strong> Los metadatos de una imagen pueden revelar autor, software y hasta coordenadas GPS. En CTFs, el primer paso suele ser <code>exiftool</code>.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -108,11 +116,12 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Codigo Fuente -->
+          <!-- Pistas, Código y Curiosidad -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('diamond')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
-                          </div>
+              <button class="mc-btn" onclick="toggleSource('diamond')" style="font-size:0.75rem; flex:1;">Ver Código</button>
+            </div>
             <div id="hint-diamond" class="hint-box">
               <strong>Pista — Inyección SQL:</strong><br>
               1. Lo que escribas no se trata como texto: se concatena dentro de la cláusula <code>WHERE</code>. Escribe siempre entre comillas simples y observa cómo cambia el error.<br>
@@ -120,7 +129,14 @@
               3. Para ignorar el resto de la línea existe un comentario de SQL de dos guiones. Colócalo al final de tu entrada.<br>
               4. Alternativa: <code>sqlmap</code> puede localizar la inyección por ti si le indicas la URL y el parámetro.
             </div>
+            <div id="source-diamond" class="source-box" style="display:none;">
+              <strong>Código vulnerable:</strong>
+              <div class="source-code-block">sql = f"SELECT ... WHERE chest_name LIKE '%{chest_query}%' AND is_locked = 0"</div>
             </div>
+            <div class="curiosity-box">
+              <strong>Curiosidad:</strong> La primera SQLi masiva se reportó en 1998. Hoy sigue siendo el riesgo #1 del OWASP Top 10.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -160,18 +176,26 @@
             </a>
           </div>
 
-          <!-- Pistas y Codigo Fuente -->
+          <!-- Pistas, Código y Curiosidad -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('portal')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
-                          </div>
+              <button class="mc-btn" onclick="toggleSource('portal')" style="font-size:0.75rem; flex:1;">Ver Código</button>
+            </div>
             <div id="hint-portal" class="hint-box">
               <strong>Pista — Datos escondidos en un documento:</strong><br>
               1. El reto no es criptografía: es el hábito de guardar información en sitios que las herramientas leen y los humanos se saltan.<br>
               2. Lee el documento <em>entero</em>, incluidas las partes que parecen relleno administrativo.<br>
               3. Si lo descargas con <code>curl</code>, recuerda que puedes pedir ver solo las cabeceras de la respuesta en lugar del cuerpo. Los metadatos también viajan ahí.
             </div>
+            <div id="source-portal" class="source-box" style="display:none;">
+              <strong>Código vulnerable:</strong>
+              <div class="source-code-block">response.headers['X-Portal-Key'] = 'FLAG{...}'</div>
             </div>
+            <div class="curiosity-box">
+              <strong>Curiosidad:</strong> Un simple <code>curl -I</code> puede exponer cabeceras con tokens, versiones de servidor o claves internas.
+            </div>
+          </div>
         </div>
       </div>
 
