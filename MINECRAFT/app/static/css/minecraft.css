@@ -471,6 +471,8 @@ body.dimension-the_end::after {
 .challenge-icon img, .challenge-icon svg {
   width: 100%;
   height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 .challenge-body {
@@ -579,6 +581,7 @@ body.dimension-the_end::after {
   width: 18px;
   height: 18px;
   filter: drop-shadow(1px 1px 0 #000);
+  image-rendering: pixelated;
   transition: transform 0.15s ease;
 }
 
@@ -724,6 +727,14 @@ body.hud-hidden {
 
 .mc-slot:hover {
   transform: translateY(-2px);
+}
+
+.mc-slot img,
+.mc-slot svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 .mc-slot.unlocked {

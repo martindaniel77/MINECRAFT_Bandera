@@ -10,7 +10,7 @@
   <meta name="author" content="Thorfinn777, Martyn777, Sassyjack777">
   <meta name="description" content="Laboratorio de Ciberseguridad Minecraft CTF desarrollado por Thorfinn777, Martyn777, Sassyjack777">
   <title>{% block title %}Security CTF - Minecraft Edition{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=4">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=5">
 </head>
 <body class="dimension-{{ current_dimension|default('overworld') }} {% if request.endpoint == 'index' %}is-landing{% endif %}" data-dimension="{{ current_dimension|default('overworld') }}">
 
@@ -23,7 +23,7 @@
       <!-- LOGO: BASTA CON LA IMAGEN OFICIAL (NO DUPLICAR TEXTO) -->
       <a href="{{ url_for('index') }}" class="ctf-brand-link" title="Ir al Inicio de Minecraft CTF">
         <div class="ctf-brand">
-          <img src="{{ url_for('static', filename='img/logo_shield.png') }}" class="ctf-shield-img" alt="SECURITY CTF MINECRAFT EDITION" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo_creeper.png') }}';">
+          <img src="{{ url_for('static', filename='img/logo_shield.png') }}?v=2" class="ctf-shield-img" alt="SECURITY CTF MINECRAFT EDITION" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo_creeper.png') }}?v=2';">
         </div>
       </a>
 
@@ -157,7 +157,7 @@
       <div class="mc-stats-bar">
         <div class="mc-hearts" title="Vida de Steve">
           {% for i in range(10) %}
-            <img src="{{ url_for('static', filename='img/heart.svg') }}" class="mc-heart" alt="heart">
+            <img src="{{ url_for('static', filename='img/heart.png') }}" class="mc-heart" alt="heart">
           {% endfor %}
         </div>
         <div class="mc-xp-bar-container">
@@ -168,21 +168,20 @@
 
       <div class="mc-hotbar" id="mc-hotbar">
         {% set items = [
-          ('iron', 'Lingote de Hierro', 'img/iron_ingot.svg'),
-          ('diamond', 'Diamante', 'img/diamond.svg'),
+          ('iron', 'Lingote de Hierro', 'img/iron_ingot.png'),
+          ('diamond', 'Diamante', 'img/diamond.png'),
           ('portal', 'Portal al Nether', 'img/nether_portal.svg'),
-          ('gold', 'Lingote de Oro', 'img/gold_ingot.svg'),
-          ('blaze', 'Vara de Blaze', 'img/blaze_rod.svg'),
-          ('pearl', 'Ojo de Ender', 'img/ender_pearl.svg'),
-          ('crystals', 'Cristales del End', 'img/end_crystal.svg'),
-          ('dragon', 'Ender Dragón', 'img/ender_dragon.svg'),
-          ('egg', 'Huevo de Dragón', 'img/dragon_egg.svg')
+          ('gold', 'Lingote de Oro', 'img/gold_ingot.png'),
+          ('blaze', 'Vara de Blaze', 'img/blaze_rod.png'),
+          ('pearl', 'Ojo de Ender', 'img/ender_pearl.png'),
+          ('crystals', 'Cristales del End', 'img/end_crystal.png'),
+          ('dragon', 'Ender Dragón', 'img/ender_dragon.png'),
+          ('egg', 'Huevo de Dragón', 'img/dragon_egg.png')
         ] %}
         {% for item_id, item_title, item_icon in items %}
           <div class="mc-slot {% if item_id in session.get('inventory', []) %}filled{% endif %}" data-item="{{ item_id }}" title="{{ item_title }}">
             {% if item_id in session.get('inventory', []) %}
               <img src="{{ url_for('static', filename=item_icon) }}" class="mc-item-icon" alt="{{ item_title }}">
-              <span class="mc-slot-count">1</span>
             {% else %}
               <div class="mc-slot-empty"></div>
             {% endif %}

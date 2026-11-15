@@ -9,7 +9,7 @@
        HERO BANNER: CAPTURE THE FLAG
        ========================================================================= -->
   <section class="ctf-hero-section">
-    <div class="ctf-hero-bg" style="background-image: url('{{ url_for('static', filename='img/Fondo inicio.png') }}'); background-size: cover; background-position: center;"></div>
+    <div class="ctf-hero-bg" style="background-image: url('{{ url_for('static', filename='img/Fondo inicio.png') }}?v=2'); background-size: cover; background-position: center;"></div>
     <div class="ctf-hero-overlay"></div>
 
     <div class="ctf-hero-content">
@@ -54,7 +54,7 @@
           </div>
         </div>
         <div class="ctf-chest-box">
-          <img src="{{ url_for('static', filename='img/chest_glowing.png') }}" class="ctf-chest-glow" alt="Cofre de Recompensas Minecraft" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/diamond.svg') }}';">
+          <img src="{{ url_for('static', filename='img/chest_glowing.png') }}?v=2" class="ctf-chest-glow" alt="Cofre de Recompensas Minecraft" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/diamond.png') }}';">
         </div>
       </div>
     </div>

@@ -26,7 +26,9 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
+# Los assets se revalidan siempre (ETag/304) para que los cambios de imagenes
+# y CSS se vean de inmediato sin quedar atrapados en la cache del navegador.
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # ------------------------------------------------------------------------------
 # DICCIONARIO OFICIAL DE BANDERAS DEL CTF (Formato Flag{...})
