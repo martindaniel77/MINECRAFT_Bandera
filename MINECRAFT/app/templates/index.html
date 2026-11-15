@@ -1,89 +1,172 @@
 {% extends "base.html" %}
 
-{% block title %}Minecraft CTF - Menú Principal{% endblock %}
+{% block title %}Security CTF - Minecraft Edition{% endblock %}
 
 {% block content %}
-<div class="mc-box">
-  <h1 class="mc-title">
-    <span>MINECRAFT CTF: VULNERABLE SECURITY LAB</span>
-  </h1>
-  <p style="margin-bottom: 16px; color: #d1d5db; font-size: 0.95rem; line-height: 1.6;">
-    Bienvenido al laboratorio de seguridad interactivo con temática de Minecraft.
-    Tu objetivo como atacante en <strong>Kali Linux</strong> es superar los 9 desafíos de seguridad organizados en 3 dimensiones para derrotar al Ender Dragón y capturar la bandera final.
-  </p>
+<div class="ctf-landing-container ctf-wide-layout">
 
-  <!-- REQUERIMIENTO: AVISO VISUAL DEL FORMATO DE LAS BANDERAS -->
-  <div class="mc-alert mc-alert-info" style="margin-bottom: 20px; border-left: 4px solid #3b82f6;">
-     <strong>FORMATO OFICIAL DE BANDERAS:</strong> Todas las banderas tienen el formato estándar <code>Flag{...}</code> (o <code>FLAG{...}</code>).
-  </div>
+  <!-- =========================================================================
+       HERO BANNER: CAPTURE THE FLAG
+       ========================================================================= -->
+  <section class="ctf-hero-section">
+    <div class="ctf-hero-bg" style="background-image: url('{{ url_for('static', filename='img/hero_banner.jpg') }}');"></div>
+    <div class="ctf-hero-overlay"></div>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px; margin: 24px 0;">
-    
-    <!-- Tarjeta Overworld -->
-    <div class="challenge-card" style="background:#1a2b1a; border: 2px solid #2e7d32; padding: 20px; box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25);">
-      <h3 style="color:#81c784; margin-bottom: 10px; font-size: 1.15rem; text-shadow: 0 0 10px rgba(129, 199, 132, 0.5);"><img src="{{ url_for('static', filename='img/iron_ingot.svg') }}" alt="" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:6px;">1. Overworld (Fácil)</h3>
-      <p style="font-size:0.86rem; color:#d1fae5; line-height: 1.5; margin-bottom: 14px;">
-        Fundamentos de esteganografía, cifrado César/XOR, inyecciones SQL y análisis de metadatos forenses.
-      </p>
-      <div>
-        <span class="mc-badge" style="background:#2e7d32; color:#fff;">
-          Progreso: {{ overworld_count|default(0) }}/3
-        </span>
+    <div class="ctf-hero-content">
+      <div class="ctf-title-3d">
+        <h1 class="title-capture">CAPTURE</h1>
+        <h2 class="title-flag">THE FLAG</h2>
       </div>
-      <a href="{{ url_for('overworld_view') }}" class="mc-btn mc-btn-green" style="margin-top: 14px; width: 100%;">
-        Entrar al Overworld 
-      </a>
-    </div>
 
-    <!-- Tarjeta Nether -->
-    <div class="challenge-card" style="background:#2d1515; border: 2px solid #c62828; padding: 20px; box-shadow: 0 4px 14px rgba(198, 40, 40, 0.25);">
-      <h3 style="color:#ef5350; margin-bottom: 10px; font-size: 1.15rem; text-shadow: 0 0 10px rgba(239, 83, 80, 0.5);"><img src="{{ url_for('static', filename='img/gold_ingot.svg') }}" alt="" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:6px;">2. Nether (Medio)</h3>
-      <p style="font-size:0.86rem; color:#fee2e2; line-height: 1.5; margin-bottom: 14px;">
-        Explotación web: Stored XSS con robo de cookies de Piglins, subida de scripts maliciosos (Webshell RCE) y escalada de privilegios.
+      <p class="ctf-hero-subtitle">
+        Demuestra tus habilidades en ciberseguridad y conquista la bandera enemiga.
       </p>
-      <div>
-        <span class="mc-badge" style="background:#c62828; color:#fff;">
-          Progreso: {{ nether_count|default(0) }}/3
-        </span>
-      </div>
-      {% if 'portal' in session.get('inventory', []) %}
-        <a href="{{ url_for('nether_view') }}" class="mc-btn mc-btn-red" style="margin-top: 14px; width: 100%;">
-          Entrar al Nether 
+
+      <div class="ctf-hero-cta">
+        <a href="{{ url_for('desafios_view') }}" class="ctf-btn-start">
+          ¡Comenzar Desafío! <span class="arrow">&gt;</span>
         </a>
-      {% else %}
-        <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '¡Debes completar el Overworld para desbloquear el Nether!')" style="margin-top: 14px; width: 100%;">
-          Bloqueado (Falta Portal)
-        </button>
-      {% endif %}
-    </div>
-
-    <!-- Tarjeta The End -->
-    <div class="challenge-card" style="background:#21122e; border: 2px solid #7e22ce; padding: 20px; box-shadow: 0 4px 14px rgba(126, 34, 206, 0.25);">
-      <h3 style="color:#c084fc; margin-bottom: 10px; font-size: 1.15rem; text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);"><img src="{{ url_for('static', filename='img/ender_pearl.svg') }}" alt="" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:6px;">3. The End (Difícil)</h3>
-      <p style="font-size:0.86rem; color:#f3e8ff; line-height: 1.5; margin-bottom: 14px;">
-        Explotación de servicios de red (CVEs emulados), inyección de comandos en telemetría y evasión de Honeypots para reclamar el Huevo.
-      </p>
-      <div>
-        <span class="mc-badge" style="background:#7e22ce; color:#fff;">
-          Progreso: {{ end_count|default(0) }}/3
-        </span>
       </div>
-      {% if 'pearl' in session.get('inventory', []) %}
-        <a href="{{ url_for('the_end_view') }}" class="mc-btn mc-btn-purple" style="margin-top: 14px; width: 100%;">
-          Entrar a The End 
-        </a>
-      {% else %}
-        <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '¡Debes forjar el Ojo de Ender en el Nether!')" style="margin-top: 14px; width: 100%;">
-          Bloqueado (Falta Ojo)
-        </button>
-      {% endif %}
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       GRID DE 3 TARJETAS (AMPLIO, EXPANDIDO Y ESTRUCTURADO POR DIMENSIÓN)
+       ========================================================================= -->
+  <section class="ctf-cards-grid">
+
+    <!-- TARJETA 1: ¿QUÉ ES UN CTF? -->
+    <div class="ctf-card ctf-card-info">
+      <div class="ctf-card-header">
+        <div class="ctf-card-icon-creeper">
+          <span class="pixel-creeper">🟩</span>
+        </div>
+        <h3 class="ctf-card-title">¿Qué es un CTF?</h3>
+      </div>
+
+      <div class="ctf-card-body ctf-body-split">
+        <div class="ctf-text-explain">
+          <p>
+            Un <strong>Capture The Flag (CTF)</strong> es una competencia interactiva de seguridad donde resuelves desafíos de análisis de código, explotación web y forensia digital para encontrar secretos llamados <strong>Banderas</strong> (<code>Flag{...}</code>).
+          </p>
+          <div class="ctf-mini-pedagogy">
+            <span>💡 <strong>Diseñado para aprender:</strong> Cada reto te muestra código real vulnerable y te permite razonar la solución sin frustración.</span>
+          </div>
+        </div>
+        <div class="ctf-chest-box">
+          <img src="{{ url_for('static', filename='img/chest_glowing.png') }}" class="ctf-chest-glow" alt="Cofre de Recompensas Minecraft" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/diamond.svg') }}';">
+        </div>
+      </div>
     </div>
 
-  </div>
+    <!-- TARJETA 2: DESAFÍOS ORGANIZADOS POR LAS 3 DIMENSIONES DE MINECRAFT -->
+    <div class="ctf-card ctf-card-challenges">
+      <div class="ctf-card-header">
+        <div class="ctf-card-icon-swords">
+          <span class="pixel-swords">⚔️</span>
+        </div>
+        <h3 class="ctf-card-title">Desafíos por Dimensión</h3>
+      </div>
 
-  <!-- REQUERIMIENTO: MARCA DE AUTORÍA EN PANTALLA PRINCIPAL -->
-  <div style="margin-top: 24px; padding: 12px 18px; background: rgba(0, 0, 0, 0.45); border: 1px solid #333333; text-align: center; font-size: 0.85rem; color: #a3a3a3;">
-     <strong>Laboratorio desarrollado por:</strong> <span style="color:#86efac; font-weight: bold;">Thorfinn777</span> • <span style="color:#fca5a5; font-weight: bold;">Martyn777</span> • <span style="color:#d8b4fe; font-weight: bold;">Sassyjack777</span>
-  </div>
+      <div class="ctf-card-body">
+        <div class="ctf-challenge-list">
+          
+          <!-- Dimensión 1: Overworld -->
+          <a href="{{ url_for('overworld_view') }}" class="ctf-challenge-row row-dim-overworld" title="Entrar a los 3 retos del Overworld">
+            <div class="row-left">
+              <span class="code-icon">🌲</span>
+              <div class="row-titles-wrap">
+                <span class="row-title">1. Overworld (Fácil)</span>
+                <span class="row-sub">Adentro: Lingote de Hierro (César/ROT-13), Diamante (SQLi), Planos del Portal</span>
+              </div>
+            </div>
+            <div class="row-right">
+              <span class="ctf-badge badge-facil">{{ overworld_count }}/3</span>
+              <span class="row-arrow">&gt;</span>
+            </div>
+          </a>
+
+          <!-- Dimensión 2: Nether -->
+          <a href="{{ url_for('nether_view') }}" class="ctf-challenge-row row-dim-nether" title="Entrar a los 3 retos del Nether">
+            <div class="row-left">
+              <span class="code-icon">🔥</span>
+              <div class="row-titles-wrap">
+                <span class="row-title">2. Nether (Medio)</span>
+                <span class="row-sub">Adentro: Lingote de Oro (Stored XSS), Varas de Blaze (Webshell RCE), Ojo de Ender</span>
+              </div>
+            </div>
+            <div class="row-right">
+              <span class="ctf-badge badge-medio">{{ nether_count }}/3</span>
+              <span class="row-arrow">&gt;</span>
+            </div>
+          </a>
+
+          <!-- Dimensión 3: The End -->
+          <a href="{{ url_for('the_end_view') }}" class="ctf-challenge-row row-dim-the-end" title="Entrar a los 3 retos de The End">
+            <div class="row-left">
+              <span class="code-icon">🌌</span>
+              <div class="row-titles-wrap">
+                <span class="row-title">3. The End (Difícil - Boss)</span>
+                <span class="row-sub">Adentro: Cristales (CVE simulada), Ender Dragón (Command Injection), Huevo de Dragón (LFI)</span>
+              </div>
+            </div>
+            <div class="row-right">
+              <span class="ctf-badge badge-dificil">{{ end_count }}/3</span>
+              <span class="row-arrow">&gt;</span>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- TARJETA 3: RANKING DE EQUIPOS -->
+    <div class="ctf-card ctf-card-ranking">
+      <div class="ctf-card-header">
+        <div class="ctf-card-icon-trophy">
+          <span class="pixel-trophy">🏆</span>
+        </div>
+        <h3 class="ctf-card-title">Ranking</h3>
+      </div>
+
+      <div class="ctf-card-body">
+        <table class="ctf-ranking-table">
+          <thead>
+            <tr>
+              <th class="th-pos">#</th>
+              <th class="th-team">Equipo</th>
+              <th class="th-pts">Puntos</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for team in leaderboard %}
+              <tr class="ranking-row {% if team.is_current_user %}is-me{% endif %}">
+                <td class="td-pos">{{ team.rank_pos }}</td>
+                <td class="td-team">
+                  <span class="team-icon">
+                    {% if team.badge_icon == 'creeper' %}🟩
+                    {% elif team.badge_icon == 'grass' %}🌱
+                    {% elif team.badge_icon == 'diamond' %}💎
+                    {% elif team.badge_icon == 'redstone' %}🔴
+                    {% elif team.badge_icon == 'pickaxe' %}⛏️
+                    {% else %}👤{% endif %}
+                  </span>
+                  <span class="team-name">{{ team.team_name }}</span>
+                </td>
+                <td class="td-pts">
+                  <span class="pts-value">{{ team.score }}</span>
+                  {% if team.is_crown %}
+                    <span class="crown-icon" title="Líder del Torneo">👑</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
 </div>
 {% endblock %}

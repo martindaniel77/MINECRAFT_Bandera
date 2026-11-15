@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Guía para Estudiantes - Minecraft Security CTF{% endblock %}
+
+{% block content %}
+<div class="ctf-page-container ctf-wide-layout">
+  
+  <div class="ctf-page-header">
+    <div class="header-icon">📖</div>
+    <h1 class="ctf-page-title">GUÍA DE APRENDIZAJE PARA ESTUDIANTES</h1>
+    <p class="ctf-page-desc">
+      Aprender ciberseguridad debe ser claro, estructurado y sin frustración. Aquí tienes los conceptos fundamentales de cada desafío organizados para que comprendas la lógica de cada vulnerabilidad antes de atacarla.
+    </p>
+  </div>
+
+  <div class="ctf-guide-grid ctf-guide-grid-wide">
+
+    <!-- SECCIÓN 1: ¿QUÉ ES UNA BANDERA (FLAG)? -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">🚩</span>
+        <h3>1. ¿Qué es una Bandera (Flag) y cómo se entrega?</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          En una competencia de ciberseguridad (CTF), tu meta como estudiante atacante es encontrar un "secreto" oculto dentro del sistema vulnerable. A este secreto se le llama <strong>Bandera</strong> o <strong>Flag</strong>.
+        </p>
+        <div class="guide-example-box">
+          <strong>Formato oficial en esta plataforma:</strong>
+          <code>Flag{MINECRAFT_...}</code> o en mayúsculas <code>FLAG{...}</code>
+        </div>
+        <p>
+          Cuando encuentres una bandera en el código fuente, en una imagen o tras explotar una vulnerabilidad, cópiala exactamente e ingrésala en la caja de validación del desafío para ganar puntos de experiencia (XP) y sumar el ítem a tu inventario.
+        </p>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: INYECCIÓN SQL (SQLi) -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">💉</span>
+        <h3>2. ¿Qué es una Inyección SQL y cómo funciona <code>' OR 1=1 --</code>?</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          Una aplicación web interactúa con la base de datos mediante sentencias SQL. Por ejemplo, al buscar un cofre:
+        </p>
+        <pre class="guide-code">SELECT * FROM cofres WHERE nombre LIKE '%TU_BUSQUEDA%' AND bloqueado = 0;</pre>
+        <p>
+          Si la aplicación concatena lo que escribes directamente sin sanitizarlo, puedes inyectar comandos SQL:
+        </p>
+        <div class="guide-steps-list">
+          <div><strong>1. La comilla simple <code>'</code>:</strong> Cierra el texto esperado por la base de datos y te permite agregar sentencias.</div>
+          <div><strong>2. El operador <code>OR 1=1</code>:</strong> Como 1 siempre es igual a 1 (Verdadero), la condición se vuelve cierta para todos los registros del juego, incluso los cofres ocultos.</div>
+          <div><strong>3. Los guiones <code>--</code>:</strong> Le dicen a SQLite que ignore el resto de la consulta original, anulando el filtro <code>AND bloqueado = 0</code>.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: ESTEGANOGRAFÍA Y METADATOS -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">🔍</span>
+        <h3>3. ¿Cómo encontrar secretos ocultos en imágenes y archivos?</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          Los archivos digitales no solo contienen píxeles o texto visible, también almacenan <strong>metadatos</strong> (información sobre el autor, software, comentarios) y pueden ocultar mensajes:
+        </p>
+        <ul class="guide-bullet-list">
+          <li><strong>Inspección de Metadatos:</strong> En Kali Linux puedes usar <code>exiftool mapa_cueva.png</code> para leer comentarios y propiedades ocultas.</li>
+          <li><strong>Extracción de Texto:</strong> El comando <code>strings archivo.png</code> busca cadenas de caracteres legibles dentro de archivos binarios.</li>
+          <li><strong>Decodificación Base64:</strong> Si ves un texto que termina en <code>=</code> o parece letras y números aleatorios (ej: <code>U1lOVHs...</code>), decodifícalo con:
+            <pre class="guide-code">echo "TEXTO_BASE64" | base64 -d</pre>
+          </li>
+          <li><strong>Cifrado César / ROT-13:</strong> Es un cifrado donde cada letra se desplaza 13 posiciones en el abecedario. Se decodifica con:
+            <pre class="guide-code">echo "TEXTO" | tr 'A-Za-z' 'N-ZA-Mn-za-m'</pre>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: XSS Y ROBO DE COOKIES -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">🍪</span>
+        <h3>4. ¿Qué es XSS (Cross-Site Scripting) y para qué sirve?</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          Ocurre cuando una aplicación web permite que un usuario ingrese código HTML/JavaScript malicioso y luego lo renderiza en pantalla ante otros usuarios (o ante un bot auditor, como el Piglin Guard).
+        </p>
+        <p>
+          Cuando el administrador abre la página infectada, el script se ejecuta en su navegador con todos sus permisos, permitiendo leer su <strong>cookie de sesión</strong>:
+        </p>
+        <pre class="guide-code">&lt;script&gt;fetch('/nether/gold/leak?cookie=' + encodeURIComponent(document.cookie));&lt;/script&gt;</pre>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5: PATH TRAVERSAL (LFI) -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">📂</span>
+        <h3>5. Salto de Directorios (Path Traversal / LFI)</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          Si un servidor web te permite pedir un archivo mediante un parámetro (ej: <code>?altar_file=documento.txt</code>), un atacante puede usar <code>../</code> para subir niveles en el árbol de carpetas del servidor y leer archivos protegidos:
+        </p>
+        <pre class="guide-code">../../root/real_dragon_egg.txt</pre>
+        <p>
+          Esto permite burlar trampas (<em>Honeypots</em>) colocadas intencionalmente en carpetas públicas.
+        </p>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 6: CONSEJO PEDAGÓGICO -->
+    <div class="ctf-guide-card guide-highlight">
+      <div class="guide-card-header">
+        <span class="guide-icon">💡</span>
+        <h3>6. Método de Aprendizaje Recomendado</h3>
+      </div>
+      <div class="guide-card-body">
+        <ol class="guide-ordered-list">
+          <li><strong>Comienza por el Overworld:</strong> Es la dimensión introductoria diseñada para que entiendas la dinámica sin agobiarte.</li>
+          <li><strong>Usa el botón "Ver Código":</strong> En cada reto puedes inspeccionar el código fuente vulnerable para entender <em>dónde</em> está el error de programación.</li>
+          <li><strong>Consulta las Pistas:</strong> Si te quedas atascado, puedes desbloquear pistas conceptuales usando la XP que acumulas.</li>
+          <li><strong>Pregunta e investiga:</strong> Cada reto representa un fallo real que los desarrolladores cometen en el mundo laboral.</li>
+        </ol>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ctf-guide-cta">
+    <a href="{{ url_for('desafios_view') }}" class="ctf-btn-start">
+      ¡Ir a los Desafíos por Dimensión! ⚔️
+    </a>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar Sesión - Minecraft Security CTF{% endblock %}
+
+{% block content %}
+<div class="ctf-page-container">
+  <div class="ctf-login-box">
+    
+    <div class="ctf-login-header">
+      <div class="ctf-login-badge">👤</div>
+      <h2 class="ctf-login-title">INICIAR SESIÓN DE ESTUDIANTE</h2>
+      <p class="ctf-login-subtitle">
+        Plataforma adaptada para estudiantes. <strong>Solo requieres UNA credencial</strong> (Gamertag o Código de Alumno). No necesitas contraseña.
+      </p>
+    </div>
+
+    <form action="{{ url_for('login') }}" method="POST" class="ctf-login-form">
+      <div class="ctf-form-group">
+        <label for="pageCredential" class="ctf-form-label">Tu Gamertag o Código de Estudiante:</label>
+        <div class="ctf-input-wrapper">
+          <span class="input-icon">🎮</span>
+          <input type="text" id="pageCredential" name="credential" class="ctf-input" placeholder="Ej: Steve, Alex, Alumno1..." required autofocus autocomplete="username">
+        </div>
+      </div>
+
+      <div class="ctf-quick-tags" style="margin-bottom: 20px;">
+        <span class="quick-title">Opciones rápidas para pruebas:</span>
+        <button type="button" class="ctf-tag-btn" onclick="document.getElementById('pageCredential').value='Steve';">Steve</button>
+        <button type="button" class="ctf-tag-btn" onclick="document.getElementById('pageCredential').value='Alex';">Alex</button>
+        <button type="button" class="ctf-tag-btn" onclick="document.getElementById('pageCredential').value='BlockSec-Student';">BlockSec-Student</button>
+      </div>
+
+      <div class="ctf-modal-actions">
+        <button type="submit" class="ctf-btn-primary" style="width: 100%;">
+          ¡Entrar al Desafío! ⚔️
+        </button>
+      </div>
+    </form>
+
+    <div class="ctf-login-info">
+      <h4>📌 ¿Por qué solo una credencial?</h4>
+      <p>
+        Para eliminar barreras de acceso en el aula, tu progreso, banderas recolectadas y puntaje en el ranking se enlazan de forma ágil a tu identificador sin requerir contraseñas complejas.
+      </p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
