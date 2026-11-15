@@ -539,7 +539,7 @@ def overworld_diamond_search():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    sql = f"SELECT chest_name, location, depth_level, secret_loot FROM villager_chests WHERE chest_name LIKE '%{chest_query}%' AND is_locked = 0"
+    sql = f"SELECT chest_name, location, depth_level, secret_loot, is_locked FROM villager_chests WHERE chest_name LIKE '%{chest_query}%' AND is_locked = 0"
     
     try:
         cursor.execute(sql)

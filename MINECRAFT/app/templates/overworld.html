@@ -103,16 +103,29 @@ print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
             </button>
           </form>
 
-          {% if sql_results is defined %}
+          {% if diamond_results is defined %}
             <div class="terminal-output">
               <strong>[+] Resultados de la consulta:</strong>
-              {% if sql_results %}
-                {% for row in sql_results %}
+              {% if diamond_results %}
+                {% for row in diamond_results %}
                   <div> <strong>{{ row.chest_name }}</strong>{% if row.is_locked %}  <span style="color:#f59e0b;">(PROTEGIDO)</span>{% endif %} (Profundidad: Y={{ row.depth_level }}) -> Botín: <span style="color:#55ff55;">{{ row.secret_loot }}</span></div>
                 {% endfor %}
               {% else %}
                 <span style="color:#ef4444;">[!] No se encontraron cofres con ese término.</span>
               {% endif %}
+            </div>
+          {% endif %}
+
+          {% if query_executed %}
+            <div class="terminal-output">
+              <strong>[+] Consulta ejecutada:</strong>
+              <pre style="margin-top:4px;">{{ query_executed }}</pre>
+            </div>
+          {% endif %}
+
+          {% if sql_error %}
+            <div class="terminal-output" style="color:#ef4444;">
+              <strong>[!] Error SQL:</strong> {{ sql_error }}
             </div>
           {% endif %}
 
