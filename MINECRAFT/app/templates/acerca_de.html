@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Acerca de - Minecraft Security CTF{% endblock %}
+
+{% block content %}
+<div class="ctf-page-container">
+
+  <div class="ctf-page-header">
+    <div class="header-icon">ℹ️</div>
+    <h1 class="ctf-page-title">ACERCA DEL LABORATORIO MINECRAFT CTF</h1>
+    <p class="ctf-page-desc">
+      Plataforma interactiva de entrenamiento en Ciberseguridad inspirada en la dinámica y estética de Minecraft.
+    </p>
+  </div>
+
+  <div class="ctf-guide-grid">
+    
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">👨‍💻</span>
+        <h3>Desarrolladores y Autores Oficiales</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>Este laboratorio fue diseñado y desarrollado con fines formativos y académicos por:</p>
+        <ul class="guide-bullet-list">
+          <li><strong>Thorfinn777</strong> — Arquitectura del Laboratorio, Sandboxing y Retos Overworld / Nether.</li>
+          <li><strong>Martyn777</strong> — Simulación de Vulnerabilidades Web, Stored XSS y Optimización Docker/Gunicorn.</li>
+          <li><strong>Sassyjack777</strong> — Retos de The End, Command Injection, Honeypots y Gamificación.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">🎓</span>
+        <h3>Objetivo Pedagógico</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          El objetivo primordial es <strong>acercar la ciberseguridad práctica a estudiantes en formación</strong>, reduciendo la frustración que provocan entornos excesivamente abstractos.
+        </p>
+        <p>
+          Mediante una narrativa amigable de Minecraft, los estudiantes aprenden de primera mano cómo piensan los atacantes y cómo los desarrolladores deben programar defensivamente para evitar brechas críticas.
+        </p>
+      </div>
+    </div>
+
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">🛡️</span>
+        <h3>Arquitectura y Tecnologías</h3>
+      </div>
+      <div class="guide-card-body">
+        <ul class="guide-bullet-list">
+          <li><strong>Backend:</strong> Python 3.11 con Flask y servidor WSGI Gunicorn (optimizado para VM de 2 vCPUs y bajo consumo de RAM).</li>
+          <li><strong>Persistencia:</strong> SQLite en modo Write-Ahead Logging (WAL) para rendimiento eficiente de I/O en disco.</li>
+          <li><strong>Aislamiento:</strong> Contenedor Docker para confinar los retos vulnerables y evitar daños a la máquina anfitriona.</li>
+          <li><strong>Frontend:</strong> HTML5, CSS3 Pixel-art y JavaScript nativo sin dependencias pesadas.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

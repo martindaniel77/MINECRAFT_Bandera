@@ -1,5 +1,5 @@
 <!-- ==========================================================================
-     MINECRAFT CTF - BASE TEMPLATE
+     MINECRAFT CTF - BASE TEMPLATE (RESTRUCTURED & FULL-WIDTH EDITION)
      Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
      ========================================================================== -->
 <!DOCTYPE html>
@@ -9,169 +9,257 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="author" content="Thorfinn777, Martyn777, Sassyjack777">
   <meta name="description" content="Laboratorio de Ciberseguridad Minecraft CTF desarrollado por Thorfinn777, Martyn777, Sassyjack777">
-  <title>{% block title %}Minecraft CTF{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=2">
+  <title>{% block title %}Security CTF - Minecraft Edition{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=4">
 </head>
-<body class="dimension-{{ current_dimension|default('overworld') }}" data-dimension="{{ current_dimension|default('overworld') }}">
+<body class="dimension-{{ current_dimension|default('overworld') }} {% if request.endpoint == 'index' %}is-landing{% endif %}" data-dimension="{{ current_dimension|default('overworld') }}">
 
-  <!-- Botón para desplegar la barra lateral derecha -->
-  <button type="button" class="mc-sidebar-toggle" id="mc-sidebar-toggle" aria-expanded="false" aria-controls="mc-sidebar-right" title="Abrir menú de navegación">
-    Menú
-  </button>
-
-  <!-- Barra lateral desplegable a la derecha (reemplaza la barra superior) -->
-  <aside class="mc-sidebar-right" id="mc-sidebar-right" aria-hidden="true">
-    <div class="mc-sidebar-header">
-      <a href="{{ url_for('index') }}" class="mc-logo">
-        <span>MINECRAFT CTF</span>
-        {% if logo_src %}<img src="{{ url_for('static', filename=logo_src) }}" class="mc-logo-creeper" alt="Creeper">{% endif %}
+  <!-- =========================================================================
+       BARRA DE NAVEGACIÓN SUPERIOR (EXPANDIDA, LIMPIA Y SIN PALABRAS ENROLLADAS)
+       ========================================================================= -->
+  <header class="ctf-header">
+    <div class="ctf-navbar-container">
+      
+      <!-- LOGO: BASTA CON LA IMAGEN OFICIAL (NO DUPLICAR TEXTO) -->
+      <a href="{{ url_for('index') }}" class="ctf-brand-link" title="Ir al Inicio de Minecraft CTF">
+        <div class="ctf-brand">
+          <img src="{{ url_for('static', filename='img/logo_shield.png') }}" class="ctf-shield-img" alt="SECURITY CTF MINECRAFT EDITION" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo_creeper.png') }}';">
+        </div>
       </a>
-      <button type="button" class="mc-sidebar-close" id="mc-sidebar-close" aria-label="Cerrar menú">×</button>
-    </div>
 
-    <!-- MARCA DE AGUA VISUAL 1: IDENTIFICACIÓN DE AUTORÍA EN NAVBAR -->
-    <div class="mc-watermark-navbar" title="Laboratorio desarrollado por Thorfinn777, Martyn777, Sassyjack777">
-      <span class="mc-wm-tag">Creadores:</span>
-      <span class="mc-wm-names"><strong>Thorfinn777</strong> • <strong>Martyn777</strong> • <strong>Sassyjack777</strong></span>
-    </div>
-
-    <nav class="mc-nav-links">
-      <a href="{{ url_for('overworld_view') }}" class="mc-btn mc-btn-green {% if current_dimension == 'overworld' %}active{% endif %}">
-        Overworld
-      </a>
-      {% if 'portal' in session.get('inventory', []) %}
-        <a href="{{ url_for('nether_view') }}" class="mc-btn mc-btn-red {% if current_dimension == 'nether' %}active{% endif %}">
-          Nether
+      <!-- ENLACES PRINCIPALES EN UNA SOLA LÍNEA SIN MONTARSE -->
+      <nav class="ctf-nav-menu">
+        <a href="{{ url_for('index') }}" class="ctf-nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+          <span class="nav-icon">🏠</span> Inicio
         </a>
-      {% else %}
-        <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '¡Debes completar el Overworld y encender el portal!')" title="Debes completar el Overworld para desbloquear el Nether">
-          Nether (Bloqueado)
-        </button>
-      {% endif %}
-
-      {% if 'pearl' in session.get('inventory', []) %}
-        <a href="{{ url_for('the_end_view') }}" class="mc-btn mc-btn-purple {% if current_dimension == 'the_end' %}active{% endif %}">
-          The End
+        <a href="{{ url_for('desafios_view') }}" class="ctf-nav-item {% if request.endpoint in ['desafios_view', 'overworld_view', 'nether_view', 'the_end_view'] %}active{% endif %}">
+          <span class="nav-icon">🏆</span> Desafíos
         </a>
-      {% else %}
-        <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '¡Debes forjar el Ojo de Ender en el Nether!')" title="Debes craftear el Ojo de Ender en el Nether">
-          The End (Bloqueado)
-        </button>
-      {% endif %}
+        <a href="{{ url_for('ranking_view') }}" class="ctf-nav-item {% if request.endpoint == 'ranking_view' %}active{% endif %}">
+          <span class="nav-icon">📊</span> Ranking
+        </a>
+        <a href="{{ url_for('guia_view') }}" class="ctf-nav-item {% if request.endpoint == 'guia_view' %}active{% endif %}">
+          <span class="nav-icon">📖</span> Guía
+        </a>
+        <a href="{{ url_for('acerca_de_view') }}" class="ctf-nav-item {% if request.endpoint == 'acerca_de_view' %}active{% endif %}">
+          <span class="nav-icon">ℹ️</span> Acerca de
+        </a>
+      </nav>
 
-      <a href="{{ url_for('reset_session') }}" class="mc-btn" onclick="return confirm('¿Reiniciar todo el progreso del juego?')">
-        Reiniciar
-      </a>
-    </nav>
-  </aside>
-  <div class="mc-sidebar-backdrop" id="mc-sidebar-backdrop"></div>
+      <!-- BOTÓN DE INICIO DE SESIÓN / PERFIL CON UNA SOLA CREDENCIAL -->
+      <div class="ctf-nav-auth">
+        {% if is_authenticated %}
+          <div class="ctf-user-pill" title="Sesión activa como {{ current_student }}">
+            <span class="ctf-user-tag">👤 {{ current_student }}</span>
+            <span class="ctf-user-score">{{ student_score }} pts</span>
+            <a href="{{ url_for('logout') }}" class="ctf-btn-logout" title="Cerrar sesión">Salir</a>
+          </div>
+        {% else %}
+          <button type="button" class="ctf-btn-login" onclick="openLoginModal()" id="btnOpenLogin">
+            <span class="btn-login-icon">👤</span> Iniciar Sesión
+          </button>
+        {% endif %}
+      </div>
 
-  <!-- Contenido Principal -->
-  <main class="mc-container">
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL FLUIDO APROVECHANDO TODO EL ANCHO -->
+  <main class="ctf-main-wrapper">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        {% for category, message in messages %}
-          <div class="mc-alert mc-alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
+        <div class="ctf-alerts-container">
+          {% for category, message in messages %}
+            <div class="mc-alert mc-alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
       {% endif %}
     {% endwith %}
 
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Botón para mostrar/ocultar la barra inferior (HUD) -->
-  <button type="button" class="mc-hud-toggle" id="mc-hud-toggle" aria-expanded="true" aria-controls="mc-hud-bottom">
-     Ocultar HUD
-  </button>
+  <!-- =========================================================================
+       FOOTER INFERIOR COMPLETO
+       ========================================================================= -->
+  <footer class="ctf-footer">
+    <div class="ctf-footer-inner">
+      <div class="ctf-footer-left">
+        <span class="ctf-creeper-ico">🟩</span>
+        <span class="ctf-footer-phrase">Seguridad + Minecraft = El desafío perfecto</span>
+      </div>
 
-  <!-- HUD INVENTARIO MINECRAFT FIJO AL PIE DE PÁGINA (9 SLOTS CON BARRA DE XP) -->
-  <footer class="mc-hud-bottom" id="mc-hud-bottom">
-    <!-- MARCA DE AGUA VISUAL 2: AUTORÍA PERMANENTE EN EL HUD DE JUEGO -->
-    <div class="mc-watermark-hud">
-      <span>Laboratorio Minecraft CTF</span> | Desarrollado por: <strong>Thorfinn777</strong> &bull; <strong>Martyn777</strong> &bull; <strong>Sassyjack777</strong>
-    </div>
+      <div class="ctf-footer-authors">
+        Desarrollado por: <strong>Thorfinn777</strong> &bull; <strong>Martyn777</strong> &bull; <strong>Sassyjack777</strong>
+      </div>
 
-    <div class="mc-stats-bar">
-      <!-- Corazones de vida de Steve -->
-      <div class="mc-hearts" title="Vida de Steve">
-        {% for i in range(10) %}
-          <img src="{{ url_for('static', filename='img/heart.svg') }}" class="mc-heart" alt="heart">
-        {% endfor %}
-      </div>
-      <!-- Badge de Nivel / Saldo de Experiencia -->
-      <div class="mc-level-badge" id="mc-xp-level" title="Experiencia actual. Ganas +50 XP por cada bandera correcta y gastas 20 XP al solicitar pistas.">
-        XP {{ session.get('xp', 30) }}
-      </div>
-    </div>
-
-    <!-- Barra de Experiencia Minecraft Oficial (Animada y Consumible) -->
-    <div class="mc-xp-bar-wrapper" title="Barra de XP: Consigue banderas para recargarla y úsala para desbloquear pistas">
-      <div class="mc-xp-bar-track">
-        <div class="mc-xp-bar-progress" id="mc-xp-bar-progress" style="width: {{ [100, (session.get('xp', 30) % 100)]|max(5) }}%;"></div>
-        <div class="mc-xp-bar-segments"></div>
-      </div>
-      <span class="mc-xp-number" id="mc-xp-number">{{ session.get('xp', 30) }}</span>
-    </div>
-
-    <!-- Hotbar de 9 ranuras -->
-    <div class="mc-hotbar">
-      <!-- 1. Hierro -->
-      <div class="mc-slot {% if 'iron' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-1">
-        <span class="mc-slot-num">1</span>
-        <img src="{{ url_for('static', filename='img/iron_ingot.svg') }}" alt="Hierro">
-        <span class="mc-slot-name">1. Lingote de Hierro</span>
-      </div>
-      <!-- 2. Diamante -->
-      <div class="mc-slot {% if 'diamond' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-2">
-        <span class="mc-slot-num">2</span>
-        <img src="{{ url_for('static', filename='img/diamond.svg') }}" alt="Diamante">
-        <span class="mc-slot-name">2. Diamante</span>
-      </div>
-      <!-- 3. Portal Nether -->
-      <div class="mc-slot {% if 'portal' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-3">
-        <span class="mc-slot-num">3</span>
-        <img src="{{ url_for('static', filename='img/nether_portal.svg') }}" alt="Portal">
-        <span class="mc-slot-name">3. Portal Nether</span>
-      </div>
-      <!-- 4. Oro -->
-      <div class="mc-slot {% if 'gold' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-4">
-        <span class="mc-slot-num">4</span>
-        <img src="{{ url_for('static', filename='img/gold_ingot.svg') }}" alt="Oro">
-        <span class="mc-slot-name">4. Lingote de Oro</span>
-      </div>
-      <!-- 5. Vara de Blaze -->
-      <div class="mc-slot {% if 'blaze' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-5">
-        <span class="mc-slot-num">5</span>
-        <img src="{{ url_for('static', filename='img/blaze_rod.svg') }}" alt="Blaze">
-        <span class="mc-slot-name">5. Vara de Blaze</span>
-      </div>
-      <!-- 6. Ender Pearl -->
-      <div class="mc-slot {% if 'pearl' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-6">
-        <span class="mc-slot-num">6</span>
-        <img src="{{ url_for('static', filename='img/ender_pearl.svg') }}" alt="Perla">
-        <span class="mc-slot-name">6. Ojo de Ender</span>
-      </div>
-      <!-- 7. Cristales -->
-      <div class="mc-slot {% if 'crystals' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-7">
-        <span class="mc-slot-num">7</span>
-        <img src="{{ url_for('static', filename='img/end_crystal.svg') }}" alt="Cristal">
-        <span class="mc-slot-name">7. Cristales del End</span>
-      </div>
-      <!-- 8. Ender Dragon -->
-      <div class="mc-slot {% if 'dragon' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-8">
-        <span class="mc-slot-num">8</span>
-        <img src="{{ url_for('static', filename='img/ender_dragon.svg') }}" alt="Dragon">
-        <span class="mc-slot-name">8. Ender Dragón</span>
-      </div>
-      <!-- 9. Huevo de Dragón -->
-      <div class="mc-slot {% if 'egg' in session.get('inventory', []) %}unlocked{% else %}locked{% endif %}" id="slot-9">
-        <span class="mc-slot-num">9</span>
-        <img src="{{ url_for('static', filename='img/dragon_egg.svg') }}" alt="Huevo">
-        <span class="mc-slot-name">9. Huevo de Dragón</span>
+      <div class="ctf-footer-right">
+        <a href="#" class="social-icon" title="Discord">💬</a>
+        <a href="https://github.com" target="_blank" rel="noopener" class="social-icon" title="GitHub">🐙</a>
+        <a href="https://youtube.com" target="_blank" rel="noopener" class="social-icon" title="YouTube">▶️</a>
+        <span class="ctf-divider">|</span>
+        <span class="ctf-year">CTF 2026</span>
       </div>
     </div>
   </footer>
 
-  <script src="{{ url_for('static', filename='js/hud.js') }}?v=2"></script>
+  <!-- =========================================================================
+       MODAL DE INICIO DE SESIÓN CON SOLO UNA CREDENCIAL
+       ========================================================================= -->
+  <div class="ctf-modal-overlay" id="loginModalOverlay" onclick="handleOverlayClick(event)">
+    <div class="ctf-modal-box">
+      <div class="ctf-modal-header">
+        <div class="ctf-modal-title">
+          <span class="modal-icon">👤</span> INICIAR SESIÓN DE ESTUDIANTE
+        </div>
+        <button type="button" class="ctf-modal-close" onclick="closeLoginModal()">&times;</button>
+      </div>
+
+      <div class="ctf-modal-body">
+        <p class="ctf-modal-desc">
+          Laboratorio diseñado para estudiantes. <strong>Solo necesitas UNA credencial</strong> (Gamertag o Código de Alumno). No requiere contraseña.
+        </p>
+
+        <form id="singleCredentialForm" action="{{ url_for('login') }}" method="POST" onsubmit="handleModalLogin(event)">
+          <div class="ctf-form-group">
+            <label for="studentCredential" class="ctf-form-label">Gamertag o Código de Estudiante:</label>
+            <div class="ctf-input-wrapper">
+              <span class="input-icon">🎮</span>
+              <input type="text" id="studentCredential" name="credential" class="ctf-input" placeholder="Ej: Steve, Alex, Alumno1..." required autofocus autocomplete="username">
+            </div>
+          </div>
+
+          <div class="ctf-quick-tags">
+            <span class="quick-title">Opciones rápidas:</span>
+            <button type="button" class="ctf-tag-btn" onclick="selectQuickTag('Steve')">Steve</button>
+            <button type="button" class="ctf-tag-btn" onclick="selectQuickTag('Alex')">Alex</button>
+            <button type="button" class="ctf-tag-btn" onclick="selectQuickTag('CyberMine')">CyberMine</button>
+            <button type="button" class="ctf-tag-btn" onclick="selectQuickTag('Estudiante-Seg')">Estudiante-Seg</button>
+          </div>
+
+          <div class="ctf-modal-actions">
+            <button type="submit" class="ctf-btn-primary" id="btnSubmitLogin">
+              ¡Entrar al Desafío! ⚔️
+            </button>
+          </div>
+        </form>
+
+        <div class="ctf-modal-footer-tip">
+          <span>💡 <strong>Tip para el estudiante:</strong> Tu progreso, banderas y posición en el ranking se guardarán bajo este nombre.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUD INVENTARIO MINECRAFT (DISPONIBLE EN LOS DESAFÍOS DE CADA DIMENSIÓN) -->
+  {% if request.endpoint in ['overworld_view', 'nether_view', 'the_end_view'] %}
+    <div class="mc-hud-bottom" id="mc-hud-bottom">
+      <div class="mc-stats-bar">
+        <div class="mc-hearts" title="Vida de Steve">
+          {% for i in range(10) %}
+            <img src="{{ url_for('static', filename='img/heart.svg') }}" class="mc-heart" alt="heart">
+          {% endfor %}
+        </div>
+        <div class="mc-xp-bar-container">
+          <div class="mc-xp-bar-fill" id="hud-xp-fill" style="width: {{ (session.get('inventory', [])|length / 9.0 * 100)|round }}%;"></div>
+          <span class="mc-xp-level" id="hud-xp-level">{{ (session.get('inventory', [])|length) * 10 }}</span>
+        </div>
+      </div>
+
+      <div class="mc-hotbar" id="mc-hotbar">
+        {% set items = [
+          ('iron', 'Lingote de Hierro', 'img/iron_ingot.svg'),
+          ('diamond', 'Diamante', 'img/diamond.svg'),
+          ('portal', 'Portal al Nether', 'img/nether_portal.svg'),
+          ('gold', 'Lingote de Oro', 'img/gold_ingot.svg'),
+          ('blaze', 'Vara de Blaze', 'img/blaze_rod.svg'),
+          ('pearl', 'Ojo de Ender', 'img/ender_pearl.svg'),
+          ('crystals', 'Cristales del End', 'img/end_crystal.svg'),
+          ('dragon', 'Ender Dragón', 'img/ender_dragon.svg'),
+          ('egg', 'Huevo de Dragón', 'img/dragon_egg.svg')
+        ] %}
+        {% for item_id, item_title, item_icon in items %}
+          <div class="mc-slot {% if item_id in session.get('inventory', []) %}filled{% endif %}" data-item="{{ item_id }}" title="{{ item_title }}">
+            {% if item_id in session.get('inventory', []) %}
+              <img src="{{ url_for('static', filename=item_icon) }}" class="mc-item-icon" alt="{{ item_title }}">
+              <span class="mc-slot-count">1</span>
+            {% else %}
+              <div class="mc-slot-empty"></div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- SCRIPTS BÁSICOS -->
+  <script src="{{ url_for('static', filename='js/hud.js') }}"></script>
+  <script>
+    function openLoginModal() {
+      const modal = document.getElementById('loginModalOverlay');
+      if (modal) {
+        modal.classList.add('active');
+        const input = document.getElementById('studentCredential');
+        if (input) setTimeout(() => input.focus(), 100);
+      }
+    }
+
+    function closeLoginModal() {
+      const modal = document.getElementById('loginModalOverlay');
+      if (modal) {
+        modal.classList.remove('active');
+      }
+    }
+
+    function handleOverlayClick(event) {
+      if (event.target.id === 'loginModalOverlay') {
+        closeLoginModal();
+      }
+    }
+
+    function selectQuickTag(name) {
+      const input = document.getElementById('studentCredential');
+      if (input) {
+        input.value = name;
+        input.focus();
+      }
+    }
+
+    async function handleModalLogin(event) {
+      event.preventDefault();
+      const input = document.getElementById('studentCredential');
+      const credential = (input ? input.value : '').trim();
+      if (!credential) return;
+
+      const btn = document.getElementById('btnSubmitLogin');
+      if (btn) btn.disabled = true;
+
+      try {
+        const response = await fetch("{{ url_for('login') }}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ credential: credential })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert(data.message || 'Error al iniciar sesión');
+          if (btn) btn.disabled = false;
+        }
+      } catch (e) {
+        event.target.submit();
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeLoginModal();
+    });
+  </script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

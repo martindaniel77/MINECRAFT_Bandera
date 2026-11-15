@@ -3,19 +3,18 @@
 {% block title %}The End - Minecraft CTF{% endblock %}
 
 {% block content %}
-<div class="mc-box">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h1 class="mc-title" style="color: #c084fc;">
-      <span><img src="{{ url_for('static', filename='img/ender_pearl.svg') }}" alt="" style="width:1.2em;height:1.2em;vertical-align:middle;margin-right:6px;">FASE 3: THE END (Nivel: Difícil - Boss Final)</span>
-    </h1>
-    <span class="mc-badge" style="background:#7e22ce; color:#fff;">3 Desafíos</span>
+<div class="ctf-page-container ctf-wide-layout">
+
+  <div class="ctf-page-header">
+    <div class="header-icon">🌌</div>
+    <h1 class="ctf-page-title">FASE 3: THE END (Nivel: Difícil - Boss Final)</h1>
+    <p class="ctf-page-desc">
+      Has colocado los 12 Ojos de Ender y cruzado el portal hacia el Vacío.
+      Te encuentras en la isla central frente al <strong>Ender Dragón</strong>.
+      Para liberar el End debes <strong>destruir los Cristales de las Torres</strong>, <strong>asestar el golpe final al Dragón</strong> y <strong>capturar el Huevo legítimo evadiendo los señuelos (Honeypots)</strong>.
+      (Recuerda que todas las banderas tienen el formato <code>Flag{...}</code>).
+    </p>
   </div>
-  <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
-    Has colocado los 12 Ojos de Ender y cruzado el portal hacia el Vacío. 
-    Te encuentras en la isla central frente al <strong>Ender Dragón</strong>. 
-    Para liberar el End debes <strong>destruir los Cristales de las Torres</strong>, <strong>asestar el golpe final al Dragón</strong> y <strong>capturar el Huevo legítimo evadiendo los señuelos (Honeypots)</strong>.
-    (Recuerda que todas las banderas tienen el formato <code>Flag{...}</code>).
-  </p>
 
   <div class="challenges-grid">
 
@@ -51,18 +50,26 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Codigo Fuente -->
+          <!-- Pistas, Código y Curiosidad -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('crystals')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
-                          </div>
+              <button class="mc-btn" onclick="toggleSource('crystals')" style="font-size:0.75rem; flex:1;">Ver Código</button>
+            </div>
             <div id="hint-crystals" class="hint-box">
               <strong>Pista — Disparo de una backdoor:</strong><br>
               1. No estás buscando un fallo de autenticación: estás buscando una <em>puerta atrás</em> que alguien dejó en el servicio. Así funcionaban los incidentes de IRC y ProFTPD que se han documentado en la historia de la ciberseguridad.<br>
               2. Estas backdoors casi nunca se aleatorizan: comparan tu entrada contra un token fijo. El proveedor y el año suelen estar escritos en el propio token.<br>
               3. El mismo campo cumple dos funciones: una es activar el disparador y la otra es entregar tu entrada a una shell. Piensa en un carácter de dos letras que precedía a los comandos en los protocolos antiguos, y en el operador que le sigue.
             </div>
+            <div id="source-crystals" class="source-box" style="display:none;">
+              <strong>Código vulnerable:</strong>
+              <div class="source-code-block">if any(trigger in payload for trigger in ['CVE-2026-OVERLOAD', 'AB;', ...]): ...</div>
             </div>
+            <div class="curiosity-box">
+              <strong>Curiosidad:</strong> Backdoors reales se escondieron en servidores IRC y compiladores, activándose con una secuencia exacta de bytes.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -112,18 +119,27 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Codigo Fuente -->
+          <!-- Pistas, Código y Curiosidad -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('dragon')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
-                          </div>
+              <button class="mc-btn" onclick="toggleSource('dragon')" style="font-size:0.75rem; flex:1;">Ver Código</button>
+            </div>
             <div id="hint-dragon" class="hint-box">
               <strong>Pista — Inyección de comandos:</strong><br>
               1. Tu valor (la potencia del impacto) se coloca dentro de una línea de comando que se ejecuta en una shell. La shell no sabe dónde acaba tu dato: cree que todo lo que sigue es parte de su trabajo.<br>
               2. La clave es <em>terminar</em> tu comando antes de que lo termine el servidor, para que la shell interprete lo que venga como una orden nueva e independiente.<br>
               3. Usa la opción de ver el código de esta misma tarjeta: te muestra exactamente cómo se construye la orden.
             </div>
+            <div id="source-dragon" class="source-box" style="display:none;">
+              <strong>Código vulnerable:</strong>
+              <div class="source-code-block">cmd = f"echo 'Calculando impacto de flecha: potencia {shot_power}'"
+output, error = run_sandboxed(cmd, shell=True)</div>
             </div>
+            <div class="curiosity-box">
+              <strong>Curiosidad:</strong> Shellshock (CVE-2014-6271) permitió ejecutar comandos arbitrarios en millones de servidores Linux y dispositivos IoT.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -175,18 +191,27 @@
             </div>
           {% endif %}
 
-          <!-- Pistas y Codigo Fuente -->
+          <!-- Pistas, Código y Curiosidad -->
           <div class="lab-tools">
             <div style="display: flex; gap: 8px;">
               <button class="mc-btn" onclick="toggleHint('egg')" style="font-size:0.75rem; flex:1;">Ver Pista</button>
-                          </div>
+              <button class="mc-btn" onclick="toggleSource('egg')" style="font-size:0.75rem; flex:1;">Ver Código</button>
+            </div>
             <div id="hint-egg" class="hint-box">
               <strong>Pista — Recorrido de rutas (Path Traversal):</strong><br>
               1. El lector coge el nombre de fichero que le mandas, lo une a un directorio base y abre lo que salga. Si tú controlas el nombre, tal vez también controlas lo que se une.<br>
               2. Ojo: hay <em>dos</em> ficheros que parecen el premio. Uno está colocado para que se encuentre demasiado fácil, y ese es un señuelo. ¿Cuál querría un defensor que cogieras?<br>
               3. Para salir del directorio base necesitas subir directorios en la ruta. La respuesta a la pregunta 2 te dice en cuál estás.
             </div>
+            <div id="source-egg" class="source-box" style="display:none;">
+              <strong>Código vulnerable:</strong>
+              <div class="source-code-block">base_dir = "/var/www"
+target_path = os.path.join(base_dir, altar_file)  # sin validar traversal</div>
             </div>
+            <div class="curiosity-box">
+              <strong>Curiosidad:</strong> Los honeypots son señuelos deliberados. En la naturaleza, muchos "archivos secretos" públicos son trampas para distraer atacantes.
+            </div>
+          </div>
         </div>
       </div>
 

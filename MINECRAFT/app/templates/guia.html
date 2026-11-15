@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Guía para Estudiantes - Minecraft Security CTF{% endblock %}
+
+{% block content %}
+<div class="ctf-page-container ctf-wide-layout">
+
+  <div class="ctf-page-header">
+    <div class="header-icon">📖</div>
+    <h1 class="ctf-page-title">GUÍA DE APRENDIZAJE PARA ESTUDIANTES</h1>
+    <p class="ctf-page-desc">
+      Aprender ciberseguridad debe ser claro, estructurado y sin frustración. Aquí tienes un ítem de la guía por cada bandera del laboratorio: el concepto, el porqué y una curiosidad del mundo real antes de atacar.
+    </p>
+  </div>
+
+  <div class="ctf-guide-grid ctf-guide-grid-wide">
+
+    <!-- ÍTEM 0: ¿QUÉ ES UNA BANDERA? -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">🚩</span>
+        <h3>0. ¿Qué es una Bandera (Flag) y cómo se entrega?</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          En un CTF tu meta es encontrar un secreto oculto. A ese secreto se le llama <strong>Bandera</strong> o <strong>Flag</strong>.
+        </p>
+        <div class="guide-example-box">
+          <strong>Formato oficial:</strong> <code>Flag{MINECRAFT_...}</code> o en mayúsculas <code>FLAG{...}</code>
+        </div>
+        <p>
+          Cuando la encuentres, cópiala exactamente e ingrésala en la caja de validación del desafío para ganar XP y sumar el ítem a tu inventario.
+        </p>
+        <div class="guide-highlight-box">
+          <strong>Curiosidad:</strong> Las flags nacieron en los primeros CTF académicos (UCSB iCTF, 2003) para que los organizadores pudieran verificar automáticamente quién había comprometido un servicio.
+        </div>
+      </div>
+    </div>
+
+    <!-- BANDERA 1: HIERRO -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">⛏️</span>
+        <h3>1. Bandera — Lingote de Hierro: Esteganografía, Base64 y César (ROT-13)</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          El secreto no está en los píxeles: viaja dentro de los metadatos del PNG. Después se envuelve en Base64 y se cifra con un desplazamiento clásico.
+        </p>
+        <pre class="guide-code">exiftool mapa_cueva.png
+echo "TEXTO_BASE64" | base64 -d
+echo "TEXTO" | tr 'A-Za-z' 'N-ZA-Mn-za-m'</pre>
+        <div class="guide-highlight-box">
+          <strong>Curiosidad:</strong> El cifrado César debe su nombre a Julio César, que lo usaba para comunicarse con sus generales. ROT-13 es solo un caso particular con desplazamiento 13.
+        </div>
+      </div>
+    </div>
+
+    <!-- BANDERA 2: DIAMANTE -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">💎</span>
+        <h3>2. Bandera — Diamante: Inyección SQL clásica (' OR 1=1 --)</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          La aplicación concatena tu búsqueda dentro de la cláusula <code>WHERE</code> sin sanitizar. Con <code>' OR 1=1 --</code> fuerzas que la condición sea verdadera para todos los registros.
+        </p>
+        <pre class="guide-code">SELECT * FROM cofres WHERE nombre LIKE '%TU_BUSQUEDA%' AND bloqueado = 0;</pre>
+        <div class="guide-steps-list">
+          <div><strong>1.</strong> La comilla <code>'</code> cierra el texto esperado y te deja agregar sentencias.</div>
+          <div><strong>2.</strong> <code>OR 1=1</code> hace verdadera la condición para todos los cofres.</div>
+          <div><strong>3.</strong> <code>--</code> comenta el resto y anula <code>AND bloqueado = 0</code>.</div>
+        </div>
+        <div class="guide-highlight-box">
+          <strong>Curiosidad:</strong> La primera SQLi documentada masivamente fue en 1998 por Jeff Forristal ("rain.forest.puppy"). Hoy sigue siendo el #1 del OWASP Top 10.
+        </div>
+      </div>
+    </div>
+
+    <!-- BANDERA 3: PORTAL -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">🟪</span>
+        <h3>3. Bandera — Portal al Nether: Metadatos y cabeceras HTTP</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          El secreto está escondido en partes del documento que las herramientas leen pero los humanos se saltan: comentarios internos y cabeceras de la respuesta HTTP.
+        </p>
+        <pre class="guide-code">curl -I http://localhost:8080/static/docs/planos_portal_nether.txt</pre>
+        <div class="guide-highlight-box">
+          <strong>Curiosidad:</strong> Los metadatos de archivos han filtrado información sensible en casos reales (por ejemplo, documentos de oficina que conservan el nombre del autor o la ruta del servidor).
+        </div>
+      </div>
+    </div>
+
+    <!-- BANDERA 4: ORO / XSS -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">💰</span>
+        <h3>4. Bandera — Lingote de Oro: Stored XSS y robo de cookies</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          El libro de ofertas del Bastión pinta tu nota sin escaparla. Si insertas JavaScript, el Piglin Guard la ejecuta en su navegador y entrega su cookie de tesorero.
+        </p>
+        <pre class="guide-code">&lt;script&gt;fetch('/nether/gold/leak?cookie=' + encodeURIComponent(document.cookie));&lt;/script&gt;</pre>
+        <div class="guide-highlight-box">
+          <strong>Curiosidad:</strong> El primer worm de XSS masivo fue "Samy" en MySpace (2005). En una sola hora infectó a más de un millón de perfiles.
+        </div>
+      </div>
+    </div>
+
+    <!-- BANDERA 5: BLAZE / FILE UPLOAD -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">🔥</span>
+        <h3>5. Bandera — Vara de Blaze: Subida de archivos a RCE</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          El caldero acepta cualquier archivo y además lo ejecuta. Subiendo un pequeño script Python puedes leer archivos del servidor y extraer el secreto.
+        </p>
+        <pre class="guide-code">import os
+print(open('/secret/blaze_rod.txt').read())</pre>
+        <div class="guide-highlight-box">
+          <strong>Curiosidad:</strong> La falta de validación de extensiones es la causa de muchos incidentes reales: un formulario de "subir avatar" que termina ejecutando un webshell.
+        </div>
+      </div>
+    </div>
+
+    <!-- BANDERA 6: PEARL / PRIVILEGE ESCALATION -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">👁️</span>
+        <h3>6. Bandera — Ojo de Ender: Violación de mínimo privilegio y parameter tampering</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          El altar decide tu rol a partir de un dato que tú mismo envías (<code>user_role</code>). Si lo cambias a <code>ender_master</code>, el servidor te concede acceso sin validar la identidad real.
+        </p>
+        <pre class="guide-code">/nether/pearl/altar?user_role=ender_master</pre>
+        <div class="guide-highlight-box">
+          <strong>Curiosidad:</strong> A este fallo se le llama "decide by client". En la práctica, cambiar un parámetro en la URL o en una cookie ha dado acceso de administrador en sistemas reales.
+        </div>
+      </div>
+    </div>
+
+    <!-- BANDERA 7: CRYSTALS / CVE -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">💠</span>
+        <h3>7. Bandera — Cristales del End: Explotación de servicio y CVE simulado</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          El servicio de telemetría tiene una puerta atrás: compara tu entrada contra un token fijo y, si coincide, ejecuta comandos. Enviar el payload correcto detona los cristales.
+        </p>
+        <pre class="guide-code">CVE-2026-OVERLOAD;shatter_crystals</pre>
+        <div class="guide-highlight-box">
+          <strong>Curiosidad:</strong> Backdoors reales se han escondido en software legítimo (por ejemplo, en servidores IRC o compiladores) y se activaban con una secuencia exacta de bytes.
+        </div>
+      </div>
+    </div>
+
+    <!-- BANDERA 8: DRAGON / COMMAND INJECTION -->
+    <div class="ctf-guide-card">
+      <div class="guide-card-header">
+        <span class="guide-icon">🐉</span>
+        <h3>8. Bandera — Ender Dragón: Inyección de comandos (Command Injection)</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          Tu potencia se inserta dentro de una línea que se ejecuta en una shell. Si terminas el comando antes (con <code>;</code> o <code>&&</code>), la shell interpreta el resto como una orden nueva.
+        </p>
+        <pre class="guide-code">100; cat /secret/dragon_slain.txt</pre>
+        <div class="guide-highlight-box">
+          <strong>Curiosidad:</strong> Shellshock (CVE-2014-6271) permitía ejecutar comandos arbitrarios a través de variables de entorno, afectando a millones de servidores Linux y dispositivos IoT.
+        </div>
+      </div>
+    </div>
+
+    <!-- BANDERA 9: EGG / HONEYPOT + LFI -->
+    <div class="ctf-guide-card guide-highlight">
+      <div class="guide-card-header">
+        <span class="guide-icon">🥚</span>
+        <h3>9. Bandera — Huevo de Dragón: Evasión de Honeypot y Path Traversal (LFI)</h3>
+      </div>
+      <div class="guide-card-body">
+        <p>
+          El altar lee el archivo que tú le pides uniendo tu entrada a un directorio base. Usando <code>../../</code> puedes salir de la carpeta pública y leer el huevo real en <code>/root/</code>. El primer resultado fácil es un señuelo (honeypot).
+        </p>
+        <pre class="guide-code">../../root/real_dragon_egg.txt</pre>
+        <div class="guide-highlight-box">
+          <strong>Curiosidad:</strong> Los honeypots son sistemas señuelo diseñados para distraer y estudiar a los atacantes. En la naturaleza, muchos "archivos secretos" públicos son trampas deliberadas.
+        </div>
+      </div>
+    </div>
+
+    <!-- MÉTODO DE APRENDIZAJE -->
+    <div class="ctf-guide-card guide-highlight">
+      <div class="guide-card-header">
+        <span class="guide-icon">💡</span>
+        <h3>10. Método de Aprendizaje Recomendado</h3>
+      </div>
+      <div class="guide-card-body">
+        <ol class="guide-ordered-list">
+          <li><strong>Comienza por el Overworld:</strong> es la dimensión introductoria.</li>
+          <li><strong>Usa el botón "Ver Código":</strong> inspecciona el código vulnerable para entender dónde está el error.</li>
+          <li><strong>Consulta las Pistas:</strong> desbloquea pistas conceptuales usando la XP que acumulas.</li>
+          <li><strong>Lee la Guía por bandera:</strong> cada ítem te da la curiosidad y el concepto antes de atacar.</li>
+        </ol>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ctf-guide-cta">
+    <a href="{{ url_for('desafios_view') }}" class="ctf-btn-start">
+      ¡Ir a los Desafíos por Dimensión! ⚔️
+    </a>
+  </div>
+
+</div>
+{% endblock %}

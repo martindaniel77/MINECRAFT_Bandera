@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # MINECRAFT CTF - DATABASE INITIALIZER & MODELS
 # Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
 # ==============================================================================
@@ -62,7 +62,43 @@ def init_db():
         )
     ''')
 
-    # Poblar datos iniciales si está vacía
+    # Tabla 4: Tokens robados al Piglin Guard (reto de XSS Stored)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS stolen_tokens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            offer_id INTEGER,
+            captured_data TEXT NOT NULL,
+            captured_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Tabla 5: Perfiles de estudiantes y progreso con credencial única
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS student_profiles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            credential TEXT UNIQUE NOT NULL,
+            display_name TEXT NOT NULL,
+            team_name TEXT DEFAULT 'MinecraftStudent',
+            score INTEGER DEFAULT 0,
+            flags_solved INTEGER DEFAULT 0,
+            inventory_json TEXT DEFAULT '[]',
+            last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Tabla 6: Equipos precargados para el Ranking (como en la imagen del CTF)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS leaderboard_teams (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            rank_pos INTEGER NOT NULL,
+            team_name TEXT NOT NULL,
+            badge_icon TEXT NOT NULL,
+            score INTEGER NOT NULL,
+            is_crown INTEGER DEFAULT 0
+        )
+    ''')
+
+    # Poblar cofres iniciales si está vacía
     cursor.execute('SELECT COUNT(*) FROM villager_chests')
     if cursor.fetchone()[0] == 0:
         cursor.executemany('''
@@ -76,16 +112,6 @@ def init_db():
             ('Cofre Abandonado en Mina', 'X: -210, Z: 512', 12, '8x Carbón, 4x Antorchas', 0)
         ])
 
-    # Tabla 4: Tokens robados al Piglin Guard (reto de XSS Stored).
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS stolen_tokens (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            offer_id INTEGER,
-            captured_data TEXT NOT NULL,
-            captured_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-
     cursor.execute('SELECT COUNT(*) FROM end_crystals')
     if cursor.fetchone()[0] == 0:
         cursor.executemany('''
@@ -96,6 +122,19 @@ def init_db():
             ('CRISTAL_BETA', 4402, 'ACTIVE', 100),
             ('CRISTAL_GAMMA', 4403, 'ACTIVE', 100),
             ('CRISTAL_OMEGA', 4404, 'ACTIVE', 100)
+        ])
+
+    cursor.execute('SELECT COUNT(*) FROM leaderboard_teams')
+    if cursor.fetchone()[0] == 0:
+        cursor.executemany('''
+            INSERT INTO leaderboard_teams (rank_pos, team_name, badge_icon, score, is_crown)
+            VALUES (?, ?, ?, ?, ?)
+        ''', [
+            (1, 'BlockSec', 'creeper', 1250, 1),
+            (2, 'CyberMine', 'grass', 1100, 0),
+            (3, 'TeamCraft', 'diamond', 980, 0),
+            (4, 'RedstoneSec', 'redstone', 920, 0),
+            (5, 'MineGuardians', 'pickaxe', 870, 0)
         ])
 
     conn.commit()

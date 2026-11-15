@@ -8,6 +8,9 @@ console.log(
   "background: #1e3a1e; color: #55ff55; font-size: 13px; font-weight: bold; padding: 4px 8px; border: 1px solid #55ff55;"
 );
 
+// Definición oficial del orden de ítems de la barra de inventario (Hotbar)
+const HOTBAR_ORDER = ['iron', 'diamond', 'portal', 'gold', 'blaze', 'pearl', 'crystals', 'dragon', 'egg'];
+
 window.unlockedHints = new Set();
 window.currentXp = 30;
 
@@ -16,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Sincronizar HUD
   syncInventoryHUD();
-
 
   // Mostrar/ocultar barra inferior (HUD)
   const hudToggle = document.getElementById('mc-hud-toggle');
@@ -65,11 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Detectar y reproducir sonido cuando se entra o cambia entre las 3 dimensiones / victoria
-
 // Sacudir botones bloqueados con sonido de error
 function triggerLockedShake(buttonEl, message) {
-    if (buttonEl) {
+  if (buttonEl) {
     buttonEl.classList.remove('mc-btn-shake');
     void buttonEl.offsetWidth; // retrigger reflow
     buttonEl.classList.add('mc-btn-shake');
@@ -105,13 +105,13 @@ async function toggleHint(challengeId) {
 
   // Si ya está visible, alternar para cerrar gratis
   if (hintEl.style.display === 'block') {
-        hintEl.style.display = 'none';
+    hintEl.style.display = 'none';
     return;
   }
 
   // Si ya fue desbloqueada en esta sesión, abrir gratis
   if (window.unlockedHints.has(challengeId)) {
-        hintEl.style.display = 'block';
+    hintEl.style.display = 'block';
     return;
   }
 
@@ -127,7 +127,7 @@ async function toggleHint(challengeId) {
     if (data.success) {
       window.unlockedHints.add(challengeId);
       window.currentXp = data.xp;
-            hintEl.style.display = 'block';
+      hintEl.style.display = 'block';
       
       if (btn) {
         btn.textContent = 'Ver Pista';
@@ -135,21 +135,21 @@ async function toggleHint(challengeId) {
       }
 
       updateXpDisplay(data.xp);
-      showToast(`Pista desbloqueada! Se consumieron ${data.cost || 20} XP.`, 'success');
+      showToast(data.message, 'success');
     } else {
-            if (btn) {
-        btn.classList.remove('mc-btn-shake');
-        void btn.offsetWidth;
-        btn.classList.add('mc-btn-shake');
-        setTimeout(() => btn.classList.remove('mc-btn-shake'), 450);
-      }
       showToast(`Aviso: ${data.message}`, 'error');
     }
   } catch (err) {
-        showToast('Error: Error de conexión con el servidor.', 'error');
+    showToast('Error: Error de conexión con el servidor.', 'error');
   }
 }
 
+// 2b. Mostrar/ocultar código vulnerable (sin costo de XP)
+function toggleSource(challengeId) {
+  const sourceEl = document.getElementById(`source-${challengeId}`);
+  if (!sourceEl) return;
+  sourceEl.style.display = (sourceEl.style.display === 'block') ? 'none' : 'block';
+}
 
 // 3. Aviso de dimensión completada sin bloquear el hilo
 function showCelebration(message) {
@@ -183,14 +183,14 @@ function markItemUnlocked(step) {
     const submitBtn = form.querySelector('button[type="submit"]');
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = '';
+      submitBtn.textContent = '✅ Conquistado';
     }
   }
   const cardEl = inputEl.closest('.challenge-card');
   if (cardEl) cardEl.classList.add('unlocked');
 }
 
-// 5. Envío Asíncrono de Flags y Actualización de HUD (Sin sonido repetitivo de flag y sin retrasos)
+// 5. Envío Asíncrono de Flags y Actualización de HUD
 async function submitFlag(dimension, step, event) {
   if (event) event.preventDefault();
   
@@ -201,7 +201,7 @@ async function submitFlag(dimension, step, event) {
   const flagValue = inputEl.value.trim();
   if (!flagValue) {
     if (feedbackEl) {
-      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error"> Ingresa una bandera primero.</div>`;
+      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">⚠️ Ingresa una bandera primero.</div>`;
     }
     return;
   }
@@ -215,42 +215,43 @@ async function submitFlag(dimension, step, event) {
     const data = await res.json();
 
     if (data.success) {
-      // SE ELIMINÓ EL SONIDO REPETITIVO EN CADA FLAG CONSEGUIDA SEGÚN REQUERIMIENTO DEL USUARIO
       if (feedbackEl) {
         feedbackEl.innerHTML = `<div class="mc-alert mc-alert-success">${data.message}</div>`;
       }
       markItemUnlocked(step);
 
-      if (data.xp !== undefined) {
-        updateXpDisplay(data.xp);
+      const newXp = (data.current_xp !== undefined) ? data.current_xp : data.xp;
+      if (newXp !== undefined) {
+        updateXpDisplay(newXp);
       }
 
-      // Sincronización inmediata sin lag artificial
+      // Sincronización inmediata de HUD
       syncInventoryHUD();
 
       // Si se completó el juego completo (derrota final del dragón)
-      if (data.all_completed) {
-                showCelebration('HAS LIBERADO EL END!<br>¡Ender Dragón derrotado! Redirigiendo...');
+      if (data.game_won || data.all_completed) {
+        showCelebration('¡HAS LIBERADO EL END!<br>¡Ender Dragón derrotado! Redirigiendo...');
         setTimeout(() => { 
-          sessionStorage.setItem('mc_last_dimension', 'the_end'); // fuerza sonido en victoria si corresponde
-          window.location.href = '/victory'; 
+          sessionStorage.setItem('mc_last_dimension', 'the_end');
+          window.location.href = data.redirect_url || '/victory'; 
         }, 1200);
         return;
       }
 
       // Si completó la dimensión actual, permitir avanzar
       if (data.dimension_completed) {
-        showCelebration(`Has completado la dimension ${dimension.toUpperCase()}! (+50 XP)`);
+        showCelebration(`¡Has completado la dimensión ${dimension.toUpperCase()}! (+50 XP)`);
         setTimeout(() => window.location.reload(), 1400);
       }
     } else {
-            if (feedbackEl) {
-        feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">Error: ${data.message}</div>`;
+      if (feedbackEl) {
+        feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">❌ Error: ${data.message}</div>`;
       }
     }
   } catch (err) {
-        if (feedbackEl) {
-      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">Error: Error de conexión con el servidor.</div>`;
+    console.error("Error en submitFlag:", err);
+    if (feedbackEl) {
+      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">❌ Error en el envío: ${err.message || 'Error de conexión con el servidor.'}</div>`;
     }
   }
 }
@@ -297,8 +298,9 @@ async function syncInventoryHUD() {
     });
 
     // Actualizar XP y pistas desbloqueadas
-    if (data.xp !== undefined) {
-      updateXpDisplay(data.xp);
+    const newXp = (data.xp !== undefined) ? data.xp : data.current_xp;
+    if (newXp !== undefined) {
+      updateXpDisplay(newXp);
     }
 
     if (Array.isArray(data.unlocked_hints)) {

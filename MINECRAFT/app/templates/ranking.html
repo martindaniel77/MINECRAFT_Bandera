@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Ranking - Minecraft Security CTF{% endblock %}
+
+{% block content %}
+<div class="ctf-page-container">
+
+  <div class="ctf-page-header">
+    <div class="header-icon">📊</div>
+    <h1 class="ctf-page-title">TABLA DE CLASIFICACIÓN (RANKING)</h1>
+    <p class="ctf-page-desc">
+      Compite con tus compañeros de clase. Cada bandera capturada otorga 150 puntos, más la experiencia (XP) ganada por resolver retos.
+    </p>
+  </div>
+
+  <div class="ctf-ranking-full-box">
+    
+    <div class="ctf-ranking-stats-summary">
+      <div class="stat-box">
+        <span class="stat-number">9</span>
+        <span class="stat-label">Banderas Totales</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number">1350</span>
+        <span class="stat-label">Puntos Máximos</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number">{{ current_student or 'Invitado' }}</span>
+        <span class="stat-label">Tu Identificador</span>
+      </div>
+      <div class="stat-box highlight">
+        <span class="stat-number">{{ student_score }}</span>
+        <span class="stat-label">Tu Puntaje Actual</span>
+      </div>
+    </div>
+
+    <table class="ctf-ranking-table ctf-table-large">
+      <thead>
+        <tr>
+          <th class="th-pos">#</th>
+          <th class="th-team">Equipo / Estudiante</th>
+          <th class="th-status">Estado</th>
+          <th class="th-pts">Puntos</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for team in teams %}
+          <tr class="ranking-row {% if team.is_current_user %}is-me{% endif %}">
+            <td class="td-pos">
+              {% if team.rank_pos == 1 %}
+                <span class="pos-gold">🥇 1</span>
+              {% elif team.rank_pos == 2 %}
+                <span class="pos-silver">🥈 2</span>
+              {% elif team.rank_pos == 3 %}
+                <span class="pos-bronze">🥉 3</span>
+              {% else %}
+                {{ team.rank_pos }}
+              {% endif %}
+            </td>
+            <td class="td-team">
+              <span class="team-icon">
+                {% if team.badge_icon == 'creeper' %}🟩
+                {% elif team.badge_icon == 'grass' %}🌱
+                {% elif team.badge_icon == 'diamond' %}💎
+                {% elif team.badge_icon == 'redstone' %}🔴
+                {% elif team.badge_icon == 'pickaxe' %}⛏️
+                {% else %}👤{% endif %}
+              </span>
+              <span class="team-name">{{ team.team_name }}</span>
+              {% if team.is_current_user %}
+                <span class="tag-you">Tú</span>
+              {% endif %}
+            </td>
+            <td class="td-status">
+              {% if team.score >= 1000 %}
+                <span class="ctf-badge badge-facil">Nether Master</span>
+              {% elif team.score >= 500 %}
+                <span class="ctf-badge badge-medio">Overworld Explorer</span>
+              {% else %}
+                <span class="ctf-badge badge-dificil">Iniciando Aventura</span>
+              {% endif %}
+            </td>
+            <td class="td-pts">
+              <span class="pts-value">{{ team.score }}</span>
+              {% if team.is_crown %}
+                <span class="crown-icon" title="Líder del Torneo">👑</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+
+</div>
+{% endblock %}

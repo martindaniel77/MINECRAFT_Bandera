@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Desafíos por Dimensión - Minecraft Security CTF{% endblock %}
+
+{% block content %}
+<div class="ctf-page-container ctf-wide-layout">
+
+  <div class="ctf-page-header">
+    <div class="header-icon">🏆</div>
+    <h1 class="ctf-page-title">DESAFÍOS POR DIMENSIÓN DE MINECRAFT</h1>
+    <p class="ctf-page-desc">
+      El laboratorio está estructurado en <strong>3 dimensiones progresivas</strong>. Cada dimensión contiene 3 desafíos de seguridad diseñados para que aprendas paso a paso qué vulnerabilidades existen y cómo se resuelven.
+    </p>
+  </div>
+
+  <!-- GRID DE LAS 3 DIMENSIONES (APROVECHA TODO EL ANCHO DE PANTALLA) -->
+  <div class="ctf-dimensions-grid">
+    {% for dim in dimensions %}
+      <div class="ctf-dimension-card dim-theme-{{ dim.id }} {% if dim.is_locked %}is-locked{% endif %}">
+        
+        <!-- CABECERA DE LA DIMENSIÓN -->
+        <div class="dim-card-header">
+          <div class="dim-badge-row">
+            <span class="ctf-badge badge-{{ dim.badge_class }}">{{ dim.badge }}</span>
+            <span class="dim-progress-tag">
+              Progreso: <strong>{{ dim.solved_count }}/{{ dim.total_count }}</strong>
+            </span>
+          </div>
+
+          <div class="dim-icon-title">
+            <span class="dim-big-icon">{{ dim.icon }}</span>
+            <div>
+              <h2 class="dim-main-title">{{ dim.title }}</h2>
+              <span class="dim-sub-title">{{ dim.subtitle }}</span>
+            </div>
+          </div>
+
+          <p class="dim-description-text">{{ dim.description }}</p>
+        </div>
+
+        <!-- CONTENIDO: QUÉ VAS A ENCONTRAR ADENTRO -->
+        <div class="dim-card-body">
+          <h4 class="dim-section-label">🎯 ¿Qué vas a encontrar adentro?</h4>
+          
+          <div class="dim-challenges-list">
+            {% for ch in dim.challenges %}
+              <div class="dim-challenge-item {% if ch.solved %}is-solved{% endif %}">
+                <div class="ch-left-badge">
+                  <span class="ch-num">#{{ ch.num }}</span>
+                </div>
+                
+                <div class="ch-info">
+                  <div class="ch-header-row">
+                    <strong class="ch-name">{{ ch.name }}</strong>
+                    {% if ch.solved %}
+                      <span class="ch-status-pill solved">✅ Conquistado</span>
+                    {% else %}
+                      <span class="ch-status-pill pending">⏳ Pendiente</span>
+                    {% endif %}
+                  </div>
+                  
+                  <span class="ch-vuln-type">🛡️ {{ ch.type }}</span>
+                  <p class="ch-detail">{{ ch.description }}</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- BOTÓN DE ACCIÓN / ENTRAR A LA DIMENSIÓN -->
+        <div class="dim-card-footer">
+          {% if dim.is_locked %}
+            <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '{{ dim.lock_msg }}')" title="{{ dim.lock_msg }}">
+              🔒 Bloqueado (Falta requisito previo)
+            </button>
+          {% else %}
+            <a href="{{ dim.url }}" class="dim-btn-enter dim-btn-{{ dim.id }}">
+              ¡Entrar a la Dimensión {{ dim.subtitle }}! ⚔️
+            </a>
+          {% endif %}
+        </div>
+
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}
