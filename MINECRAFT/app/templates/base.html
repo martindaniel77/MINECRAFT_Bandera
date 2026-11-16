@@ -4,69 +4,85 @@
      ========================================================================== -->
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="author" content="Thorfinn777, Martyn777, Sassyjack777">
-  <meta name="description" content="Laboratorio de Ciberseguridad Minecraft CTF desarrollado por Thorfinn777, Martyn777, Sassyjack777">
+  <meta name="description"
+    content="Laboratorio de Ciberseguridad Minecraft CTF desarrollado por Thorfinn777, Martyn777, Sassyjack777">
   <title>{% block title %}Security CTF - Minecraft Edition{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=6">
 </head>
-<body class="dimension-{{ current_dimension|default('overworld') }} {% if request.endpoint == 'index' %}is-landing{% endif %}" data-dimension="{{ current_dimension|default('overworld') }}">
+
+<body
+  class="dimension-{{ current_dimension|default('overworld') }} {% if request.endpoint == 'index' %}is-landing{% endif %}"
+  data-dimension="{{ current_dimension|default('overworld') }}">
 
   <!-- =========================================================================
        BARRA DE NAVEGACIÓN SUPERIOR (EXPANDIDA, LIMPIA Y SIN PALABRAS ENROLLADAS)
        ========================================================================= -->
   <header class="ctf-header">
     <div class="ctf-navbar-container">
-      
+
       <!-- LOGO: BASTA CON LA IMAGEN OFICIAL (NO DUPLICAR TEXTO) -->
       <a href="{{ url_for('index') }}" class="ctf-brand-link" title="Ir al Inicio de Minecraft CTF">
         <div class="ctf-brand">
-          <img src="{{ url_for('static', filename='img/logo_shield.png') }}?v=2" class="ctf-shield-img" alt="SECURITY CTF MINECRAFT EDITION" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo_creeper.png') }}?v=2';">
+          <img src="{{ url_for('static', filename='img/logo_shield.png') }}?v=2" class="ctf-shield-img"
+            alt="SECURITY CTF MINECRAFT EDITION"
+            onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo_creeper.png') }}?v=2';">
         </div>
       </a>
 
       <!-- ENLACES PRINCIPALES EN UNA SOLA LÍNEA SIN MONTARSE -->
       <nav class="ctf-nav-menu">
         <a href="{{ url_for('index') }}" class="ctf-nav-item {% if request.endpoint == 'index' %}active{% endif %}">
-          <span class="nav-icon">🏠</span> Inicio
+          <span class="nav-icon"><img src="{{ url_for('static', filename='img/Inicio_wooden_pickaxe.png') }}" alt=""
+              style="width:1.1rem;height:1.1rem;object-fit:contain;vertical-align:middle;"></span> Inicio
         </a>
-        <a href="{{ url_for('desafios_view') }}" class="ctf-nav-item {% if request.endpoint in ['desafios_view', 'overworld_view', 'nether_view', 'the_end_view'] %}active{% endif %}">
-          <span class="nav-icon">🏆</span> Desafíos
+        <a href="{{ url_for('desafios_view') }}"
+          class="ctf-nav-item {% if request.endpoint in ['desafios_view', 'overworld_view', 'nether_view', 'the_end_view'] %}active{% endif %}">
+          <span class="nav-icon"><img src="{{ url_for('static', filename='img/Desafios_nether_star.png') }}" alt=""
+              style="width:1.1rem;height:1.1rem;object-fit:contain;vertical-align:middle;"></span> Desafíos
         </a>
-        <a href="{{ url_for('ranking_view') }}" class="ctf-nav-item {% if request.endpoint == 'ranking_view' %}active{% endif %}">
-          <span class="nav-icon">📊</span> Ranking
+        <a href="{{ url_for('ranking_view') }}"
+          class="ctf-nav-item {% if request.endpoint == 'ranking_view' %}active{% endif %}">
+          <span class="nav-icon"><img src="{{ url_for('static', filename='img/Ranking_totem_of_undying.png') }}" alt=""
+              style="width:1.1rem;height:1.1rem;object-fit:contain;vertical-align:middle;"></span> Ranking
         </a>
-        <a href="{{ url_for('guia_view') }}" class="ctf-nav-item {% if request.endpoint == 'guia_view' %}active{% endif %}">
-          <span class="nav-icon">📖</span> Guía
+        <a href="{{ url_for('guia_view') }}"
+          class="ctf-nav-item {% if request.endpoint == 'guia_view' %}active{% endif %}">
+          <span class="nav-icon"><img src="{{ url_for('static', filename='img/Guia_recipe_book.png') }}" alt=""
+              style="width:1.1rem;height:1.1rem;object-fit:contain;vertical-align:middle;"></span> Guía
         </a>
-        <a href="{{ url_for('acerca_de_view') }}" class="ctf-nav-item {% if request.endpoint == 'acerca_de_view' %}active{% endif %}">
-          <span class="nav-icon">ℹ️</span> Acerca de
+        <a href="{{ url_for('acerca_de_view') }}"
+          class="ctf-nav-item {% if request.endpoint == 'acerca_de_view' %}active{% endif %}">
+          <span class="nav-icon"><img src="{{ url_for('static', filename='img/Acerca de_barrier.png') }}" alt=""
+              style="width:1.1rem;height:1.1rem;object-fit:contain;vertical-align:middle;"></span> Acerca de
         </a>
       </nav>
 
       <!-- BOTÓN DE INICIO DE SESIÓN / PERFIL CON UNA SOLA CREDENCIAL -->
       <div class="ctf-nav-auth">
         {% if next_dimension and next_dimension.id != current_dimension %}
-          <a href="{{ next_dimension.url }}"
-             class="ctf-btn-next-dim ctf-btn-next-{{ next_dimension.theme }}"
-             title="Ir a la siguiente dimensión: {{ next_dimension.name }}">
-            <span class="next-dim-icon">{{ next_dimension.icon }}</span>
-            <span class="next-dim-prefix">Siguiente:</span>
-            <span class="next-dim-name">{{ next_dimension.name }}</span>
-          </a>
+        <a href="{{ next_dimension.url }}" class="ctf-btn-next-dim ctf-btn-next-{{ next_dimension.theme }}"
+          title="Ir a la siguiente dimensión: {{ next_dimension.name }}">
+          <span class="next-dim-icon"><img src="{{ url_for('static', filename=next_dimension.icon_img) }}" alt=""
+              style="width:1.2rem;height:1.2rem;object-fit:contain;"></span>
+          <span class="next-dim-prefix">Siguiente:</span>
+          <span class="next-dim-name">{{ next_dimension.name }}</span>
+        </a>
         {% endif %}
         {% if is_authenticated %}
-          <div class="ctf-user-pill" title="Sesión activa como {{ current_student }}">
-            <span class="ctf-user-tag">👤 {{ current_student }}</span>
-            <span class="ctf-user-score">{{ student_score }} pts</span>
-            <a href="{{ url_for('logout') }}" class="ctf-btn-logout" title="Cerrar sesión">Salir</a>
-          </div>
+        <div class="ctf-user-pill" title="Sesión activa como {{ current_student }}">
+          <span class="ctf-user-tag">👤 {{ current_student }}</span>
+          <span class="ctf-user-score">{{ student_score }} pts</span>
+          <a href="{{ url_for('logout') }}" class="ctf-btn-logout" title="Cerrar sesión">Salir</a>
+        </div>
         {% else %}
-          <button type="button" class="ctf-btn-login" onclick="openLoginModal()" id="btnOpenLogin">
-            <span class="btn-login-icon">👤</span> Iniciar Sesión
-          </button>
+        <button type="button" class="ctf-btn-login" onclick="openLoginModal()" id="btnOpenLogin">
+          <span class="btn-login-icon">👤</span> Iniciar Sesión
+        </button>
         {% endif %}
       </div>
 
@@ -76,13 +92,13 @@
   <!-- CONTENEDOR PRINCIPAL FLUIDO APROVECHANDO TODO EL ANCHO -->
   <main class="ctf-main-wrapper">
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="ctf-alerts-container">
-          {% for category, message in messages %}
-            <div class="mc-alert mc-alert-{{ category }}">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
+    {% if messages %}
+    <div class="ctf-alerts-container">
+      {% for category, message in messages %}
+      <div class="mc-alert mc-alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
     {% block content %}{% endblock %}
@@ -99,16 +115,11 @@
       </div>
 
       <div class="ctf-footer-authors">
-        Desarrollado por: <strong>Thorfinn777</strong> &bull; <strong>Martyn777</strong> &bull; <strong>Sassyjack777</strong>
+        Desarrollado por: <strong>Thorfinn777</strong> &bull; <strong>Martyn777</strong> &bull;
+        <strong>Sassyjack777</strong>
       </div>
 
-      <div class="ctf-footer-right">
-        <a href="#" class="social-icon" title="Discord">💬</a>
-        <a href="https://github.com" target="_blank" rel="noopener" class="social-icon" title="GitHub">🐙</a>
-        <a href="https://youtube.com" target="_blank" rel="noopener" class="social-icon" title="YouTube">▶️</a>
-        <span class="ctf-divider">|</span>
-        <span class="ctf-year">CTF 2026</span>
-      </div>
+
     </div>
   </footer>
 
@@ -126,15 +137,18 @@
 
       <div class="ctf-modal-body">
         <p class="ctf-modal-desc">
-          Laboratorio diseñado para estudiantes. <strong>Solo necesitas UNA credencial</strong> (Gamertag o Código de Alumno). No requiere contraseña.
+          Laboratorio diseñado para estudiantes. <strong>Solo necesitas UNA credencial</strong> (Gamertag o Código de
+          Alumno). No requiere contraseña.
         </p>
 
-        <form id="singleCredentialForm" action="{{ url_for('login') }}" method="POST" onsubmit="handleModalLogin(event)">
+        <form id="singleCredentialForm" action="{{ url_for('login') }}" method="POST"
+          onsubmit="handleModalLogin(event)">
           <div class="ctf-form-group">
             <label for="studentCredential" class="ctf-form-label">Gamertag o Código de Estudiante:</label>
             <div class="ctf-input-wrapper">
               <span class="input-icon">🎮</span>
-              <input type="text" id="studentCredential" name="credential" class="ctf-input" placeholder="Ej: Steve, Alex, Alumno1..." required autofocus autocomplete="username">
+              <input type="text" id="studentCredential" name="credential" class="ctf-input"
+                placeholder="Ej: Steve, Alex, Alumno1..." required autofocus autocomplete="off">
             </div>
           </div>
 
@@ -154,7 +168,8 @@
         </form>
 
         <div class="ctf-modal-footer-tip">
-          <span>💡 <strong>Tip para el estudiante:</strong> Tu progreso, banderas y posición en el ranking se guardarán bajo este nombre.</span>
+          <span>💡 <strong>Tip para el estudiante:</strong> Tu progreso, banderas y posición en el ranking se guardarán
+            bajo este nombre.</span>
         </div>
       </div>
     </div>
@@ -162,48 +177,50 @@
 
   <!-- HUD INVENTARIO MINECRAFT (DISPONIBLE EN LOS DESAFÍOS DE CADA DIMENSIÓN) -->
   {% set hud_endpoints = [
-       'overworld_view', 'overworld_diamond_search',
-       'nether_view', 'nether_blaze_upload', 'nether_blaze_execute', 'nether_pearl_altar',
-       'the_end_view', 'the_end_crystals_exploit',
-       'the_end_dragon_damage', 'the_end_egg_inspect'
-     ] %}
+  'overworld_view', 'overworld_diamond_search',
+  'nether_view', 'nether_blaze_upload', 'nether_blaze_execute', 'nether_pearl_altar',
+  'the_end_view', 'the_end_crystals_exploit',
+  'the_end_dragon_damage', 'the_end_egg_inspect'
+  ] %}
   {% if request.endpoint in hud_endpoints %}
-    <div class="mc-hud-bottom" id="mc-hud-bottom">
-      <div class="mc-stats-bar">
-        <div class="mc-hearts" title="Vida de Steve">
-          {% for i in range(10) %}
-            <img src="{{ url_for('static', filename='img/heart.png') }}" class="mc-heart" alt="heart">
-          {% endfor %}
-        </div>
-        <div class="mc-xp-bar-container">
-          <div class="mc-xp-bar-fill" id="hud-xp-fill" style="width: {{ (session.get('inventory', [])|length / 9.0 * 100)|round }}%;"></div>
-          <span class="mc-xp-level" id="hud-xp-level">{{ (session.get('inventory', [])|length) * 10 }}</span>
-        </div>
-      </div>
-
-      <div class="mc-hotbar" id="mc-hotbar">
-        {% set items = [
-          ('iron', 'Lingote de Hierro', 'img/iron_ingot.png'),
-          ('diamond', 'Diamante', 'img/diamond.png'),
-          ('portal', 'Portal al Nether', 'img/nether_portal.svg'),
-          ('gold', 'Lingote de Oro', 'img/gold_ingot.png'),
-          ('blaze', 'Vara de Blaze', 'img/blaze_rod.png'),
-          ('pearl', 'Ojo de Ender', 'img/ender_pearl.png'),
-          ('crystals', 'Cristales del End', 'img/end_crystal.png'),
-          ('dragon', 'Ender Dragón', 'img/ender_dragon.png'),
-          ('egg', 'Huevo de Dragón', 'img/dragon_egg.png')
-        ] %}
-        {% for item_id, item_title, item_icon in items %}
-          <div class="mc-slot {% if item_id in session.get('inventory', []) %}filled{% endif %}" data-item="{{ item_id }}" title="{{ item_title }}">
-            {% if item_id in session.get('inventory', []) %}
-              <img src="{{ url_for('static', filename=item_icon) }}" class="mc-item-icon" alt="{{ item_title }}">
-            {% else %}
-              <div class="mc-slot-empty"></div>
-            {% endif %}
-          </div>
+  <div class="mc-hud-bottom" id="mc-hud-bottom">
+    <div class="mc-stats-bar">
+      <div class="mc-hearts" title="Vida de Steve">
+        {% for i in range(10) %}
+        <img src="{{ url_for('static', filename='img/heart.png') }}" class="mc-heart" alt="heart">
         {% endfor %}
       </div>
+      <div class="mc-xp-bar-container">
+        <div class="mc-xp-bar-fill" id="hud-xp-fill"
+          style="width: {{ (session.get('inventory', [])|length / 9.0 * 100)|round }}%;"></div>
+        <span class="mc-xp-level" id="hud-xp-level">{{ (session.get('inventory', [])|length) * 10 }}</span>
+      </div>
     </div>
+
+    <div class="mc-hotbar" id="mc-hotbar">
+      {% set items = [
+      ('iron', 'Lingote de Hierro', 'img/iron_ingot.png'),
+      ('diamond', 'Diamante', 'img/diamond.png'),
+      ('portal', 'Portal al Nether', 'img/nether_portal.svg'),
+      ('gold', 'Lingote de Oro', 'img/gold_ingot.png'),
+      ('blaze', 'Vara de Blaze', 'img/blaze_rod.png'),
+      ('pearl', 'Ojo de Ender', 'img/ender_pearl.png'),
+      ('crystals', 'Cristales del End', 'img/end_crystal.png'),
+      ('dragon', 'Ender Dragón', 'img/ender_dragon.png'),
+      ('egg', 'Huevo de Dragón', 'img/dragon_egg.png')
+      ] %}
+      {% for item_id, item_title, item_icon in items %}
+      <div class="mc-slot {% if item_id in session.get('inventory', []) %}filled{% endif %}" data-item="{{ item_id }}"
+        title="{{ item_title }}">
+        {% if item_id in session.get('inventory', []) %}
+        <img src="{{ url_for('static', filename=item_icon) }}" class="mc-item-icon" alt="{{ item_title }}">
+        {% else %}
+        <div class="mc-slot-empty"></div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
   {% endif %}
 
   <!-- SCRIPTS BÁSICOS -->
@@ -270,10 +287,11 @@
       }
     }
 
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeLoginModal();
     });
   </script>
   {% block scripts %}{% endblock %}
 </body>
+
 </html>

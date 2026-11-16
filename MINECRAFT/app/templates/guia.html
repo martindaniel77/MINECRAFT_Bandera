@@ -6,7 +6,7 @@
 <div class="ctf-page-container ctf-wide-layout">
 
   <div class="ctf-page-header">
-    <div class="header-icon">📖</div>
+    <div class="header-icon"><img src="{{ url_for('static', filename='img/Guia_recipe_book.png') }}" alt="" style="width:2.8rem;height:2.8rem;object-fit:contain;"></div>
     <h1 class="ctf-page-title">GUÍA DE APRENDIZAJE PARA ESTUDIANTES</h1>
     <p class="ctf-page-desc">
       Aprender ciberseguridad debe ser claro, estructurado y sin frustración. Aquí tienes un ítem de la guía por cada bandera del laboratorio: el concepto, el porqué y una curiosidad del mundo real antes de atacar.
@@ -40,7 +40,7 @@
     <!-- BANDERA 1: HIERRO -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon">⛏️</span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/iron_ingot.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>1. Bandera — Lingote de Hierro: Esteganografía, Base64 y César (ROT-13)</h3>
       </div>
       <div class="guide-card-body">
@@ -59,7 +59,7 @@ echo "TEXTO" | tr 'A-Za-z' 'N-ZA-Mn-za-m'</pre>
     <!-- BANDERA 2: DIAMANTE -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon">💎</span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/diamond.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>2. Bandera — Diamante: Inyección SQL clásica (' OR 1=1 --)</h3>
       </div>
       <div class="guide-card-body">
@@ -81,7 +81,7 @@ echo "TEXTO" | tr 'A-Za-z' 'N-ZA-Mn-za-m'</pre>
     <!-- BANDERA 3: CONSOLA DE LAS CUEVAS -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon">🕯️</span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/nether_portal.svg') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>3. Bandera — Consola de las Cuevas: enumeración y allowlist</h3>
       </div>
       <div class="guide-card-body">
@@ -105,7 +105,7 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 4: ORO / XSS -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon">💰</span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/gold_ingot.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>4. Bandera — Lingote de Oro: Stored XSS y robo de cookies</h3>
       </div>
       <div class="guide-card-body">
@@ -144,7 +144,7 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 5: BLAZE / FILE UPLOAD -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon">🔥</span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/blaze_rod.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>5. Bandera — Vara de Blaze: Subida de archivos a RCE</h3>
       </div>
       <div class="guide-card-body">
@@ -161,7 +161,7 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 6: PEARL / PRIVILEGE ESCALATION -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon">👁️</span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/ender_pearl.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>6. Bandera — Ojo de Ender: Violación de mínimo privilegio y parameter tampering</h3>
       </div>
       <div class="guide-card-body">
@@ -178,7 +178,7 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 7: CRYSTALS / CVE -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon">💠</span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/end_crystal.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>7. Bandera — Cristales del End: Explotación de servicio y CVE simulado</h3>
       </div>
       <div class="guide-card-body">
@@ -195,7 +195,7 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 8: DRAGON / COMMAND INJECTION -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon">🐉</span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/ender_dragon.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>8. Bandera — Ender Dragón: Inyección de comandos (Command Injection)</h3>
       </div>
       <div class="guide-card-body">
@@ -212,7 +212,7 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 9: EGG / HONEYPOT + LFI -->
     <div class="ctf-guide-card guide-highlight">
       <div class="guide-card-header">
-        <span class="guide-icon">🥚</span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/dragon_egg.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>9. Bandera — Huevo de Dragón: Evasión de Honeypot y Path Traversal (LFI)</h3>
       </div>
       <div class="guide-card-body">
@@ -229,7 +229,7 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- MÉTODO DE APRENDIZAJE -->
     <div class="ctf-guide-card guide-highlight">
       <div class="guide-card-header">
-        <span class="guide-icon">💡</span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/diamond_pickaxe.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>10. Método de Aprendizaje Recomendado</h3>
       </div>
       <div class="guide-card-body">
