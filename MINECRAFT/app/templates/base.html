@@ -12,12 +12,13 @@
   <meta name="description"
     content="Laboratorio de Ciberseguridad Minecraft CTF desarrollado por Thorfinn777, Martyn777, Sassyjack777">
   <title>{% block title %}Security CTF - Minecraft Edition{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=6">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=7">
 </head>
 
 <body
   class="dimension-{{ current_dimension|default('overworld') }} {% if request.endpoint == 'index' %}is-landing{% endif %}"
-  data-dimension="{{ current_dimension|default('overworld') }}">
+  data-dimension="{{ current_dimension|default('overworld') }}"
+  data-hint-cost="{{ hint_cost }}">
 
   <!-- =========================================================================
        BARRA DE NAVEGACIÓN SUPERIOR (EXPANDIDA, LIMPIA Y SIN PALABRAS ENROLLADAS)
@@ -190,10 +191,12 @@
         <img src="{{ url_for('static', filename='img/heart.png') }}" class="mc-heart" alt="heart">
         {% endfor %}
       </div>
-      <div class="mc-xp-bar-container">
-        <div class="mc-xp-bar-fill" id="hud-xp-fill"
-          style="width: {{ (session.get('inventory', [])|length / 9.0 * 100)|round }}%;"></div>
-        <span class="mc-xp-level" id="hud-xp-level">{{ (session.get('inventory', [])|length) * 10 }}</span>
+      <div class="mc-xp-display" id="mc-xp-display"
+        title="Experiencia: +{{ xp_per_flag }} XP por bandera, -{{ hint_cost }} XP por pista">
+        <img src="{{ url_for('static', filename='img/experience_bottle.png') }}"
+          class="mc-xp-bottle" alt="Botella de experiencia">
+        <span class="mc-xp-value" id="hud-xp-level">{{ player_xp }}</span>
+        <span class="mc-xp-label">XP</span>
       </div>
     </div>
 

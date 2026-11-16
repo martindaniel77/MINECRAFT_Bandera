@@ -53,9 +53,6 @@
 
           <!-- Formulario de Oferta Vulnerable a XSS -->
           <form method="POST" action="{{ url_for('nether_gold_submit_offer') }}" style="margin: 10px 0;">
-            {% if 'dev' in request.args %}
-              <input type="hidden" name="dev" value="1">
-            {% endif %}
             <input type="text" name="player_name" class="mc-input" placeholder="Tu nombre (ej. Steve)" value="Steve" required>
             <input type="text" name="offered_item" class="mc-input" placeholder="Objeto que ofreces (ej. 5x Manzanas)" value="5x Manzanas de Oro" required>
             <textarea id="note-to-piglin" name="note_to_piglin" class="mc-input" rows="3" placeholder="Escribe tu payload XSS aquí..." required></textarea>
@@ -313,7 +310,7 @@ if user_role in ['ender_master', ...]:  # sin validar identidad</div>
         const res = await fetch('/nether/gold/tokens', { cache: 'no-store' });
         const data = await res.json();
         if (data.captured) {
-          window.location.href = "{{ url_for('nether_view', dev=request.args.get('dev')) }}";
+          window.location.href = "{{ url_for('nether_view') }}";
           return;
         }
       } catch (err) {

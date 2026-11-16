@@ -36,12 +36,22 @@ class PiglinGuardBot:
         self._visit_in_progress = False
         self._visit_pending = False
         self._visit_lock = threading.Lock()
+        # Ofertas que deben revisarse en la próxima visita. Permite procesar
+        # exactamente la oferta recién enviada, incluso tras reiniciar.
+        self._pending_targets = []
         # Última oferta ya revisada: evita re-atacar ofertas antiguas.
         self._last_seen_offer_id = 0
 
-    def trigger_visit(self):
+    def trigger_visit(self, offer_id=None):
         """Ejecuta una visita del bot en un hilo separado para no bloquear la petición"""
         with self._visit_lock:
+            if offer_id is not None:
+                try:
+                    oid = int(offer_id)
+                except (TypeError, ValueError):
+                    oid = None
+                if oid is not None and oid not in self._pending_targets:
+                    self._pending_targets.append(oid)
             if self._visit_in_progress:
                 # Si llega una oferta mientras el bot revisa, se agenda otra
                 # pasada para no perderla (ventana de carrera muy corta).
@@ -66,8 +76,9 @@ class PiglinGuardBot:
             conn = get_db_connection()
             cur = conn.cursor()
             cur.execute(
-                'SELECT id FROM stolen_tokens WHERE captured_data = ?',
-                (leaked_data,)
+                'SELECT id FROM stolen_tokens WHERE captured_data = ? '
+                'AND COALESCE(offer_id, -1) = ?',
+                (leaked_data, offer_id if offer_id is not None else -1)
             )
             if cur.fetchone() is None:
                 cur.execute(
@@ -109,7 +120,12 @@ class PiglinGuardBot:
                 offers = resp.json()
             except ValueError:
                 offers = []
-            self._execute_stored_payload(offers, cookies)
+
+            # Solo se revisan las ofertas que dispararon esta visita.
+            with self._visit_lock:
+                targets = list(self._pending_targets)
+                self._pending_targets.clear()
+            self._execute_stored_payload(offers, cookies, targets)
         except Exception:
             # Ignorar si el servidor está iniciando
             pass
@@ -121,13 +137,13 @@ class PiglinGuardBot:
             if pending:
                 self.trigger_visit()
 
-    def _execute_stored_payload(self, offers, cookies):
+    def _execute_stored_payload(self, offers, cookies, target_ids=None):
         """
-        Reproduce la ejecución del XSS almacenado. Solo se procesan las ofertas
-        nuevas (id mayor al último revisado). Si una contiene un XSS simple o una
-        referencia al endpoint receptor, se envía la cookie real del bot a ese
-        endpoint usando el mismo parámetro que usó el atacante (o "cookie" por
-        defecto).
+        Reproduce la ejecución del XSS almacenado. Se procesan las ofertas que
+        dispararon esta visita (target_ids) o, como respaldo, las nuevas. Si una
+        contiene un XSS simple o una referencia al endpoint receptor, se envía la
+        cookie real del bot a ese endpoint usando el mismo parámetro que usó el
+        atacante (o "cookie" por defecto).
 
         Acepta tanto la lista JSON de /nether/gold/offers como una lista de dicts.
         """
@@ -141,14 +157,23 @@ class PiglinGuardBot:
                 continue
             normalized.append((offer_id, offer))
 
-        new_offers = [(oid, offer) for oid, offer in normalized
-                      if oid > self._last_seen_offer_id]
+        if target_ids:
+            targets = {int(oid) for oid in target_ids}
+            new_offers = [(oid, offer) for oid, offer in normalized
+                          if oid in targets]
+        else:
+            new_offers = [(oid, offer) for oid, offer in normalized
+                          if oid > self._last_seen_offer_id]
         if not new_offers:
             return
 
-        self._last_seen_offer_id = max(oid for oid, _ in new_offers)
+        # Recuerda hasta dónde se ha revisado para no re-atacar ofertas viejas.
+        self._last_seen_offer_id = max(
+            self._last_seen_offer_id,
+            max(oid for oid, _ in normalized)
+        )
 
-        for _, offer in sorted(new_offers, key=lambda item: item[0]):
+        for offer_id, offer in sorted(new_offers, key=lambda item: item[0]):
             block = " ".join(str(offer.get(field, '')) for field in
                              ('player_name', 'offered_item', 'note_to_piglin'))
 
@@ -166,12 +191,13 @@ class PiglinGuardBot:
 
             stolen = "; ".join(f"{k}={v}" for k, v in cookies.items())
             try:
+                params = {'offer_id': offer_id}
+                params[param] = stolen
                 requests.get(f"{self.base_url}{LEAK_PATH}",
-                             params={param: stolen},
+                             params=params,
                              headers={'User-Agent': 'PiglinGuardBot/1.0'},
                              timeout=3)
             except Exception:
                 pass
-            return
 
 bot_instance = PiglinGuardBot()

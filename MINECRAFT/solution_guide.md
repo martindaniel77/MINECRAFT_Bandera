@@ -196,7 +196,7 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 ---
 
 ##  PANTALLA FINAL DE VICTORIA
-Al ingresar las 9 banderas en sus respectivos desafíos, la barra HUD inferior se completará con los 9 ítems, desbloqueando el nivel 90 y redirigiendo automáticamente a `http://localhost:8080/victory` con el **Poema del End** y el resumen de competencias aprobadas.
+Al ingresar las 9 banderas en sus respectivos desafíos, la barra HUD inferior se completará con los 9 ítems, habrás acumulado la XP de las 9 banderas (+10 XP por cada una) y se redirigirá automáticamente a `http://localhost:8080/victory` con el **Poema del End** y el resumen de competencias aprobadas.
 
 ---
 
@@ -239,9 +239,10 @@ Los corazones del HUD son hoy decorativos (`base.html`, `range(10)` fijo).
   consumibles, o que el nivel de XP baje como marca visible al consultar una pista.
 
 ### 2. Coste de consultar una pista
-Hoy el XP es decorativo: `NIVEL = banderas × 10`. No es un pool gastable.
-Para que "una pista cuesta 10 XP" tenga efecto haría falta un saldo real que
-descienda, o registrar el uso de pistas en la nota final del alumno.
+Implementado: cada bandera válida otorga **+10 XP** y consultar una pista consume
+**20 XP**. La XP es un saldo real y persistente (`student_profiles.xp`) que se
+muestra en el HUD junto a la botella de experiencia. Si no hay XP suficiente, la
+pista no se desbloquea; una pista ya investigada no vuelve a cobrarse.
 
 ### 3. Formato de las banderas
 Las 9 banderas usan el envoltorio `FLAG{...}`, idéntico en todas.

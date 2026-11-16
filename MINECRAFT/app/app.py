@@ -9,6 +9,7 @@ import re
 import sqlite3
 import base64
 import json
+import uuid
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, send_from_directory
 from werkzeug.utils import secure_filename
 
@@ -65,14 +66,31 @@ ITEM_NAMES = {
     'egg': 'Huevo de Dragón'
 }
 
+# Orden oficial de las dimensiones. Para entrar a una dimensión hay que tener
+# las 3 banderas de la dimensión anterior; no basta con una sola.
+DIMENSION_SEQUENCE = ['overworld', 'nether', 'the_end']
+
+
+def dimension_is_complete(inv, dimension):
+    """Devuelve True solo si están las 3 banderas de la dimensión."""
+    return all(step in inv for step in FLAGS[dimension])
+
+
+def previous_dimension_is_complete(inv, dimension):
+    """True si la dimensión anterior está completa (Overworld siempre lo está)."""
+    index = DIMENSION_SEQUENCE.index(dimension)
+    if index == 0:
+        return True
+    return dimension_is_complete(inv, DIMENSION_SEQUENCE[index - 1])
+
 def get_inventory():
     if 'inventory' not in session:
         session['inventory'] = []
     return session['inventory']
 
-XP_PER_FLAG = 50
+XP_PER_FLAG = 10
 HINT_COST = 20
-INITIAL_XP = 30
+INITIAL_XP = 0
 
 def get_xp():
     if 'xp' not in session:
@@ -88,6 +106,34 @@ def get_unlocked_hints():
     if 'unlocked_hints' not in session:
         session['unlocked_hints'] = []
     return session['unlocked_hints']
+
+
+def get_piglin_trace():
+    """Identificador de esta sesión para no mostrar capturas de otros jugadores."""
+    if 'piglin_trace' not in session:
+        session['piglin_trace'] = uuid.uuid4().hex
+        session.modified = True
+    return session['piglin_trace']
+
+
+def save_student_progress():
+    """Persiste inventario, XP y pistas desbloqueadas del estudiante logueado."""
+    student = session.get('student_name')
+    if not student:
+        return
+    try:
+        conn = get_db_connection()
+        conn.execute('''
+            UPDATE student_profiles
+            SET score = ?, flags_solved = ?, inventory_json = ?, xp = ?,
+                unlocked_hints_json = ?, last_active = CURRENT_TIMESTAMP
+            WHERE credential = ?
+        ''', (get_student_score(), len(get_inventory()), json.dumps(get_inventory()),
+              get_xp(), json.dumps(get_unlocked_hints()), student))
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
 def get_leaderboard_data():
     try:
@@ -179,8 +225,8 @@ def build_dimensions_info(inv):
             'icon_img': 'img/Dimencion del nether_netherrack.png',
             'theme_color': '#ef4444',
             'url': url_for('nether_view'),
-            'is_locked': 'portal' not in inv,
-            'lock_msg': '¡Requiere completar el Overworld y encender el portal!',
+            'is_locked': not dimension_is_complete(inv, 'overworld'),
+            'lock_msg': '¡Requiere completar las 3 banderas del Overworld!',
             'solved_count': sum(1 for x in ['gold', 'blaze', 'pearl'] if x in inv),
             'total_count': 3,
             'description': 'El entorno de explotación web. Dominarás ataques de Stored XSS contra bots simulados, subida de archivos maliciosos a ejecución remota de código (RCE) y escalada de privilegios.',
@@ -221,8 +267,8 @@ def build_dimensions_info(inv):
             'icon_img': 'img/Dimencion del end_end_stone.png',
             'theme_color': '#a855f7',
             'url': url_for('the_end_view'),
-            'is_locked': 'pearl' not in inv,
-            'lock_msg': '¡Requiere forjar el Ojo de Ender en el Nether!',
+            'is_locked': not dimension_is_complete(inv, 'nether'),
+            'lock_msg': '¡Requiere completar las 3 banderas del Nether!',
             'solved_count': sum(1 for x in ['crystals', 'dragon', 'egg'] if x in inv),
             'total_count': 3,
             'description': 'El desafío final. Explotarás vulnerabilidades CVE simuladas, ejecutarás inyección de comandos en el sistema operativo del servidor y burlarás señuelos de tipo Honeypot.',
@@ -271,8 +317,9 @@ def inject_brand_and_authors():
 
     # Siguiente dimensión desbloqueada: el botón aparece en la barra superior
     # cuando ya se puede avanzar, sin obligar a volver a la pestaña Desafíos.
+    # Se exige la dimensión completa (3/3), no una sola bandera.
     next_dimension = None
-    if all(item in inv for item in ('crystals', 'dragon', 'egg')):
+    if dimension_is_complete(inv, 'the_end'):
         next_dimension = {
             'id': 'victory',
             'icon': '🏆',
@@ -281,7 +328,7 @@ def inject_brand_and_authors():
             'url': url_for('victory_view'),
             'theme': 'victory',
         }
-    elif 'pearl' in inv:
+    elif dimension_is_complete(inv, 'nether'):
         next_dimension = {
             'id': 'the_end',
             'icon': '🌌',
@@ -290,7 +337,7 @@ def inject_brand_and_authors():
             'url': url_for('the_end_view'),
             'theme': 'the_end',
         }
-    elif 'portal' in inv:
+    elif dimension_is_complete(inv, 'overworld'):
         next_dimension = {
             'id': 'nether',
             'icon': '🔥',
@@ -309,6 +356,9 @@ def inject_brand_and_authors():
         'student_score': get_student_score(),
         'solved_flags_count': len(inv),
         'next_dimension': next_dimension,
+        'player_xp': get_xp(),
+        'hint_cost': HINT_COST,
+        'xp_per_flag': XP_PER_FLAG,
     }
 
 @app.after_request
@@ -343,6 +393,11 @@ def login():
             return redirect(url_for('login'))
 
         # Autenticación con solo 1 credencial (sin contraseña)
+        previous_credential = session.get('student_credential')
+        if previous_credential != credential:
+            # Otra persona en el mismo navegador: no debe heredar las capturas
+            # del Piglin ni la traza de la sesión anterior.
+            session.pop('piglin_trace', None)
         session['student_name'] = credential
         session['student_credential'] = credential
         session['logged_in'] = True
@@ -352,21 +407,54 @@ def login():
             conn = get_db_connection()
             row = conn.execute('SELECT * FROM student_profiles WHERE credential = ?', (credential,)).fetchone()
             if row:
+                # Inventario: conserva lo que ya había en la sesión y añade lo guardado.
                 try:
-                    saved_inv = json.loads(row['inventory_json'])
-                    if saved_inv and not session.get('inventory'):
-                        session['inventory'] = saved_inv
+                    saved_inv = json.loads(row['inventory_json'] or '[]')
+                    inv = get_inventory()
+                    for item in saved_inv:
+                        if item not in inv:
+                            inv.append(item)
+                    session['inventory'] = inv
+                    session.modified = True
+                except Exception:
+                    pass
+
+                # XP: si la sesión aún no ha ganado/gastado XP, restaura el saldo guardado.
+                try:
+                    saved_xp = row['xp']
+                    if saved_xp is not None and get_xp() == INITIAL_XP:
+                        session['xp'] = int(saved_xp)
+                        session.modified = True
+                except Exception:
+                    pass
+
+                # Pistas ya investigadas: no se vuelven a cobrar al recargar.
+                try:
+                    saved_hints = json.loads(row['unlocked_hints_json'] or '[]')
+                    hints = get_unlocked_hints()
+                    for hint in saved_hints:
+                        if hint not in hints:
+                            hints.append(hint)
+                    session['unlocked_hints'] = hints
+                    session.modified = True
                 except Exception:
                     pass
             else:
                 conn.execute('''
-                    INSERT INTO student_profiles (credential, display_name, team_name, score, flags_solved)
-                    VALUES (?, ?, ?, ?, ?)
-                ''', (credential, credential, f'Team {credential}', get_student_score(), len(get_inventory())))
+                    INSERT INTO student_profiles
+                        (credential, display_name, team_name, score, flags_solved,
+                         inventory_json, xp, unlocked_hints_json)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (credential, credential, f'Team {credential}', get_student_score(),
+                      len(get_inventory()), json.dumps(get_inventory()), get_xp(),
+                      json.dumps(get_unlocked_hints())))
             conn.commit()
             conn.close()
         except Exception:
             pass
+
+        # Persiste el estado combinado (por ejemplo, progreso anónimo + perfil).
+        save_student_progress()
 
         success_msg = f"¡Bienvenido, {credential}! Sesión iniciada con éxito en Minecraft CTF."
         if request.is_json:
@@ -389,6 +477,8 @@ def logout():
     student = session.pop('student_name', None)
     session.pop('student_credential', None)
     session.pop('logged_in', None)
+    # Cada jugador debe empezar sin capturas del Piglin heredadas.
+    session.pop('piglin_trace', None)
     if student:
         flash(f"Sesión cerrada correctamente. ¡Hasta pronto, {student}!", "info")
     return redirect(url_for('index'))
@@ -403,7 +493,7 @@ def index():
     nether_count = sum(1 for item in ['gold', 'blaze', 'pearl'] if item in inv)
     end_count = sum(1 for item in ['crystals', 'dragon', 'egg'] if item in inv)
     
-    if len(inv) == 9:
+    if dimension_is_complete(inv, 'the_end'):
         return redirect(url_for('victory_view'))
 
     leaderboard = get_leaderboard_data()
@@ -487,6 +577,7 @@ def api_unlock_hint():
         hints.append(challenge)
     session['unlocked_hints'] = hints
     session.modified = True
+    save_student_progress()
 
     return jsonify({
         'success': True,
@@ -506,11 +597,18 @@ def api_submit_flag():
     if dimension not in FLAGS or step not in FLAGS[dimension]:
         return jsonify({'success': False, 'message': 'Desafío no válido.'}), 400
 
+    inv = get_inventory()
+    if not previous_dimension_is_complete(inv, dimension):
+        previous = DIMENSION_SEQUENCE[DIMENSION_SEQUENCE.index(dimension) - 1]
+        return jsonify({
+            'success': False,
+            'message': f'Debes completar las 3 banderas de {previous.upper()} antes de validar banderas de esta dimensión.'
+        }), 403
+
     expected_flag = FLAGS[dimension][step].strip()
     is_valid = (submitted_flag == expected_flag) or (submitted_flag.upper() == expected_flag.upper())
 
     if is_valid:
-        inv = get_inventory()
         earned_xp = 0
         if step not in inv:
             inv.append(step)
@@ -518,26 +616,11 @@ def api_submit_flag():
             session['xp'] = get_xp() + XP_PER_FLAG
             earned_xp = XP_PER_FLAG
             session.modified = True
+            save_student_progress()
 
-            # Si el estudiante ha iniciado sesión, actualizar su registro en SQLite
-            current_student = session.get('student_name')
-            if current_student:
-                try:
-                    conn = get_db_connection()
-                    conn.execute('''
-                        UPDATE student_profiles
-                        SET score = ?, flags_solved = ?, inventory_json = ?, last_active = CURRENT_TIMESTAMP
-                        WHERE credential = ?
-                    ''', (get_student_score(), len(inv), json.dumps(inv), current_student))
-                    conn.commit()
-                    conn.close()
-                except Exception:
-                    pass
+        dimension_completed = dimension_is_complete(inv, dimension)
 
-        dim_items = list(FLAGS[dimension].keys())
-        dimension_completed = all(item in inv for item in dim_items)
-
-        if len(inv) == 9:
+        if dimension_is_complete(inv, 'the_end'):
             return jsonify({
                 'success': True,
                 'message': '¡¡BANDERA FINAL CONQUISTADA!! Has completado los 9 desafíos de Minecraft CTF.',
@@ -616,8 +699,30 @@ def overworld_cave_terminal():
 # ------------------------------------------------------------------------------
 def _nether_context():
     conn = get_db_connection()
-    offers = conn.execute('SELECT * FROM piglin_trade_offers ORDER BY id DESC LIMIT 10').fetchall()
-    stolen = conn.execute('SELECT * FROM stolen_tokens ORDER BY id DESC LIMIT 5').fetchall()
+
+    # Tanto el tablón como las capturas se limitan a las ofertas de ESTA
+    # sesión. Antes se leían todas las filas de SQLite y por eso el token del
+    # Piglin aparecía siempre, incluso para otros jugadores y tras reiniciar
+    # el servicio.
+    trace = session.get('piglin_trace')
+    if trace:
+        offers = conn.execute('''
+            SELECT id, player_name, offered_item, note_to_piglin, status, created_at
+            FROM piglin_trade_offers
+            WHERE session_trace = ?
+            ORDER BY id DESC LIMIT 10
+        ''', (trace,)).fetchall()
+        stolen = conn.execute('''
+            SELECT st.id, st.offer_id, st.captured_data, st.captured_at
+            FROM stolen_tokens st
+            JOIN piglin_trade_offers o ON o.id = st.offer_id
+            WHERE o.session_trace = ?
+            ORDER BY st.id DESC LIMIT 5
+        ''', (trace,)).fetchall()
+    else:
+        offers = []
+        stolen = []
+
     conn.close()
     return offers, stolen
 
@@ -645,8 +750,8 @@ def _stolen_tokens_with_flags(rows):
 @app.route('/nether')
 def nether_view():
     inv = get_inventory()
-    if 'portal' not in inv and 'dev' not in request.args:
-        flash("Debes completar el Overworld y activar el portal para entrar al Nether.", "error")
+    if not dimension_is_complete(inv, 'overworld'):
+        flash("Debes completar las 3 banderas del Overworld (Lingote de Hierro, Diamante y Portal) para entrar al Nether.", "error")
         return redirect(url_for('overworld_view'))
 
     offers, stolen = _nether_context()
@@ -665,42 +770,61 @@ def nether_view():
 
 @app.route('/nether/gold/submit_offer', methods=['POST'])
 def nether_gold_submit_offer():
+    inv = get_inventory()
+    if not dimension_is_complete(inv, 'overworld'):
+        flash("Debes completar las 3 banderas del Overworld antes de comerciar con los Piglins.", "error")
+        return redirect(url_for('overworld_view'))
+
     player_name = request.form.get('player_name', 'Steve')
     offered_item = request.form.get('offered_item', 'Manzanas')
     note_to_piglin = request.form.get('note_to_piglin', '')
+    trace = get_piglin_trace()
 
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO piglin_trade_offers (player_name, offered_item, note_to_piglin)
-        VALUES (?, ?, ?)
-    ''', (player_name, offered_item, note_to_piglin))
+        INSERT INTO piglin_trade_offers (player_name, offered_item, note_to_piglin, session_trace)
+        VALUES (?, ?, ?, ?)
+    ''', (player_name, offered_item, note_to_piglin, trace))
+    offer_id = cursor.lastrowid
     conn.commit()
     conn.close()
 
-    # El bot revisa las ofertas por su cuenta; no recibe argumentos.
-    # (Antes se le pasaban offer_id/note_to_piglin y eso provocaba el HTTP 500).
-    bot_instance.trigger_visit()
+    # El bot revisa exactamente la oferta recién creada. Así, tras reiniciar,
+    # no reinterpreta ofertas antiguas ni asocia la captura a otro jugador.
+    bot_instance.trigger_visit(offer_id=offer_id)
     flash("Tu oferta ha sido entregada al Piglin Guard. ¡Espera su inspección!", "success")
     # La vista muestra un aviso y consulta /nether/gold/tokens hasta que el bot
     # termine, para que el jugador no tenga que refrescar a mano.
-    return redirect(url_for('nether_view', awaiting=1, dev=request.form.get('dev')))
+    return redirect(url_for('nether_view', awaiting=1))
 
 @app.route('/nether/gold/offers')
 def nether_gold_offers():
     conn = get_db_connection()
     cursor = conn.cursor()
-    offers = cursor.execute('SELECT * FROM piglin_trade_offers ORDER BY id DESC LIMIT 10').fetchall()
+    # No se expone session_trace: es interno para vincular la captura.
+    offers = cursor.execute('''
+        SELECT id, player_name, offered_item, note_to_piglin, status, created_at
+        FROM piglin_trade_offers ORDER BY id DESC LIMIT 10
+    ''').fetchall()
     conn.close()
     return jsonify([dict(ix) for ix in offers])
 
 @app.route('/nether/gold/tokens')
 def nether_gold_tokens():
     """Estado ligero para que la tarjeta detecte cuándo el bot ya exfiltró la cookie."""
+    trace = session.get('piglin_trace')
+    if not trace:
+        return jsonify({'captured': False, 'flags': []})
+
     conn = get_db_connection()
-    rows = conn.execute(
-        'SELECT captured_data FROM stolen_tokens ORDER BY id DESC LIMIT 20'
-    ).fetchall()
+    rows = conn.execute('''
+        SELECT st.captured_data
+        FROM stolen_tokens st
+        JOIN piglin_trade_offers o ON o.id = st.offer_id
+        WHERE o.session_trace = ?
+        ORDER BY st.id DESC LIMIT 20
+    ''', (trace,)).fetchall()
     conn.close()
 
     flags = []
@@ -714,6 +838,7 @@ def nether_gold_tokens():
 @app.route('/nether/gold/leak')
 def nether_gold_leak():
     cookie_data = request.args.get('cookie', '')
+    offer_id = request.args.get('offer_id', type=int)
     token_verified = False
     flag = None
 
@@ -721,17 +846,30 @@ def nether_gold_leak():
         token_verified = True
         flag = FLAGS['nether']['gold']
 
-    # Guardamos la exfiltración una sola vez por valor recibido, para que las
-    # visitas repetidas del bot no llenen el registro de duplicados.
+    # Guardamos la exfiltración una sola vez por oferta, para que las visitas
+    # repetidas del bot no llenen el registro de duplicados y cada jugador
+    # tenga asociada su propia captura.
     if cookie_data:
         conn = get_db_connection()
         cursor = conn.cursor()
+        if offer_id is not None:
+            exists_offer = cursor.execute(
+                'SELECT 1 FROM piglin_trade_offers WHERE id = ?',
+                (offer_id,)
+            ).fetchone()
+            if not exists_offer:
+                offer_id = None
+
+        dedupe_id = offer_id if offer_id is not None else -1
         exists = cursor.execute(
-            'SELECT 1 FROM stolen_tokens WHERE captured_data = ? LIMIT 1',
-            (cookie_data,)
+            'SELECT 1 FROM stolen_tokens WHERE captured_data = ? AND COALESCE(offer_id, -1) = ? LIMIT 1',
+            (cookie_data, dedupe_id)
         ).fetchone()
         if not exists:
-            cursor.execute('INSERT INTO stolen_tokens (captured_data) VALUES (?)', (cookie_data,))
+            cursor.execute(
+                'INSERT INTO stolen_tokens (offer_id, captured_data) VALUES (?, ?)',
+                (offer_id, cookie_data)
+            )
             conn.commit()
         conn.close()
 
@@ -765,6 +903,11 @@ def _run_recipe_file(filename):
 
 @app.route('/nether/blaze/upload', methods=['POST'])
 def nether_blaze_upload():
+    inv = get_inventory()
+    if not dimension_is_complete(inv, 'overworld'):
+        flash("Debes completar las 3 banderas del Overworld antes de usar el caldero del Nether.", "error")
+        return redirect(url_for('overworld_view'))
+
     if 'recipe_file' not in request.files:
         flash("No se seleccionó ningún archivo.", "error")
         return redirect(url_for('nether_view'))
@@ -798,6 +941,11 @@ def nether_blaze_upload():
 
 @app.route('/nether/blaze/execute/<filename>')
 def nether_blaze_execute(filename):
+    inv = get_inventory()
+    if not dimension_is_complete(inv, 'overworld'):
+        flash("Debes completar las 3 banderas del Overworld antes de ejecutar recetas en el Nether.", "error")
+        return redirect(url_for('overworld_view'))
+
     output = _run_recipe_file(filename)
     if output is None:
         return "Error: Archivo no encontrado en el caldero.", 404
@@ -813,6 +961,11 @@ def nether_blaze_execute(filename):
 
 @app.route('/nether/pearl/altar')
 def nether_pearl_altar():
+    inv = get_inventory()
+    if not dimension_is_complete(inv, 'overworld'):
+        flash("Debes completar las 3 banderas del Overworld antes de acceder al altar del Enderman.", "error")
+        return redirect(url_for('overworld_view'))
+
     user_role = request.args.get('user_role') or request.cookies.get('user_role', 'guest_traveler')
     
     if user_role in ['ender_master', 'bastion_overlord', 'admin', 'root']:
@@ -839,14 +992,19 @@ def nether_pearl_altar():
 @app.route('/the_end')
 def the_end_view():
     inv = get_inventory()
-    if 'pearl' not in inv and 'dev' not in request.args:
-        flash("Debes completar el Nether y craftear el Ojo de Ender para entrar a The End.", "error")
+    if not dimension_is_complete(inv, 'nether'):
+        flash("Debes completar las 3 banderas del Nether (Lingote de Oro, Vara de Blaze y Ojo de Ender) para entrar a The End.", "error")
         return redirect(url_for('nether_view'))
 
     return render_template('the_end.html', current_dimension='the_end')
 
 @app.route('/end/crystals/exploit', methods=['POST'])
 def the_end_crystals_exploit():
+    inv = get_inventory()
+    if not dimension_is_complete(inv, 'nether'):
+        flash("Debes completar las 3 banderas del Nether antes de atacar los cristales.", "error")
+        return redirect(url_for('nether_view'))
+
     payload = request.form.get('exploit_payload', '')
     
     if any(trigger in payload for trigger in ['CVE-2026-OVERLOAD', 'AB;', 'shatter_crystals', 'OVERLOAD_CRYSTALS']):
@@ -874,6 +1032,11 @@ def the_end_crystals_exploit():
 
 @app.route('/end/dragon/damage', methods=['POST'])
 def the_end_dragon_damage():
+    inv = get_inventory()
+    if not dimension_is_complete(inv, 'nether'):
+        flash("Debes completar las 3 banderas del Nether antes de atacar al Ender Dragón.", "error")
+        return redirect(url_for('nether_view'))
+
     shot_power = request.form.get('shot_power', '100')
     
     cmd = f"echo 'Calculando impacto de flecha: potencia {shot_power}'"
@@ -885,6 +1048,11 @@ def the_end_dragon_damage():
 
 @app.route('/end/egg/inspect')
 def the_end_egg_inspect():
+    inv = get_inventory()
+    if not dimension_is_complete(inv, 'nether'):
+        flash("Debes completar las 3 banderas del Nether antes de inspeccionar el Huevo de Dragón.", "error")
+        return redirect(url_for('nether_view'))
+
     altar_file = request.args.get('altar_file', 'honeypot/fake_egg.txt')
     base_dir = "/var/www"
     target_path = os.path.join(base_dir, altar_file)
@@ -907,6 +1075,11 @@ def the_end_egg_inspect():
 # ------------------------------------------------------------------------------
 @app.route('/victory')
 def victory_view():
+    inv = get_inventory()
+    if not dimension_is_complete(inv, 'the_end'):
+        flash("Debes completar las 3 banderas de The End para ver la pantalla de victoria.", "error")
+        return redirect(url_for('the_end_view'))
+
     return render_template('victory.html', current_dimension='victory')
 
 # ------------------------------------------------------------------------------

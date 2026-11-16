@@ -601,6 +601,47 @@ body.dimension-the_end::after {
   box-shadow: 0 0 10px rgba(128, 255, 32, 0.3);
 }
 
+/* Saldo de XP visible: botella + número + XP en tipografía Minecraft */
+.mc-xp-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 112px;
+  padding: 5px 12px 5px 8px;
+  background: #000000;
+  border: 2px solid var(--mc-xp-green);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(128, 255, 32, 0.3), inset 0 0 12px rgba(128, 255, 32, 0.08);
+  image-rendering: pixelated;
+}
+
+.mc-xp-bottle {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(1px 1px 0 #000);
+  flex-shrink: 0;
+}
+
+.mc-xp-value {
+  font-family: var(--mc-font);
+  font-size: 1.15rem;
+  font-weight: bold;
+  line-height: 1;
+  color: var(--mc-xp-green);
+  text-shadow: 2px 2px 0 var(--mc-xp-shadow), 0 0 8px rgba(128, 255, 32, 0.8);
+}
+
+.mc-xp-label {
+  font-family: var(--mc-font);
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: var(--mc-xp-green);
+  text-shadow: 1px 1px 0 var(--mc-xp-shadow);
+}
+
 /* Contenedor de Barra de XP Minecraft */
 .mc-xp-bar-wrapper {
   position: relative;
@@ -2656,5 +2697,29 @@ body.is-landing {
   .cave-actions .mc-btn {
     flex: 1 1 100%;
     width: 100%;
+  }
+}
+
+/* ==========================================================================
+   SALDO DE XP RESPONSIVE
+   ========================================================================== */
+@media (max-width: 640px) {
+  .mc-stats-bar {
+    gap: 12px;
+  }
+  .mc-xp-display {
+    min-width: 92px;
+    gap: 5px;
+    padding: 4px 8px 4px 6px;
+  }
+  .mc-xp-bottle {
+    width: 20px;
+    height: 20px;
+  }
+  .mc-xp-value {
+    font-size: 1rem;
+  }
+  .mc-xp-label {
+    font-size: 0.7rem;
   }
 }
