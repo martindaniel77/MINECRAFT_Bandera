@@ -152,7 +152,13 @@
   </div>
 
   <!-- HUD INVENTARIO MINECRAFT (DISPONIBLE EN LOS DESAFÍOS DE CADA DIMENSIÓN) -->
-  {% if request.endpoint in ['overworld_view', 'nether_view', 'the_end_view'] %}
+  {% set hud_endpoints = [
+       'overworld_view', 'overworld_diamond_search',
+       'nether_view', 'nether_blaze_execute', 'nether_pearl_altar',
+       'the_end_view', 'the_end_crystals_exploit',
+       'the_end_dragon_damage', 'the_end_egg_inspect'
+     ] %}
+  {% if request.endpoint in hud_endpoints %}
     <div class="mc-hud-bottom" id="mc-hud-bottom">
       <div class="mc-stats-bar">
         <div class="mc-hearts" title="Vida de Steve">
