@@ -78,19 +78,26 @@ echo "TEXTO" | tr 'A-Za-z' 'N-ZA-Mn-za-m'</pre>
       </div>
     </div>
 
-    <!-- BANDERA 3: PORTAL -->
+    <!-- BANDERA 3: CONSOLA DE LAS CUEVAS -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon">🟪</span>
-        <h3>3. Bandera — Portal al Nether: Metadatos y cabeceras HTTP</h3>
+        <span class="guide-icon">🕯️</span>
+        <h3>3. Bandera — Consola de las Cuevas: enumeración y allowlist</h3>
       </div>
       <div class="guide-card-body">
         <p>
-          El secreto está escondido en partes del documento que las herramientas leen pero los humanos se saltan: comentarios internos y cabeceras de la respuesta HTTP.
+          La terminal de la cueva no es una shell real. Solo acepta una lista cerrada de comandos (<code>ls</code>, <code>cat</code>, <code>help</code> y <code>clear</code>) y resuelve las rutas contra un diccionario de cinco cuevas. Tu trabajo es enumerar y leer.
         </p>
-        <pre class="guide-code">curl -I http://localhost:8080/static/docs/planos_portal_nether.txt</pre>
+        <pre class="guide-code">ls
+ls /cueva/lago-de-lava
+cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
+        <div class="guide-steps-list">
+          <div><strong>1.</strong> <code>ls</code> muestra las cuevas y <code>ls &lt;cueva&gt;</code> sus archivos.</div>
+          <div><strong>2.</strong> <code>cat &lt;archivo&gt;</code> lee el contenido; no existe <code>cd</code>.</div>
+          <div><strong>3.</strong> No toda bandera que aparece es real: la tablilla congelada de la cueva de hielo es un señuelo.</div>
+        </div>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Los metadatos de archivos han filtrado información sensible en casos reales (por ejemplo, documentos de oficina que conservan el nombre del autor o la ruta del servidor).
+          <strong>Curiosidad:</strong> Una consola que valida por <em>allowlist</em> solo ejecuta lo que está en la lista. Las listas negras fallan porque siempre aparece un comando nuevo que nadie prohibió.
         </div>
       </div>
     </div>

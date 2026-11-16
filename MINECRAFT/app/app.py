@@ -14,6 +14,7 @@ from werkzeug.utils import secure_filename
 from database import get_db_connection
 from bot import bot_instance, PIGLIN_SECRET_TOKEN
 from sandbox import run_sandboxed
+from cave_data import run_cave_command
 
 # Autores oficiales del laboratorio
 LAB_AUTHORS = ['Thorfinn777', 'Martyn777', 'Sassyjack777']
@@ -158,10 +159,10 @@ def build_dimensions_info(inv):
                 },
                 {
                     'num': 3,
-                    'name': 'Planos del Portal al Nether',
-                    'type': 'Análisis Forense de Metadatos & Cabeceras',
+                    'name': 'Consola de las Cuevas',
+                    'type': 'Enumeración de rutas y lectura de archivos (allowlist)',
                     'solved': 'portal' in inv,
-                    'description': 'Audita los planos técnicos de obsidiana para encender el portal y habilitar el viaje a la siguiente dimensión.',
+                    'description': 'Recorre cinco cuevas con una consola restringida a ls, cat y ayuda para encontrar la llave de ignición y una pista para el Nether.',
                     'url': url_for('overworld_view')
                 }
             ]
@@ -558,6 +559,19 @@ def overworld_diamond_search():
                            diamond_results=results,
                            query_executed=sql,
                            sql_error=error_msg)
+
+
+@app.route('/overworld/cueva')
+def overworld_cave():
+    return render_template('cueva.html', current_dimension='overworld')
+
+
+@app.route('/overworld/cueva/terminal', methods=['POST'])
+def overworld_cave_terminal():
+    payload = request.get_json(silent=True) or {}
+    raw_command = payload.get('command', '')
+    result = run_cave_command(raw_command, FLAGS['overworld']['portal'])
+    return jsonify(result)
 
 # ------------------------------------------------------------------------------
 # DIMENSIÓN 2: NETHER (MEDIO)

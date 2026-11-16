@@ -5,13 +5,10 @@ from PIL import Image, ImageDraw, ImageFont
 from PIL.PngImagePlugin import PngInfo
 
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), 'static', 'img')
-DOCS_DIR = os.path.join(os.path.dirname(__file__), 'static', 'docs')
 
 os.makedirs(ASSETS_DIR, exist_ok=True)
-os.makedirs(DOCS_DIR, exist_ok=True)
 
 IRON_FLAG = "FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}"
-PORTAL_FLAG = "FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}"
 
 
 def rot13_base64(flag):
@@ -60,36 +57,7 @@ def create_stego_map(force=False):
     img.save(img_path, "PNG", pnginfo=target_info)
     print(f"[+] Mapa con esteganografía generado en: {img_path}")
 
-# 2. Crear archivo de planos del portal (Metadatos FOCA / ExifTool)
-def create_portal_blueprints(force=False):
-    doc_path = os.path.join(DOCS_DIR, 'planos_portal_nether.txt')
-    if not force and os.path.exists(doc_path) and os.path.getsize(doc_path) > 0:
-        return
-
-    content = (
-        "===============================================================\n"
-        " DOCUMENTO OFICIAL: PLANOS DE CONSTRUCCION DEL PORTAL AL NETHER \n"
-        "===============================================================\n"
-        "AUTOR: Steve_Maestro_Arquitecto\n"
-        "FECHA_CREACION: 2026-08-22\n"
-        "HERRAMIENTA_DE_DISENO: FOCA_Metadata_Analyzer_v3.4\n"
-        "PROYECTO: Obsidian_Gateway_Activation\n"
-        "\n"
-        "INSTRUCCIONES DE ENSAMBLAJE:\n"
-        "1. Colocar 10 bloques de Obsidiana en marco 4x5 (esquinas opcionales).\n"
-        "2. Aplicar chispa con pedernal y acero en la base inferior.\n"
-        "\n"
-        "[METADATA_HEADER_INTERNAL]\n"
-        "X-Portal-Security-Hash: 8f4a1c9b2e6d5a7f\n"
-        f"X-Obsidian-Ignition-Key: {PORTAL_FLAG}\n"
-        "X-Target-Dimension: NETHER_DIMENSION_ID_02\n"
-        "===============================================================\n"
-    )
-    with open(doc_path, 'w', encoding='utf-8') as f:
-        f.write(content)
-    print(f"[+] Planos del portal generados en: {doc_path}")
-
-# 3. Generar iconos SVG en pixel art para cada uno de los 9 ítems de Minecraft
+# 2. Generar iconos SVG en pixel art para cada uno de los 9 ítems de Minecraft
 ICON_EXTENSIONS = ('.png', '.svg', '.webp', '.jpg', '.jpeg', '.gif')
 
 
@@ -184,5 +152,4 @@ def create_svg_icons(force=False):
 
 if __name__ == '__main__':
     create_stego_map()
-    create_portal_blueprints()
     create_svg_icons()

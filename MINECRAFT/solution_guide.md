@@ -51,17 +51,24 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-###  Desafío 3: Portal del Nether
-- **Tema Académico:** *7º Semestre — Análisis de Metadatos y Reconocimiento Semi-pasivo (FOCA / Exif).*
-- **Herramientas Kali Linux:** `curl`, `wget`, `grep`, Navegador.
+###  Desafío 3: Consola de las Cuevas
+- **Tema Académico:** *7º Semestre — Enumeración de rutas y validación por allowlist.*
+- **Herramientas:** Navegador; opcionalmente `curl` para automatizar la consola.
 - **Procedimiento de Explotación:**
-  1. Hacer clic en "Inspeccionar Planos del Portal" o descargar `planos_portal_nether.txt`:
-     ```bash
-     curl -s http://localhost:8080/static/docs/planos_portal_nether.txt | grep "FLAG"
+  1. Entrar a `/overworld/cueva` desde la tarjeta del desafío 3.
+  2. Listar las cinco cuevas con `ls` y revisar el contenido de cada una con `ls <cueva>` y `cat <archivo>`.
+  3. Descartar la tablilla falsa de la cueva de hielo y leer los escritos de la bruja para la pista del Nether.
+  4. La llave real está en `/cueva/lago-de-lava/llave_ignicion.txt`; el calor de la lava conserva la inscripción.
      ```
-  2. Extraer la cabecera `X-Obsidian-Ignition-Key`.
+     steve@cueva:/cueva$ ls
+     bruja/  estalactitas/  hielo/  lago-de-lava/  luminosa/
+     steve@cueva:/cueva$ cat /cueva/lago-de-lava/llave_ignicion.txt
+     ```
+  5. Pegar la bandera en el formulario del desafío 3. La tablilla congelada devuelve un error: es un señuelo.
 - **Bandera Obtenida:**
   `FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}`
+- **Pista para el Nether:**
+  `/cueva/bruja/escritos_de_la_bruja.txt` indica que el caldero acepta recetas `.py` y que el secreto del Blaze está en `/secret/blaze_rod.txt`.
 
 ---
 

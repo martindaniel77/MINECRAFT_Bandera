@@ -70,7 +70,7 @@ http://localhost:8080
 1. ** Overworld (Fácil):**
    -  **Hierro:** Esteganografía y Cifrado César (ROT-13) / Base64.
    -  **Diamante:** Inyección SQL (SQLi) en el cofre $Y=-58$.
-   -  **Portal:** Análisis de Metadatos (FOCA/Exif) en planos de construcción.
+   -  **Portal:** Enumeración de rutas y lectura de archivos con una consola restringida (allowlist: `ls`, `cat`, `help`, `clear`).
 
 2. ** Nether (Medio):**
    -  **Oro:** Stored XSS y Robo de Sesiones al Piglin Guard.

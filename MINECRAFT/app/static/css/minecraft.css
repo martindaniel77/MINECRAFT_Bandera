@@ -2455,3 +2455,135 @@ body.is-landing {
     font-size: 0.85rem;
   }
 }
+
+/* ==========================================================================
+   ACTIVIDAD 3 - CONSOLA DE LAS CUEVAS
+   ========================================================================== */
+.cave-shell {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 8px 40px;
+}
+
+.cave-terminal {
+  background: #070b07;
+  border: 4px solid #141414;
+  box-shadow: inset -3px -3px 0 #000000, inset 3px 3px 0 #2f3a2f, 0 12px 32px rgba(0, 0, 0, 0.55);
+  border-radius: 2px;
+  overflow: hidden;
+  font-family: 'Consolas', 'Courier New', monospace;
+}
+
+.cave-terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background: #1b241b;
+  border-bottom: 2px solid #0a0f0a;
+}
+
+.cave-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.cave-dot-red { background: #c0392b; }
+.cave-dot-yellow { background: #d4a017; }
+.cave-dot-green { background: #3f9b45; }
+
+.cave-terminal-title {
+  margin-left: 8px;
+  font-size: 0.78rem;
+  color: #9fb59f;
+  letter-spacing: 0.04em;
+}
+
+.cave-terminal-body {
+  min-height: 340px;
+  max-height: 58vh;
+  overflow-y: auto;
+  padding: 18px 18px 10px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(76, 175, 80, 0.08), transparent 45%),
+    #070b07;
+  color: #b8f5b8;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  scrollbar-color: #2e6b2e #0b0f0b;
+}
+
+.cave-line,
+.cave-pre {
+  margin: 0 0 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cave-pre {
+  font-family: inherit;
+  font-size: inherit;
+  color: #d9ffd9;
+}
+
+.cave-line-command { color: #7dd3fc; font-weight: 700; }
+.cave-line-muted { color: #7f9a7f; }
+.cave-line-list { color: #86efac; }
+.cave-line-text { color: #e5ffe5; }
+.cave-line-help { color: #fde68a; }
+.cave-line-error { color: #fca5a5; }
+
+.cave-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px 16px;
+  background: #0b120b;
+  border-top: 1px solid #1f2b1f;
+}
+
+.cave-prompt {
+  color: #4ade80;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cave-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #eaffea;
+  font-family: inherit;
+  font-size: 0.92rem;
+  caret-color: #86efac;
+}
+
+.cave-input:disabled {
+  opacity: 0.55;
+}
+
+.cave-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .cave-terminal-body {
+    min-height: 260px;
+    font-size: 0.8rem;
+  }
+  .cave-prompt {
+    font-size: 0.78rem;
+  }
+  .cave-actions .mc-btn {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}

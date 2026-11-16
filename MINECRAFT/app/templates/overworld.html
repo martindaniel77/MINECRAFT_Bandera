@@ -167,7 +167,7 @@ print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
 
 
     <!-- ================================================================= -->
-    <!-- DESAFÍO 3: PORTAL NETHER (METADATOS / FOCA / RECONOCIMIENTO) -->
+    <!-- DESAFÍO 3: CONSOLA DE LAS CUEVAS (ENUMERACIÓN Y LECTURA) -->
     <!-- ================================================================= -->
     <div class="challenge-card {% if 'portal' in session.get('inventory', []) %}unlocked{% endif %}">
       <div>
@@ -181,11 +181,11 @@ print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
         </div>
         <div class="challenge-body">
           <p>
-            Para activar la obsidiana y abrir el portal al Nether necesitas encontrar la clave secreta de ignición escondida en el archivo de planos de la fortaleza de aldeanos.
+            La llave de ignición está grabada en obsidiana antigua, en alguna de las cinco cuevas del Overworld. Solo tienes una terminal restringida: puedes enumerar rutas con <code>ls</code> y leer archivos con <code>cat</code>. También dispones de <code>help</code> y <code>clear</code>.
           </p>
           <div style="margin: 12px 0;">
-            <a href="{{ url_for('static', filename='docs/planos_portal_nether.txt') }}" target="_blank" class="mc-btn mc-btn-purple" style="width:100%;">
-               Inspeccionar Planos del Portal
+            <a href="{{ url_for('overworld_cave') }}" class="mc-btn mc-btn-purple" style="width:100%;">
+               Entrar a la consola de las cuevas
             </a>
           </div>
 
@@ -196,17 +196,20 @@ print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
               <button class="mc-btn" onclick="toggleSource('portal')" style="font-size:0.75rem; flex:1;">Ver Código</button>
             </div>
             <div id="hint-portal" class="hint-box">
-              <strong>Pista — Datos escondidos en un documento:</strong><br>
-              1. El reto no es criptografía: es el hábito de guardar información en sitios que las herramientas leen y los humanos se saltan.<br>
-              2. Lee el documento <em>entero</em>, incluidas las partes que parecen relleno administrativo.<br>
-              3. Si lo descargas con <code>curl</code>, recuerda que puedes pedir ver solo las cabeceras de la respuesta en lugar del cuerpo. Los metadatos también viajan ahí.
+              <strong>Pista — Enumeración y lectura:</strong><br>
+              1. Escribe <code>ls</code> para ver las cinco cuevas y <code>cat &lt;archivo&gt;</code> para leer sus archivos. <code>help</code> muestra la ayuda.<br>
+              2. Piensa como en Minecraft: el agua y el hielo no forman obsidiana; la lava sí, y el calor conserva la piedra.<br>
+              3. No todas las banderas que encuentres son reales. Valida solo cuando el archivo esté completo y la pista tenga sentido.
             </div>
             <div id="source-portal" class="source-box" style="display:none;">
-              <strong>Código vulnerable:</strong>
-              <div class="source-code-block">response.headers['X-Portal-Key'] = 'FLAG{...}'</div>
+              <strong>Validación por allowlist:</strong>
+              <div class="source-code-block">ALLOWED = {'ls', 'cat', 'help', 'clear'}
+if command not in ALLOWED:
+    return 'Comando no permitido'
+# Solo se resuelven rutas del diccionario CAVE_ROUTES</div>
             </div>
             <div class="curiosity-box">
-              <strong>Curiosidad:</strong> Un simple <code>curl -I</code> puede exponer cabeceras con tokens, versiones de servidor o claves internas.
+              <strong>Curiosidad:</strong> Una consola que solo acepta una lista cerrada de comandos usa una <em>allowlist</em>. Si validara por lista negra, cualquier comando nuevo sería una puerta abierta.
             </div>
           </div>
         </div>

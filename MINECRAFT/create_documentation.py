@@ -951,19 +951,25 @@ def create_document():
         "preparadas (prepared statements), asegurando que las entradas del usuario sean tratadas como datos literales y no como código ejecutable."
     )
 
-    add_h3("8.1.3 Desafío 3 - Portal al Nether: Fuga de Metadatos Documentales (Análisis Forense con ExifTool / FOCA)")
+    add_h3("8.1.3 Desafío 3 - Consola de las Cuevas: Enumeración de Rutas y Validación por Allowlist")
     add_p(
-        "• Fundamento Teórico: Los planos técnicos, manuales y archivos documentales suelen contener cabeceras de depuración y firmas "
-        "de herramientas de diseño que los desarrolladores olvidan retirar antes del pase a producción."
+        "• Fundamento Teórico: Una consola restringida es un ejemplo de superficie de ataque mínima. Si la aplicación valida los "
+        "comandos con una allowlist explícita y resuelve las rutas contra un diccionario en memoria, el atacante no puede invocar "
+        "una shell, leer archivos del sistema ni salir del directorio lógico. La debilidad pedagógica reside en la enumeración: "
+        "el participante debe descubrir qué rutas y archivos existen antes de leer el secreto."
     )
     add_p(
-        "• Implementación en el Laboratorio: La plataforma suministra el archivo descargable planos_portal_nether.txt. Dentro de su "
-        "estructura documental se incluye una sección de cabeceras internas (X-Obsidian-Ignition-Key) que contiene la clave requerida "
-        "para validar el encendido del portal."
+        "• Implementación en el Laboratorio: El módulo cave_data.py define cinco cuevas (/cueva/hielo, /cueva/estalactitas, "
+        "/cueva/luminosa, /cueva/bruja y /cueva/lago-de-lava) con archivos de texto simulados. El endpoint POST "
+        "/overworld/cueva/terminal solo acepta ls, cat, help y clear; normaliza las rutas con posixpath.normpath y rechaza "
+        "cualquier intento de salir de /cueva. La bandera real se inyecta en tiempo de ejecución en llave_ignicion.txt, "
+        "mientras que una tablilla congelada contiene una bandera falsa como señuelo. Los escritos de la bruja aportan una "
+        "pista contextual para la actividad del caldero en el Nether."
     )
     add_p(
-        "• Impacto y Mitigación: La fuga de metadatos facilita la fase de reconocimiento (reconnaissance) del atacante. Se remedia mediante "
-        "políticas de Data Loss Prevention (DLP) y revisiones de código que impidan la publicación de claves criptográficas en texto plano."
+        "• Impacto y Mitigación: En sistemas reales, una consola de administración mal restringida puede derivar en ejecución "
+        "remota de comandos o en lectura arbitraria de archivos. La mitigación consiste en validar por allowlist, no concatenar "
+        "entradas en intérpretes de shell, resolver rutas contra un origen canónico y ejecutar el servicio con el mínimo privilegio posible."
     )
 
     # DIMENSIÓN 2: NETHER
@@ -1134,8 +1140,8 @@ def create_document():
         "evaluación presencial, asegurándose de que la máquina virtual de Kali Linux cuente con al menos 4 GB de RAM asignados en VirtualBox."
     )
     add_p(
-        "2. Para los estudiantes, se aconseja abordar el laboratorio de manera metódica, comenzando por el análisis visual y de metadatos "
-        "del Overworld antes de intentar vulnerabilidades de mayor complejidad en el Nether o The End."
+        "2. Para los estudiantes, se aconseja abordar el laboratorio de manera metódica, comenzando por el análisis visual, de metadatos "
+        "y de enumeración de rutas del Overworld antes de intentar vulnerabilidades de mayor complejidad en el Nether o The End."
     )
     add_p(
         "3. Se sugiere complementar este laboratorio con la redacción de informes de auditoría profesional (Pentesting Reports), donde el "
@@ -1264,8 +1270,8 @@ def create_document():
         3,
         "Panel de desafíos del Overworld (Fase 1: Fácil)",
         "Interfaz web de la fase Overworld con las tarjetas de los retos del Lingote de Hierro,\n"
-        "el Diamante en capa Y=-58 (buscador de cofres) y la activación del Portal al Nether.",
-        "Formularios de validación de banderas y botones de descarga de activos (mapa_cueva.png y planos)."
+        "el Diamante en capa Y=-58 (buscador de cofres) y la consola restringida de las cuevas.",
+        "Formularios de validación de banderas, botón de acceso a la consola y descarga de activos (mapa_cueva.png)."
     )
 
     add_figure_placeholder(

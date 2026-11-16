@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Consola de las Cuevas - Minecraft Security CTF{% endblock %}
+
+{% block content %}
+<div class="ctf-page-container">
+
+  <div class="ctf-page-header">
+    <div class="header-icon">⛏️</div>
+    <h1 class="ctf-page-title">CONSOLA DE LAS CUEVAS</h1>
+    <p class="ctf-page-desc">
+      La cueva está oscura y solo tienes una terminal restringida. Puedes usar
+      <code>ls</code>, <code>cat</code>, <code>help</code> y <code>clear</code>.
+      No es una shell real: solo puede leer las cinco cuevas de este laboratorio.
+      Escribe <code>help</code> si no sabes por dónde empezar.
+    </p>
+  </div>
+
+  <div class="cave-shell">
+    <div class="cave-terminal" id="cave-terminal">
+      <div class="cave-terminal-bar">
+        <span class="cave-dot cave-dot-red"></span>
+        <span class="cave-dot cave-dot-yellow"></span>
+        <span class="cave-dot cave-dot-green"></span>
+        <span class="cave-terminal-title">steve@cueva — terminal de exploración</span>
+      </div>
+
+      <div class="cave-terminal-body" id="cave-output" role="log" aria-live="polite">
+        <p class="cave-line cave-line-muted">Bienvenido a la consola de la cueva.</p>
+        <p class="cave-line cave-line-muted">Solo puedes usar: ls, cat, help, clear.</p>
+        <p class="cave-line cave-line-muted">Escribe <strong>help</strong> para ver la ayuda.</p>
+      </div>
+
+      <form id="cave-form" class="cave-form" autocomplete="off">
+        <span class="cave-prompt">steve@cueva:/cueva$</span>
+        <input id="cave-input" class="cave-input" type="text" name="command"
+               maxlength="200" autofocus autocomplete="off" spellcheck="false"
+               aria-label="Comando de la consola de la cueva">
+      </form>
+    </div>
+
+    <div class="cave-actions">
+      <a href="{{ url_for('overworld_view') }}" class="mc-btn">Volver al Overworld</a>
+      <a href="{{ url_for('guia_view') }}" class="mc-btn">Abrir la guía</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/cueva_terminal.js') }}"></script>
+{% endblock %}
