@@ -125,25 +125,22 @@
         </div>
         <div class="challenge-body">
           <p>
-            En la Fortaleza del Nether, el caldero de pociones permite subir un archivo de "receta personalizada" para activar el dispensador. El formulario no valida extensiones peligrosas.
+            En la Fortaleza del Nether, el caldero de pociones acepta recetas personalizadas y las ejecuta automáticamente al subirlas. No valida la extensión ni el contenido del archivo.
           </p>
 
           <!-- Formulario de Subida Vulnerable -->
           <form method="POST" action="{{ url_for('nether_blaze_upload') }}" enctype="multipart/form-data" style="margin: 10px 0;">
             <input type="file" name="recipe_file" class="mc-input" required>
             <button type="submit" class="mc-btn mc-btn-red" style="width:100%;">
-               Subir Receta al Caldero
+               Subir y ejecutar receta
             </button>
           </form>
 
-          {% if upload_success is defined %}
+          {% if upload_success %}
             <div class="terminal-output">
-              {% if upload_success %}
-                <span style="color:#55ff55;">[+] Archivo subido con éxito a: <code>/static/uploads/{{ uploaded_filename }}</code></span><br>
-                <span>Ejecutar receta: <a href="{{ url_for('nether_blaze_execute', filename=uploaded_filename) }}" target="_blank" style="color:#ffaa00;">Click para ejecutar receta</a></span>
-              {% else %}
-                <span style="color:#ef4444;">[!] Error al subir el archivo.</span>
-              {% endif %}
+              <span style="color:#55ff55;">[+] Receta subida al caldero: <code>{{ uploaded_filename }}</code></span><br>
+              <span style="color:#55ff55;">[+] El caldero ejecutó la receta automáticamente.</span><br>
+              <span>Volver a ejecutar: <a href="{{ url_for('nether_blaze_execute', filename=uploaded_filename) }}" target="_blank" style="color:#ffaa00;">Click para ejecutar receta</a></span>
             </div>
           {% endif %}
 
@@ -161,16 +158,18 @@
               <button class="mc-btn" onclick="toggleSource('blaze')" style="font-size:0.75rem; flex:1;">Ver Código</button>
             </div>
             <div id="hint-blaze" class="hint-box">
-              <strong>Pista — Subida de archivo sin restricción:</strong><br>
-              1. El servidor guarda el archivo con el nombre y el tipo que tú indiques, y además ofrece una forma de ejecutarlo. No hace ninguna comprobación de la extensión.<br>
-              2. Pregúntate qué hace un intérprete de Python con un fichero que nadie ha revisado. No necesitas más que un archivo de texto con unas pocas líneas.<br>
-              3. El objetivo <em>no está</em> en la carpeta de subidas. Piensa en un directorio del sistema que el proceso web pueda leer, y en cómo referenciar una ruta absoluta desde Python.
+              <strong>Pista — El caldero de la bruja:</strong><br>
+              1. La cueva de la bruja en el Overworld guarda la pista que necesitas.<br>
+              2. El caldero acepta recetas .py y las ejecuta sin revisar su contenido.<br>
+              3. Con Python puedes crear un script que abra el archivo indicado en la pista y muestre su contenido.<br>
+              4. Sube la receta al caldero y observa la salida.
             </div>
             <div id="source-blaze" class="source-box" style="display:none;">
               <strong>Código vulnerable:</strong>
               <div class="source-code-block">filename = secure_filename(file.filename)
 file.save(os.path.join(UPLOAD_FOLDER, filename))
-# sin validar extensión ni contenido</div>
+# sin validar extensión ni contenido
+output = run_sandboxed(['python', file_path])</div>
             </div>
             <div class="curiosity-box">
               <strong>Curiosidad:</strong> Un formulario de "subir avatar" sin validación ha sido la puerta de entrada de webshells en incidentes reales.
@@ -182,7 +181,7 @@ file.save(os.path.join(UPLOAD_FOLDER, filename))
       <!-- Formulario de Bandera -->
       <form class="flag-form" onsubmit="submitFlag('nether', 'blaze', event)">
         <input type="text" id="flag-input-blaze" class="mc-input" placeholder="Flag{...}"
-               value="{% if 'blaze' in session.get('inventory', []) %}FLAG{MINECRAFT_BLAZE_ROD_WEBSHELL_RCE}{% endif %}"
+               value="{% if 'blaze' in session.get('inventory', []) %}FLAG{MINECRAFT_BLAZE_ROD_RECETA_EJECUTADA}{% endif %}"
                {% if 'blaze' in session.get('inventory', []) %}readonly{% endif %}>
         <button type="submit" class="mc-btn mc-btn-green" {% if 'blaze' in session.get('inventory', []) %}disabled{% endif %}>
           {% if 'blaze' in session.get('inventory', []) %}{% else %}Validar{% endif %}

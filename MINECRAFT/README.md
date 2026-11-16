@@ -74,7 +74,7 @@ http://localhost:8080
 
 2. ** Nether (Medio):**
    -  **Oro:** Stored XSS y Robo de Sesiones al Piglin Guard.
-   -  **Varas de Blaze:** Carga de Archivos Arbitraria (File Upload) a RCE.
+   -  **Varas de Blaze:** Carga de archivos y ejecución automática de recetas .py (RCE).
    -  **Ender Pearl:** Violación de Mínimo Privilegio / Parameter Tampering.
 
 3. ** The End (Difícil):**

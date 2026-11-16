@@ -108,18 +108,18 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 - **Tema Académico:** *8º Semestre — Arbitrary File Upload a Ejecución Remota de Código (RCE).*
 - **Herramientas Kali Linux:** Editor de texto (`nano`/`vim`), `curl`, Navegador.
 - **Procedimiento de Explotación:**
-  1. Crear un script en Python llamado `pocion_rce.py`:
+  1. La pista de la cueva de la bruja (Overworld, desafío 3) indica que el secreto está en `/secret/blaze_rod.txt`.
+  2. Crear un script en Python llamado `receta_blaze.py` que abra ese archivo y muestre su contenido:
      ```python
-     import os
      print(open('/secret/blaze_rod.txt').read())
      ```
-  2. Subirlo a través del formulario del caldero.
-  3. Visitar el enlace de ejecución generado:
+  3. Subirlo al caldero con el formulario. El caldero ejecuta la receta automáticamente y muestra la salida en la misma tarjeta.
+  4. Si se desea reejecutar manualmente:
      ```bash
-     curl http://localhost:8080/nether/blaze/execute/pocion_rce.py
+     curl http://localhost:8080/nether/blaze/execute/receta_blaze.py
      ```
 - **Bandera Obtenida:**
-  `FLAG{MINECRAFT_BLAZE_ROD_WEBSHELL_RCE}`
+  `FLAG{MINECRAFT_BLAZE_ROD_RECETA_EJECUTADA}`
 
 ---
 

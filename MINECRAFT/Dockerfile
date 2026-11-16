@@ -27,7 +27,7 @@ RUN echo "FLAG{MINECRAFT_IRON_INGOT_C3S4R_X0R_M1N3D}" > /secret/iron_ingot.txt &
     echo "FLAG{MINECRAFT_DIAMOND_SQL1_Y58_UNLOCKED}" > /secret/diamond_vault.txt && \
     echo "FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}" > /secret/portal_key.txt && \
     echo "FLAG{MINECRAFT_PIGLIN_XSS_GOLD_BARTERED}" > /secret/gold_ingot.txt && \
-    echo "FLAG{MINECRAFT_BLAZE_ROD_WEBSHELL_RCE}" > /secret/blaze_rod.txt && \
+    echo "FLAG{MINECRAFT_BLAZE_ROD_RECETA_EJECUTADA}" > /secret/blaze_rod.txt && \
     echo "FLAG{MINECRAFT_ENDER_PEARL_PRIV_ESCALATION}" > /secret/ender_pearl.txt && \
     echo "FLAG{MINECRAFT_END_CRYSTALS_CVE_SHATTERED}" > /secret/end_crystals.txt && \
     echo "FLAG{MINECRAFT_ENDER_DRAGON_SLAIN_COMMAND_INJECTION}" > /secret/dragon_slain.txt && \

@@ -127,10 +127,9 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
       </div>
       <div class="guide-card-body">
         <p>
-          El caldero acepta cualquier archivo y además lo ejecuta. Subiendo un pequeño script Python puedes leer archivos del servidor y extraer el secreto.
+          El caldero acepta cualquier archivo y lo ejecuta automáticamente al subirlo. Con un pequeño script Python puedes leer archivos del servidor y extraer el secreto.
         </p>
-        <pre class="guide-code">import os
-print(open('/secret/blaze_rod.txt').read())</pre>
+        <pre class="guide-code">print(open('/secret/blaze_rod.txt').read())</pre>
         <div class="guide-highlight-box">
           <strong>Curiosidad:</strong> La falta de validación de extensiones es la causa de muchos incidentes reales: un formulario de "subir avatar" que termina ejecutando un webshell.
         </div>

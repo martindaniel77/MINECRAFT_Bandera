@@ -997,15 +997,16 @@ def create_document():
         "implementación de directivas Content Security Policy (CSP) y el marcado de cookies con el atributo HttpOnly."
     )
 
-    add_h3("8.2.2 Desafío 5 - Varas de Blaze: Carga Arbitraria de Archivos (File Upload) hacia RCE")
+    add_h3("8.2.2 Desafío 5 - Varas de Blaze: Carga Arbitraria de Archivos y Ejecución de Recetas (File Upload → RCE)")
     add_p(
         "• Fundamento Teórico: Cuando una aplicación permite a los usuarios subir ficheros al servidor sin validar su extensión, contenido "
         "real o permisos de ejecución, un atacante puede cargar scripts ejecutables (Web Shells) para tomar control del sistema operativo."
     )
     add_p(
         "• Implementación en el Laboratorio: El caldero de pociones (/nether/blaze/upload) recibe archivos de recetas guardándolos en "
-        "el directorio static/uploads. La ruta /nether/blaze/execute/<filename> inspecciona la extensión del archivo y, si termina en "
-        ".py o .sh, lo ejecuta a través del subsistema de aislamiento run_sandboxed."
+        "el directorio static/uploads. Si la receta termina en .py o .sh, se ejecuta automáticamente mediante run_sandboxed y su salida "
+        "se muestra al participante en la misma tarjeta; la ruta /nether/blaze/execute/<filename> permanece como mecanismo manual de "
+        "reejecución. La pista del desafío remite a la cueva de la bruja del Overworld, que indica el archivo objetivo sin repetir la ruta."
     )
     add_p(
         "• Impacto y Mitigación: Conduce a la ejecución remota de código (RCE). La mitigación requiere aplicar listas blancas de tipos MIME "

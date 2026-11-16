@@ -42,7 +42,7 @@ FLAGS = {
     },
     'nether': {
         'gold': 'FLAG{MINECRAFT_PIGLIN_XSS_GOLD_BARTERED}',
-        'blaze': 'FLAG{MINECRAFT_BLAZE_ROD_WEBSHELL_RCE}',
+        'blaze': 'FLAG{MINECRAFT_BLAZE_ROD_RECETA_EJECUTADA}',
         'pearl': 'FLAG{MINECRAFT_ENDER_PEARL_PRIV_ESCALATION}'
     },
     'the_end': {
@@ -195,7 +195,7 @@ def build_dimensions_info(inv):
                     'name': 'Varas de Blaze',
                     'type': 'Carga Arbitraria de Archivos (File Upload) a RCE',
                     'solved': 'blaze' in inv,
-                    'description': 'Sube un script malicioso en Python al caldero para ejecutar comandos en el servidor y extraer el secreto del Blaze.',
+                    'description': 'Sube una receta .py al caldero; se ejecutará automáticamente y revelará el secreto del Blaze.',
                     'url': url_for('nether_view')
                 },
                 {
@@ -576,6 +576,14 @@ def overworld_cave_terminal():
 # ------------------------------------------------------------------------------
 # DIMENSIÓN 2: NETHER (MEDIO)
 # ------------------------------------------------------------------------------
+def _nether_context():
+    conn = get_db_connection()
+    offers = conn.execute('SELECT * FROM piglin_trade_offers ORDER BY id DESC LIMIT 10').fetchall()
+    stolen = conn.execute('SELECT * FROM stolen_tokens ORDER BY id DESC LIMIT 5').fetchall()
+    conn.close()
+    return offers, stolen
+
+
 @app.route('/nether')
 def nether_view():
     inv = get_inventory()
@@ -583,15 +591,17 @@ def nether_view():
         flash("Debes completar el Overworld y activar el portal para entrar al Nether.", "error")
         return redirect(url_for('overworld_view'))
 
-    conn = get_db_connection()
-    offers = conn.execute('SELECT * FROM piglin_trade_offers ORDER BY id DESC LIMIT 10').fetchall()
-    stolen = conn.execute('SELECT * FROM stolen_tokens ORDER BY id DESC LIMIT 5').fetchall()
-    conn.close()
-
-    return render_template('nether.html',
-                           current_dimension='nether',
-                           offers=offers,
-                           stolen_tokens=stolen)
+    offers, stolen = _nether_context()
+    context = {
+        'current_dimension': 'nether',
+        'offers': offers,
+        'stolen_tokens': stolen,
+    }
+    uploaded_file = request.args.get('uploaded_file')
+    if uploaded_file:
+        context['upload_success'] = True
+        context['uploaded_filename'] = uploaded_file
+    return render_template('nether.html', **context)
 
 @app.route('/nether/gold/submit_offer', methods=['POST'])
 def nether_gold_submit_offer():
@@ -643,6 +653,28 @@ def nether_gold_leak():
         'flag': flag
     })
 
+def _run_recipe_file(filename):
+    safe_name = secure_filename(filename)
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], safe_name)
+    if not os.path.exists(file_path):
+        return None
+
+    try:
+        if safe_name.endswith('.py'):
+            output, error = run_sandboxed(['python', file_path])
+        elif safe_name.endswith('.sh'):
+            output, error = run_sandboxed(['bash', file_path])
+        else:
+            with open(file_path, 'r', errors='ignore') as f:
+                output, error = f.read(4096), None
+    except Exception as e:
+        output, error = '', f"Error ejecutando receta: {str(e)}"
+
+    if error:
+        output = f"{output}\n{error}".strip() if output else error
+    return output
+
+
 @app.route('/nether/blaze/upload', methods=['POST'])
 def nether_blaze_upload():
     if 'recipe_file' not in request.files:
@@ -655,34 +687,41 @@ def nether_blaze_upload():
         return redirect(url_for('nether_view'))
 
     filename = secure_filename(file.filename)
+    if not filename:
+        flash("El nombre del archivo no es válido.", "error")
+        return redirect(url_for('nether_view'))
+
     save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(save_path)
 
-    flash(f"Poción o receta subida al caldero: {filename}", "success")
-    return redirect(url_for('nether_view', uploaded_file=filename))
+    output = _run_recipe_file(filename)
+    if output is None:
+        flash("La receta se guardó, pero no se pudo ejecutar.", "error")
+        return redirect(url_for('nether_view'))
+
+    offers, stolen = _nether_context()
+    return render_template('nether.html',
+                           current_dimension='nether',
+                           offers=offers,
+                           stolen_tokens=stolen,
+                           upload_success=True,
+                           uploaded_filename=filename,
+                           rce_output=output)
 
 @app.route('/nether/blaze/execute/<filename>')
 def nether_blaze_execute(filename):
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename))
-    if not os.path.exists(file_path):
+    output = _run_recipe_file(filename)
+    if output is None:
         return "Error: Archivo no encontrado en el caldero.", 404
 
-    output = ""
-    try:
-        if filename.endswith('.py'):
-            output, error = run_sandboxed(['python', file_path])
-        elif filename.endswith('.sh'):
-            output, error = run_sandboxed(['bash', file_path])
-        else:
-            with open(file_path, 'r', errors='ignore') as f:
-                output, error = f.read(4096), None
-    except Exception as e:
-        output, error = f"Error ejecutando receta: {str(e)}", None
-
-    if error:
-        output = f"{output}\n{error}".strip() if output else error
-
-    return render_template('nether.html', current_dimension='nether', rce_output=output)
+    offers, stolen = _nether_context()
+    return render_template('nether.html',
+                           current_dimension='nether',
+                           offers=offers,
+                           stolen_tokens=stolen,
+                           upload_success=True,
+                           uploaded_filename=secure_filename(filename),
+                           rce_output=output)
 
 @app.route('/nether/pearl/altar')
 def nether_pearl_altar():
