@@ -17,6 +17,7 @@ from database import get_db_connection
 from bot import bot_instance, PIGLIN_SECRET_TOKEN
 from sandbox import run_sandboxed
 from cave_data import run_cave_command
+from end_ad import run_powerview_command
 
 # Autores oficiales del laboratorio
 LAB_AUTHORS = ['Thorfinn777', 'Martyn777', 'Sassyjack777']
@@ -271,7 +272,7 @@ def build_dimensions_info(inv):
             'lock_msg': '¡Requiere completar las 3 banderas del Nether!',
             'solved_count': sum(1 for x in ['crystals', 'dragon', 'egg'] if x in inv),
             'total_count': 3,
-            'description': 'El desafío final. Explotarás vulnerabilidades CVE simuladas, ejecutarás inyección de comandos en el sistema operativo del servidor y burlarás señuelos de tipo Honeypot.',
+            'description': 'El desafío final. Explotarás vulnerabilidades CVE simuladas, ejecutarás inyección de comandos en el sistema operativo del servidor y enumerarás Active Directory con PowerView para localizar el Huevo de Dragón.',
             'challenges': [
                 {
                     'num': 1,
@@ -292,9 +293,9 @@ def build_dimensions_info(inv):
                 {
                     'num': 3,
                     'name': 'Huevo de Dragón',
-                    'type': 'Evasión de Honeypot & Path Traversal (LFI hacia /root/)',
+                    'type': 'Enumeración de Active Directory con PowerView',
                     'solved': 'egg' in inv,
-                    'description': 'Identifica el señuelo público y utiliza ../../ para leer el verdadero trofeo en /root/real_dragon_egg.txt.',
+                    'description': 'Usa la consola PowerView para enumerar usuarios, grupos, equipos y recursos compartidos del dominio end.local, y lee el archivo del Huevo en el share del servidor de archivos.',
                     'url': url_for('the_end_view')
                 }
             ]
@@ -1046,29 +1047,20 @@ def the_end_dragon_damage():
 
     return render_template('the_end.html', current_dimension='the_end', dragon_damage_output=output)
 
-@app.route('/end/egg/inspect')
-def the_end_egg_inspect():
+@app.route('/end/powerview/terminal', methods=['POST'])
+def the_end_powerview_terminal():
     inv = get_inventory()
     if not dimension_is_complete(inv, 'nether'):
-        flash("Debes completar las 3 banderas del Nether antes de inspeccionar el Huevo de Dragón.", "error")
-        return redirect(url_for('nether_view'))
+        return jsonify({
+            'ok': False,
+            'kind': 'error',
+            'output': 'Debes completar las 3 banderas del Nether antes de usar la consola PowerView de The End.'
+        }), 403
 
-    altar_file = request.args.get('altar_file', 'honeypot/fake_egg.txt')
-    base_dir = "/var/www"
-    target_path = os.path.join(base_dir, altar_file)
-    
-    try:
-        with open(target_path, 'r') as f:
-            content = f.read()
-    except Exception as e:
-        if 'real_dragon_egg' in altar_file:
-            content = FLAGS['the_end']['egg']
-        elif 'fake_egg' in altar_file:
-            content = "FLAG{HONEYPOT_TRAP_NICE_TRY_LOOK_IN_ROOT} (Señuelo detectado: Este no es el huevo real)"
-        else:
-            content = f"Error leyendo archivo: {str(e)}"
-
-    return render_template('the_end.html', current_dimension='the_end', egg_inspect_output=content)
+    payload = request.get_json(silent=True) or {}
+    raw_command = payload.get('command', '')
+    result = run_powerview_command(raw_command, FLAGS['the_end']['egg'])
+    return jsonify(result)
 
 # ------------------------------------------------------------------------------
 # PANTALLA DE VICTORIA FINAL

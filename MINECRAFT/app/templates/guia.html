@@ -209,19 +209,21 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
       </div>
     </div>
 
-    <!-- BANDERA 9: EGG / HONEYPOT + LFI -->
+    <!-- BANDERA 9: EGG / POWERVIEW + ACTIVE DIRECTORY -->
     <div class="ctf-guide-card guide-highlight">
       <div class="guide-card-header">
         <span class="guide-icon"><img src="{{ url_for('static', filename='img/dragon_egg.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>9. Bandera — Huevo de Dragón: Evasión de Honeypot y Path Traversal (LFI)</h3>
+        <h3>9. Bandera — Huevo de Dragón: Enumeración de Active Directory con PowerView</h3>
       </div>
       <div class="guide-card-body">
         <p>
-          El altar lee el archivo que tú le pides uniendo tu entrada a un directorio base. Usando <code>../../</code> puedes salir de la carpeta pública y leer el huevo real en <code>/root/</code>. El primer resultado fácil es un señuelo (honeypot).
+          El Huevo ya no está en un archivo público: está archivado en el dominio <code>end.local</code>. PowerView permite enumerar usuarios, grupos, equipos y recursos compartidos. La descripción de una cuenta de servicio revela el servidor y el share donde se guarda el Huevo.
         </p>
-        <pre class="guide-code">../../root/real_dragon_egg.txt</pre>
+        <pre class="guide-code">Get-NetUser
+Find-DomainShare
+Get-Content \\END-FS01\vault\real_dragon_egg.txt</pre>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Los honeypots son sistemas señuelo diseñados para distraer y estudiar a los atacantes. En la naturaleza, muchos "archivos secretos" públicos son trampas deliberadas.
+          <strong>Curiosidad:</strong> PowerView (PowerSploit) es una herramienta de referencia en auditorías de Active Directory. En defensa, revisa las descripciones de cuentas de servicio, aplica mínimo privilegio a los shares y monitoriza las consultas LDAP y SMB.
         </div>
       </div>
     </div>

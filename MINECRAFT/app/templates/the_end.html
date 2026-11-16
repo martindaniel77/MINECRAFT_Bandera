@@ -11,7 +11,7 @@
     <p class="ctf-page-desc">
       Has colocado los 12 Ojos de Ender y cruzado el portal hacia el Vacío.
       Te encuentras en la isla central frente al <strong>Ender Dragón</strong>.
-      Para liberar el End debes <strong>destruir los Cristales de las Torres</strong>, <strong>asestar el golpe final al Dragón</strong> y <strong>capturar el Huevo legítimo evadiendo los señuelos (Honeypots)</strong>.
+      Para liberar el End debes <strong>destruir los Cristales de las Torres</strong>, <strong>asestar el golpe final al Dragón</strong> y <strong>capturar el Huevo enumerando Active Directory con PowerView</strong>.
       (Recuerda que todas las banderas tienen el formato <code>Flag{...}</code>).
     </p>
   </div>
@@ -157,7 +157,7 @@ output, error = run_sandboxed(cmd, shell=True)</div>
 
 
     <!-- ================================================================= -->
-    <!-- DESAFÍO 3: HUEVO (EVASIÓN DE HONEYPOT Y CAPTURA DE FLAG ROOT) -->
+    <!-- DESAFÍO 3: HUEVO (ENUMERACIÓN DE ACTIVE DIRECTORY CON POWERVIEW) -->
     <!-- ================================================================= -->
     <div class="challenge-card {% if 'egg' in session.get('inventory', []) %}unlocked{% endif %}">
       <div>
@@ -171,25 +171,35 @@ output, error = run_sandboxed(cmd, shell=True)</div>
         </div>
         <div class="challenge-body">
           <p>
-            El dragón ha caído, pero el altar del Huevo contiene un <strong>Honeypot (Señuelo)</strong> que entrega banderas falsas. Debes analizar la ruta del sistema para extraer el huevo real en <code>/root/real_dragon_egg.txt</code>.
+            El Huevo de Dragón ya no está en el altar: quedó archivado en un
+            <strong>dominio de Active Directory</strong> llamado <code>end.local</code>.
+            Usa la consola <strong>PowerView</strong> para enumerar usuarios, grupos,
+            equipos y recursos compartidos hasta localizar el archivo del Huevo en el
+            servidor de archivos.
           </p>
 
-          <!-- Visor de Archivos del Altar (LFI) -->
-          <form method="GET" action="{{ url_for('the_end_egg_inspect') }}" style="margin: 10px 0;">
-            <div style="display:flex; gap:6px;">
-              <input type="text" name="altar_file" class="mc-input" placeholder="Archivo del altar (ej. honeypot/fake_egg.txt)" value="{{ request.args.get('altar_file', 'honeypot/fake_egg.txt') }}">
-              <button type="submit" class="mc-btn mc-btn-gold" style="white-space:nowrap;">
-                 Leer Altar
-              </button>
+          <!-- Terminal PowerView simulada (sin PowerShell ni AD real) -->
+          <div class="cave-terminal pw-terminal" id="powerview-terminal">
+            <div class="cave-terminal-bar">
+              <span class="cave-dot cave-dot-red"></span>
+              <span class="cave-dot cave-dot-yellow"></span>
+              <span class="cave-dot cave-dot-green"></span>
+              <span class="cave-terminal-title">PS C:\Users\Steve — PowerView (AD simulado)</span>
             </div>
-          </form>
 
-          {% if egg_inspect_output is defined %}
-            <div class="terminal-output">
-              <strong>[+] Contenido del altar leído:</strong>
-              <pre style="color:{% if 'HONEYPOT' in egg_inspect_output %}#ef4444{% else %}#55ff55{% endif %}; margin-top:4px;">{{ egg_inspect_output }}</pre>
+            <div class="cave-terminal-body" id="powerview-output" role="log" aria-live="polite">
+              <p class="cave-line cave-line-muted">PowerView cargado contra el dominio end.local.</p>
+              <p class="cave-line cave-line-muted">No es PowerShell real: la consola consulta un AD simulado.</p>
+              <p class="cave-line cave-line-muted">Escribe <strong>help</strong> para ver los comandos disponibles.</p>
             </div>
-          {% endif %}
+
+            <form id="powerview-form" class="cave-form" autocomplete="off">
+              <span class="cave-prompt">PS C:\Users\Steve&gt;</span>
+              <input id="powerview-input" class="cave-input" type="text" name="command"
+                     maxlength="300" autofocus autocomplete="off" spellcheck="false"
+                     aria-label="Comando de la consola PowerView">
+            </form>
+          </div>
 
           <!-- Pistas, Código y Curiosidad -->
           <div class="lab-tools">
@@ -198,18 +208,25 @@ output, error = run_sandboxed(cmd, shell=True)</div>
               <button class="mc-btn" onclick="toggleSource('egg')" style="font-size:0.75rem; flex:1;">Ver Código</button>
             </div>
             <div id="hint-egg" class="hint-box">
-              <strong>Pista — Recorrido de rutas (Path Traversal):</strong><br>
-              1. El lector coge el nombre de fichero que le mandas, lo une a un directorio base y abre lo que salga. Si tú controlas el nombre, tal vez también controlas lo que se une.<br>
-              2. Ojo: hay <em>dos</em> ficheros que parecen el premio. Uno está colocado para que se encuentre demasiado fácil, y ese es un señuelo. ¿Cuál querría un defensor que cogieras?<br>
-              3. Para salir del directorio base necesitas subir directorios en la ruta. La respuesta a la pregunta 2 te dice en cuál estás.
+              <strong>Pista — Enumeración de Active Directory:</strong><br>
+              1. PowerView consulta objetos del dominio: usuarios, grupos, equipos y recursos compartidos. Empieza por el dominio y por la lista de usuarios.<br>
+              2. Las descripciones de las cuentas de servicio suelen revelar recursos internos. Busca una ruta UNC (<code>\\SERVIDOR\recurso</code>) en la descripción de una cuenta <code>svc_*</code>.<br>
+              3. Cuando conozcas el servidor de archivos, enumera sus shares. El archivo del Huevo se lee con <code>Get-Content</code> usando la ruta UNC completa.
             </div>
             <div id="source-egg" class="source-box" style="display:none;">
-              <strong>Código vulnerable:</strong>
-              <div class="source-code-block">base_dir = "/var/www"
-target_path = os.path.join(base_dir, altar_file)  # sin validar traversal</div>
+              <strong>Motor simulado (no ejecuta PowerShell real):</strong>
+              <div class="source-code-block">parts = shlex.split(command, posix=False)  # conserva las barras de Windows
+BINDINGS = {
+    'get-netuser': _command_users,
+    'find-domainshare': _command_find_domain_share,
+    'get-content': _command_get_content,
+}
+
+if name == 'get-content' and _normalize_unc(path) == EGG_UNC:
+    return egg_flag</div>
             </div>
             <div class="curiosity-box">
-              <strong>Curiosidad:</strong> Los honeypots son señuelos deliberados. En la naturaleza, muchos "archivos secretos" públicos son trampas para distraer atacantes.
+              <strong>Curiosidad:</strong> PowerView forma parte de PowerSploit y se usa en auditorías de Active Directory para enumerar usuarios, grupos, equipos, sesiones y shares. La defensa combina mínimo privilegio en los recursos compartidos, cuentas de servicio administradas (gMSA) y monitorización de consultas LDAP y SMB.
             </div>
           </div>
         </div>
@@ -229,4 +246,8 @@ target_path = os.path.join(base_dir, altar_file)  # sin validar traversal</div>
 
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/powerview_terminal.js') }}"></script>
 {% endblock %}

@@ -2701,6 +2701,46 @@ body.is-landing {
 }
 
 /* ==========================================================================
+   ACTIVIDAD 3 - CONSOLA POWERVIEW (THE END)
+   ========================================================================== */
+.pw-terminal {
+  margin: 10px 0;
+}
+
+.pw-terminal .cave-terminal-body {
+  min-height: 240px;
+  max-height: 340px;
+  padding: 14px 14px 8px;
+  font-size: 0.78rem;
+}
+
+.pw-terminal .cave-form {
+  padding: 10px 12px 12px;
+}
+
+.pw-terminal .cave-prompt {
+  font-size: 0.76rem;
+}
+
+.pw-terminal .cave-input {
+  font-size: 0.82rem;
+}
+
+.pw-terminal .cave-terminal-title {
+  font-size: 0.72rem;
+}
+
+@media (max-width: 640px) {
+  .pw-terminal .cave-terminal-body {
+    min-height: 210px;
+    font-size: 0.72rem;
+  }
+  .pw-terminal .cave-prompt {
+    font-size: 0.68rem;
+  }
+}
+
+/* ==========================================================================
    SALDO DE XP RESPONSIVE
    ========================================================================== */
 @media (max-width: 640px) {

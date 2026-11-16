@@ -441,7 +441,7 @@ def create_document():
         "Overworld (nivel introductorio), Nether (nivel intermedio) y The End (nivel avanzado y combate final). Dichos desafíos "
         "permiten evaluar competencias clave del estándar OWASP Top 10, tales como inyecciones de código SQL (SQLi), ejecución "
         "remota de comandos (Command Injection), cross-site scripting almacenado (Stored XSS), carga arbitraria de ficheros, "
-        "salto de directorios (Path Traversal / LFI), esteganografía forense y manipulación de parámetros de control de acceso. "
+        "enumeración de Active Directory con PowerView, esteganografía forense y manipulación de parámetros de control de acceso. "
         "Asimismo, se detallan los requisitos de instalación, el script de automatización de despliegue con tolerancia a fallos "
         "y los mecanismos de contención que garantizan la integridad del sistema anfitrión sin revelar las soluciones específicas."
     )
@@ -494,7 +494,7 @@ def create_document():
         "el inframundo o Nether y la dimensión sombría de The End), el estudiante experimenta una curva de progresión natural: "
         "comienza obteniendo materiales primarios (hierro, diamante y obsidiana) a través de retos elementales, continúa comerciando "
         "y forjando objetos en el inframundo mediante ataques de nivel intermedio, y culmina en una batalla contra el dragón del fin mediante "
-        "la explotación de fallos avanzados del sistema operativo y evasión de señuelos defensivos (honeypots)."
+        "la explotación de fallos avanzados del sistema operativo y la enumeración de Active Directory para localizar recursos compartidos."
     )
 
     # =========================================================================
@@ -516,7 +516,7 @@ def create_document():
     add_p(
         "b) Desarrollar nueve desafíos de seguridad informática distribuidos en tres fases progresivas (Overworld, Nether y The End), "
         "cubriendo vectores de vulnerabilidad representativos de las categorías OWASP Top 10 (SQL Injection, Stored XSS, OS Command Injection, "
-        "Arbitrary File Upload, Path Traversal, esteganografía y control de acceso roto)."
+        "Arbitrary File Upload, enumeración de Active Directory con PowerView, esteganografía y control de acceso roto)."
     )
     add_p(
         "c) Implementar un motor de contención y aislamiento (Process Sandbox Runner) con cuotas estrictas de CPU, memoria y descriptores "
@@ -1034,7 +1034,7 @@ def create_document():
     add_h2("8.3 Dimensión 3: The End (Nivel Avanzado - Boss Final)")
     add_p(
         "Constituye la fase culminante del laboratorio. Aborda vectores de compromiso a nivel de servicios del sistema operativo, "
-        "inyección de comandos en shell y evasión de señuelos defensivos."
+        "inyección de comandos en shell y enumeración de Active Directory con PowerView."
     )
 
     add_h3("8.3.1 Desafío 7 - Cristales del End: Simulación de Explotación de Servicio / CVE Backdoor")
@@ -1070,22 +1070,27 @@ def create_document():
         "o realizando conversiones estrictas a tipos de datos numéricos (ej. int(shot_power)) antes de cualquier procesamiento."
     )
 
-    add_h3("8.3.3 Desafío 9 - Huevo del Dragón: Salto de Directorio (Path Traversal / LFI) y Evasión de Honeypot")
+    add_h3("8.3.3 Desafío 9 - Huevo del Dragón: Enumeración de Active Directory con PowerView")
     add_p(
-        "• Fundamento Teórico: La vulnerabilidad de Path Traversal (o salto de directorios) surge cuando una aplicación utiliza entradas "
-        "de usuario para componer una ruta de archivo en disco sin filtrar secuencias de retroceso de directorio (como ../ o ..\\), "
-        "permitiendo acceder a ficheros ubicados fuera del directorio raíz previsto."
+        "• Fundamento Teórico: PowerView es un conjunto de funciones de PowerShell para enumerar Active Directory. "
+        "Permite consultar usuarios, grupos, equipos, sesiones y recursos compartidos sin necesidad de herramientas "
+        "administrativas adicionales, lo que lo convierte en una técnica habitual de reconocimiento en auditorías internas. "
+        "La información expuesta en descripciones de cuentas de servicio y en shares mal segmentados puede revelar la "
+        "ubicación de datos sensibles."
     )
     add_p(
-        "• Implementación en el Laboratorio: El visor del altar (/end/egg/inspect) toma el parámetro altar_file y lo concatena a la "
-        "ruta base /var/www mediante os.path.join. Como mecanismo de defensa activa, el laboratorio incorpora un Honeypot (fichero trampa) "
-        "en /var/www/honeypot/fake_egg.txt que entrega una bandera falsa (FLAG{HONEYPOT_TRAP...}). El estudiante debe identificar que se "
-        "trata de un señuelo y utilizar saltos de directorio para alcanzar el fichero legítimo en /root/real_dragon_egg.txt."
+        "• Implementación en el Laboratorio: La ruta /end/powerview/terminal expone una consola simulada que interpreta "
+        "comandos como Get-NetDomain, Get-NetUser, Get-NetGroupMember, Find-DomainShare, Get-NetShare, Invoke-UserHunter "
+        "y Get-Content contra un dominio ficticio llamado end.local. El motor no invoca PowerShell ni accede al sistema "
+        "de archivos: resuelve cada comando contra un diccionario de usuarios, grupos, equipos y shares definido en "
+        "end_ad.py. La cuenta de servicio svc_backup describe el share \\\\END-FS01\\vault y el archivo "
+        "real_dragon_egg.txt contiene la bandera final."
     )
     add_p(
-        "• Impacto y Mitigación: Exposición de archivos de configuración sensibles, claves privadas o bases de datos del servidor. "
-        "Para mitigar este fallo, se debe verificar que la ruta normalizada absoluta (obtenida con os.path.realpath) comience estrictamente "
-        "por el prefijo del directorio autorizado, o bien mapear identificadores contra una lista blanca fija de archivos."
+        "• Impacto y Mitigación: La enumeración de AD facilita el movimiento lateral y la identificación de recursos "
+        "críticos. Para mitigarlo se recomienda no incluir rutas internas en las descripciones de cuentas, aplicar "
+        "mínimo privilegio y ACLs por grupo en los shares, usar cuentas de servicio administradas (gMSA), segmentar "
+        "los servidores de archivos y monitorizar consultas LDAP y accesos SMB anómalos."
     )
 
     # =========================================================================
@@ -1102,9 +1107,9 @@ def create_document():
         "o web shells carece de privilegios de superusuario en el contenedor."
     )
     add_p(
-        "2. Aislamiento de secretos en directorios con permisos selectivos: El archivo /root/real_dragon_egg.txt se encuentra configurado "
-        "con permisos de lectura (chmod 644) mientras que la carpeta /root posee permisos 755. Esto permite su lectura mediante LFI "
-        "sin otorgar privilegios de modificación sobre el sistema de archivos del contenedor."
+        "2. Consola PowerView sin ejecución real: La ruta /end/powerview/terminal no invoca PowerShell ni accede al sistema de archivos "
+        "del contenedor. Los comandos se resuelven contra datos simulados en end_ad.py, por lo que la actividad del reto no amplía la "
+        "superficie de ataque ni permite ejecución arbitraria de comandos."
     )
     add_p(
         "3. Límite de carga de ficheros: La configuración app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 limita el tamaño de cualquier "
@@ -1295,8 +1300,8 @@ def create_document():
         6,
         "Panel de The End: Batalla contra el Dragón y telemetría de cristales (Fase 3: Difícil)",
         "Consola de telemetría de combate en The End con el panel de ataque a los Cristales de curación,\n"
-        "el cálculo de potencia de disparo contra el Ender Dragón y el lector del Altar del Huevo.",
-        "Interfaz del combate final mostrando los formularios de envío de payloads a los servicios."
+        "el cálculo de potencia de disparo contra el Ender Dragón y la terminal PowerView del Huevo.",
+        "Interfaz del combate final mostrando los formularios de envío de payloads y la enumeración de Active Directory."
     )
 
     add_figure_placeholder(
