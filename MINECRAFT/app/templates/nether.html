@@ -33,27 +33,51 @@
         </div>
         <div class="challenge-body">
           <p>
-            Los Piglins del Bastión tienen un libro público de ofertas de trueque. El <strong>Piglin Guard</strong> revisa periódicamente cada propuesta en su navegador con su cookie de tesorero real.
+            Los Piglins del Bastión tienen un tablón público de ofertas de trueque. El
+            <strong>Piglin Guard</strong> abre ese tablón en su navegador cada vez que llega una
+            propuesta, y su sesión lleva una cookie con la llave de la bóveda de oro.
           </p>
+          <p>
+            La nota que escribes se guarda <strong>sin sanitizar</strong>. En este tablón la ves
+            escapada para que no se ejecute en tu navegador; el <strong>Piglin Guard</strong> abre
+            el contenido sin escapar en el suyo. Eso es un <strong>XSS almacenado</strong>. Tu
+            objetivo es lograr que el Guard ejecute tu código.
+          </p>
+
+          <div class="terminal-output" style="border-color:#f59e0b; max-height:none;">
+            <strong style="color:#f59e0b;">[OBJETIVO]</strong>
+            Inyecta un XSS en la nota. Cuando el Piglin Guard abra el tablón, su navegador
+            ejecutará tu código y su cookie de tesorero terminará en el buzón del Bastión.
+            No necesitas un payload enorme: un XSS básico es suficiente.
+          </div>
 
           <!-- Formulario de Oferta Vulnerable a XSS -->
           <form method="POST" action="{{ url_for('nether_gold_submit_offer') }}" style="margin: 10px 0;">
-            <input type="text" name="player_name" class="mc-input" placeholder="Tu nombre (ej. Steve)" required>
-            <input type="text" name="offered_item" class="mc-input" placeholder="Objeto que ofreces (ej. 5x Manzanas)" required>
-            <textarea name="note_to_piglin" class="mc-input" rows="2" placeholder="Nota al Piglin (Permite HTML/JS)..." required></textarea>
+            {% if 'dev' in request.args %}
+              <input type="hidden" name="dev" value="1">
+            {% endif %}
+            <input type="text" name="player_name" class="mc-input" placeholder="Tu nombre (ej. Steve)" value="Steve" required>
+            <input type="text" name="offered_item" class="mc-input" placeholder="Objeto que ofreces (ej. 5x Manzanas)" value="5x Manzanas de Oro" required>
+            <textarea id="note-to-piglin" name="note_to_piglin" class="mc-input" rows="3" placeholder="Escribe tu payload XSS aquí..." required></textarea>
             <button type="submit" class="mc-btn mc-btn-gold" style="width:100%;">
                Enviar Oferta al Bastión
             </button>
           </form>
 
+          {% if request.args.get('awaiting') %}
+            <div class="mc-alert mc-alert-info" id="gold-awaiting">
+              ⏳ El Piglin Guard está revisando tu oferta...
+            </div>
+          {% endif %}
+
           <!-- Tablón de ofertas recientes -->
-          <div class="terminal-output" style="max-height: 140px;">
+          <div class="terminal-output" style="max-height: 160px;">
             <strong>[+] Últimas ofertas en el Bastión:</strong>
-            {% if trade_offers %}
-              {% for offer in trade_offers %}
+            {% if offers %}
+              {% for offer in offers %}
                 <div style="border-top: 1px dashed #444; padding-top: 4px; margin-top: 4px;" data-offer-id="{{ offer.id }}">
                    <strong>{{ offer.player_name }}</strong> ofrece: <em>{{ offer.offered_item }}</em><br>
-                   Mensaje: <span>{{ offer.note_to_piglin|safe }}</span>
+                   Mensaje: <span style="white-space:pre-wrap; word-break:break-word;">{{ offer.note_to_piglin }}</span>
                 </div>
               {% endfor %}
             {% else %}
@@ -62,13 +86,21 @@
           </div>
 
           <!-- Tokens robados al Piglin -->
-          {% if captured_tokens %}
-            <div class="terminal-output" style="border-color:#ef4444;">
-              <strong>[!] REGISTRO DEL BASTIÓN — credenciales comprometidas:</strong>
-              {% for token in captured_tokens %}
-                <div style="color:#ff5555;"> <code>{{ token }}</code></div>
+          {% if stolen_tokens %}
+            <div class="terminal-output" style="border-color:#22c55e; max-height:none;">
+              <strong style="color:#55ff55;">[✔] ¡SESIÓN DEL PIGLIN GUARD CAPTURADA!</strong>
+              {% for token in stolen_tokens %}
+                <div style="margin-top:8px; color:#ffaa00;">
+                  <strong>Cookie robada:</strong>
+                  <code style="color:#ff5555; word-break:break-all;">{{ token.captured_data }}</code>
+                </div>
+                {% if token.flag %}
+                  <div style="margin-top:8px; color:#fef08a;">
+                    <strong>Flag obtenida:</strong>
+                    <code style="color:#fef08a; font-size:1rem; word-break:break-all;">{{ token.flag }}</code>
+                  </div>
+                {% endif %}
               {% endfor %}
-              <div style="color:#f59e0b; margin-top:4px;">El Piglin Guard entregó su token de la bóveda. Ya puedes validarlo como bandera.</div>
             </div>
           {% endif %}
 
@@ -79,16 +111,22 @@
               <button class="mc-btn" onclick="toggleSource('gold')" style="font-size:0.75rem; flex:1;">Ver Código</button>
             </div>
             <div id="hint-gold" class="hint-box">
-              <strong>Pista — XSS almacenado y robo de sesión:</strong><br>
-              1. Fíjate en que la nota se pinta en el tablón de ofertas. Pregúntate si el navegador la trata como texto plano o si está interpretando etiquetas. Si el servidor la inserta sin escapar, tú decides qué se renderiza.<br>
-              2. El premio no es la oferta: es la sesión del Piglin Guard. Repasa qué información maneja el <em>lado del cliente</em> de una web y a qué no llega una petición normal hecha por otra persona.<br>
-              3. En el propio servidor ya existe un endpoint pensado para recibir datos enviados por el navegador. Búscalo entre las rutas de la aplicación: no hace falta inventarlo.<br>
-              4. F12 → Almacenamiento te deja ver las cookies de tu propia sesión; las del bot no están ahí, por eso necesitas otro canal.
+              <strong>Pista — XSS almacenado:</strong><br>
+              1. La nota se guarda y el Guard la abre con su sesión. El servidor no escapa el HTML, así que el navegador interpreta lo que escribas.<br>
+              2. Para probarlo sin ventanas emergentes, usa un payload básico como
+                 <code>&lt;script&gt;console.log('XSS')&lt;/script&gt;</code>. El tablón del
+                 jugador te lo muestra como texto escapado; el Guard lo interpreta en su navegador.<br>
+              3. Si el Guard ejecuta tu código, su cookie de tesorero llega al buzón del Bastión y verás la bandera abajo.<br>
+              4. No hace falta un script de robo complejo: el Guard simula el impacto del XSS.
             </div>
             <div id="source-gold" class="source-box" style="display:none;">
               <strong>Código vulnerable:</strong>
               <div class="source-code-block">note_to_piglin = request.form.get('note_to_piglin', '')
-# se renderiza con |safe en la plantilla</div>
+# se guarda sin sanitizar; el tablón del jugador lo escapa,
+# pero el Guard abre el contenido sin escapar.
+
+# Cualquier XSS que el Guard ejecute dispara la simulación:
+# su cookie se envía a /nether/gold/leak.</div>
             </div>
             <div class="curiosity-box">
               <strong>Curiosidad:</strong> El worm "Samy" en MySpace (2005) infectó a más de un millón de perfiles en una hora usando XSS almacenado.
@@ -262,4 +300,32 @@ if user_role in ['ender_master', ...]:  # sin validar identidad</div>
 
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  {% if request.args.get('awaiting') %}
+  // Espera activa: consulta el estado hasta que el bot exfiltre la cookie.
+  (async function pollGoldCapture() {
+    const banner = document.getElementById('gold-awaiting');
+    for (let attempt = 0; attempt < 12; attempt++) {
+      try {
+        const res = await fetch('/nether/gold/tokens', { cache: 'no-store' });
+        const data = await res.json();
+        if (data.captured) {
+          window.location.href = "{{ url_for('nether_view', dev=request.args.get('dev')) }}";
+          return;
+        }
+      } catch (err) {
+        // Reintentar en la siguiente vuelta.
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+    if (banner) {
+      banner.className = 'mc-alert mc-alert-error';
+      banner.innerHTML = 'El Guard no ha respondido todavía. Revisa el tablón o vuelve a enviar la oferta.';
+    }
+  })();
+  {% endif %}
+</script>
 {% endblock %}

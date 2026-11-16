@@ -5,6 +5,7 @@
 # ==============================================================================
 
 import os
+import re
 import sqlite3
 import base64
 import json
@@ -263,6 +264,36 @@ def inject_brand_and_authors():
             break
 
     current_student = session.get('student_name')
+    inv = get_inventory()
+
+    # Siguiente dimensión desbloqueada: el botón aparece en la barra superior
+    # cuando ya se puede avanzar, sin obligar a volver a la pestaña Desafíos.
+    next_dimension = None
+    if all(item in inv for item in ('crystals', 'dragon', 'egg')):
+        next_dimension = {
+            'id': 'victory',
+            'icon': '🏆',
+            'name': 'Victoria',
+            'url': url_for('victory_view'),
+            'theme': 'victory',
+        }
+    elif 'pearl' in inv:
+        next_dimension = {
+            'id': 'the_end',
+            'icon': '🌌',
+            'name': 'The End',
+            'url': url_for('the_end_view'),
+            'theme': 'the_end',
+        }
+    elif 'portal' in inv:
+        next_dimension = {
+            'id': 'nether',
+            'icon': '🔥',
+            'name': 'Nether',
+            'url': url_for('nether_view'),
+            'theme': 'nether',
+        }
+
     return {
         'logo_src': logo_src,
         'lab_authors': LAB_AUTHORS,
@@ -270,7 +301,8 @@ def inject_brand_and_authors():
         'current_student': current_student,
         'is_authenticated': current_student is not None,
         'student_score': get_student_score(),
-        'solved_flags_count': len(get_inventory())
+        'solved_flags_count': len(inv),
+        'next_dimension': next_dimension,
     }
 
 @app.after_request
@@ -584,6 +616,26 @@ def _nether_context():
     return offers, stolen
 
 
+def _stolen_tokens_with_flags(rows):
+    """Añade la flag extraída del token capturado para validarla manualmente.
+
+    El tablón muestra el payload escapado y la flag, pero no autocompleta el
+    formulario de validación: el jugador debe copiarla y enviarla a mano.
+    """
+    stolen_tokens = []
+    for token in rows:
+        captured = token['captured_data'] or ''
+        match = re.search(r'FLAG\{[^}]+\}', captured)
+        if not match:
+            continue
+        stolen_tokens.append({
+            'id': token['id'],
+            'captured_data': captured,
+            'flag': match.group(0),
+        })
+    return stolen_tokens
+
+
 @app.route('/nether')
 def nether_view():
     inv = get_inventory()
@@ -592,10 +644,12 @@ def nether_view():
         return redirect(url_for('overworld_view'))
 
     offers, stolen = _nether_context()
+    stolen_tokens = _stolen_tokens_with_flags(stolen)
+
     context = {
         'current_dimension': 'nether',
         'offers': offers,
-        'stolen_tokens': stolen,
+        'stolen_tokens': stolen_tokens,
     }
     uploaded_file = request.args.get('uploaded_file')
     if uploaded_file:
@@ -615,13 +669,16 @@ def nether_gold_submit_offer():
         INSERT INTO piglin_trade_offers (player_name, offered_item, note_to_piglin)
         VALUES (?, ?, ?)
     ''', (player_name, offered_item, note_to_piglin))
-    offer_id = cursor.lastrowid
     conn.commit()
     conn.close()
 
-    bot_instance.trigger_visit(offer_id, note_to_piglin)
+    # El bot revisa las ofertas por su cuenta; no recibe argumentos.
+    # (Antes se le pasaban offer_id/note_to_piglin y eso provocaba el HTTP 500).
+    bot_instance.trigger_visit()
     flash("Tu oferta ha sido entregada al Piglin Guard. ¡Espera su inspección!", "success")
-    return redirect(url_for('nether_view'))
+    # La vista muestra un aviso y consulta /nether/gold/tokens hasta que el bot
+    # termine, para que el jugador no tenga que refrescar a mano.
+    return redirect(url_for('nether_view', awaiting=1, dev=request.form.get('dev')))
 
 @app.route('/nether/gold/offers')
 def nether_gold_offers():
@@ -630,6 +687,23 @@ def nether_gold_offers():
     offers = cursor.execute('SELECT * FROM piglin_trade_offers ORDER BY id DESC LIMIT 10').fetchall()
     conn.close()
     return jsonify([dict(ix) for ix in offers])
+
+@app.route('/nether/gold/tokens')
+def nether_gold_tokens():
+    """Estado ligero para que la tarjeta detecte cuándo el bot ya exfiltró la cookie."""
+    conn = get_db_connection()
+    rows = conn.execute(
+        'SELECT captured_data FROM stolen_tokens ORDER BY id DESC LIMIT 20'
+    ).fetchall()
+    conn.close()
+
+    flags = []
+    for row in rows:
+        match = re.search(r'FLAG\{[^}]+\}', row['captured_data'] or '')
+        if match:
+            flags.append(match.group(0))
+
+    return jsonify({'captured': bool(flags), 'flags': flags})
 
 @app.route('/nether/gold/leak')
 def nether_gold_leak():
@@ -641,11 +715,19 @@ def nether_gold_leak():
         token_verified = True
         flag = FLAGS['nether']['gold']
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('INSERT INTO stolen_tokens (captured_data) VALUES (?)', (cookie_data,))
-    conn.commit()
-    conn.close()
+    # Guardamos la exfiltración una sola vez por valor recibido, para que las
+    # visitas repetidas del bot no llenen el registro de duplicados.
+    if cookie_data:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        exists = cursor.execute(
+            'SELECT 1 FROM stolen_tokens WHERE captured_data = ? LIMIT 1',
+            (cookie_data,)
+        ).fetchone()
+        if not exists:
+            cursor.execute('INSERT INTO stolen_tokens (captured_data) VALUES (?)', (cookie_data,))
+            conn.commit()
+        conn.close()
 
     return jsonify({
         'status': 'received',
@@ -703,7 +785,7 @@ def nether_blaze_upload():
     return render_template('nether.html',
                            current_dimension='nether',
                            offers=offers,
-                           stolen_tokens=stolen,
+                           stolen_tokens=_stolen_tokens_with_flags(stolen),
                            upload_success=True,
                            uploaded_filename=filename,
                            rce_output=output)
@@ -718,7 +800,7 @@ def nether_blaze_execute(filename):
     return render_template('nether.html',
                            current_dimension='nether',
                            offers=offers,
-                           stolen_tokens=stolen,
+                           stolen_tokens=_stolen_tokens_with_flags(stolen),
                            upload_success=True,
                            uploaded_filename=secure_filename(filename),
                            rce_output=output)
