@@ -276,6 +276,7 @@ def inject_brand_and_authors():
         next_dimension = {
             'id': 'victory',
             'icon': '🏆',
+            'icon_img': 'img/Desafios_nether_star.png',
             'name': 'Victoria',
             'url': url_for('victory_view'),
             'theme': 'victory',
@@ -284,6 +285,7 @@ def inject_brand_and_authors():
         next_dimension = {
             'id': 'the_end',
             'icon': '🌌',
+            'icon_img': 'img/Dimencion del end_end_stone.png',
             'name': 'The End',
             'url': url_for('the_end_view'),
             'theme': 'the_end',
@@ -292,6 +294,7 @@ def inject_brand_and_authors():
         next_dimension = {
             'id': 'nether',
             'icon': '🔥',
+            'icon_img': 'img/Dimencion del nether_netherrack.png',
             'name': 'Nether',
             'url': url_for('nether_view'),
             'theme': 'nether',
