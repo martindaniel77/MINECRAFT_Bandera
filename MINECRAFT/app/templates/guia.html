@@ -1,380 +1,848 @@
 {% extends "base.html" %}
 
-{% block title %}Guía para Estudiantes - Minecraft Security CTF{% endblock %}
+{% block title %}Guía de Aprendizaje - Minecraft Security CTF{% endblock %}
 
 {% block content %}
+{% set inv = session.get('inventory', []) %}
 <div class="ctf-page-container ctf-wide-layout">
 
   <div class="ctf-page-header">
-    <div class="header-icon"><img src="{{ url_for('static', filename='img/Guia_recipe_book.png') }}" alt=""
-        style="width:2.8rem;height:2.8rem;object-fit:contain;"></div>
+    <div class="header-icon"><img src="{{ url_for('static', filename='img/Guia_recipe_book.png') }}" alt="Libro de recetas de la guía"></div>
     <h1 class="ctf-page-title">GUÍA DE APRENDIZAJE PARA ESTUDIANTES</h1>
     <p class="ctf-page-desc">
-      Aprender ciberseguridad debe ser claro, estructurado y sin frustración. Esta guía explica los conceptos de cada
-      bandera, herramientas útiles y curiosidades. No es una solución paso a paso: la idea es que investigues y
-      practiques.
+      Esta guía explica a fondo cada tema de ciberseguridad que se practica en el laboratorio: qué es la vulnerabilidad,
+      cómo funciona por dentro, por qué importa, un ejemplo de código vulnerable, herramientas y comandos de ejemplo,
+      cómo defenderse y una curiosidad real. Es material de estudio, no una solución paso a paso: la idea es que
+      investigues, entiendas el error y practiques por tu cuenta.
     </p>
+  </div>
+
+  <nav class="guide-toc" aria-label="Índice de contenidos de la guía">
+    <div class="guide-toc-title">ÍNDICE DE CONTENIDOS</div>
+    <div class="guide-toc-links">
+      <a href="#flag-1">1 · Esteganografía</a>
+      <a href="#flag-2">2 · SQLi</a>
+      <a href="#flag-3">3 · Allowlist</a>
+      <a href="#flag-4">4 · XSS</a>
+      <a href="#flag-5">5 · File Upload</a>
+      <a href="#flag-6">6 · Access Control</a>
+      <a href="#flag-7">7 · Backdoor</a>
+      <a href="#flag-8">8 · Command Injection</a>
+      <a href="#flag-9">9 · PowerView</a>
+      <a href="#flag-10">10 · Método</a>
+      <a href="#flag-11">11 · Glosario</a>
+    </div>
+  </nav>
+
+  <!-- ==================================================================== -->
+  <!-- DIMENSIÓN 1: OVERWORLD                                                -->
+  <!-- ==================================================================== -->
+  <div class="guide-dimension-divider guide-dim-overworld">
+    <img src="{{ url_for('static', filename='img/Diemncion del over word_grass_block.png') }}" alt="">
+    <div>
+      <h2>Dimensión 1 · Overworld — Los fundamentos</h2>
+      <p>Datos ocultos, bases de datos y consolas restringidas. Aquí se aprende a observar antes de explotar.</p>
+    </div>
   </div>
 
   <div class="ctf-guide-grid ctf-guide-grid-wide">
 
-    <!-- ÍTEM 0 -->
-    <div class="ctf-guide-card">
+    <!-- BANDERA 1 -->
+    <article class="ctf-guide-card {% if 'iron' in inv %}is-solved{% endif %}" id="flag-1">
       <div class="guide-card-header">
-        <span class="guide-icon">🚩</span>
-        <h3>0. ¿Qué es una Bandera (Flag)?</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/iron_ingot.png') }}" alt="Lingote de hierro"></span>
+        <div class="guide-card-heading">
+          <h3>1. Lingote de Hierro</h3>
+          <span class="guide-card-subtitle">Esteganografía en metadatos, Base64 y cifrado César</span>
+        </div>
+        {% if 'iron' in inv %}<span class="guide-solved-badge">✓ Resuelta</span>{% endif %}
+      </div>
+      <div class="guide-card-meta">
+        <span class="guide-meta-item">Dificultad: Fácil</span>
+        <span class="guide-meta-item">Overworld</span>
+        <span class="guide-meta-item">Prerrequisito: ninguno</span>
+        <span class="guide-meta-item">Familia: cripto / forense</span>
       </div>
       <div class="guide-card-body">
-        <p><strong>Concepto:</strong> En un CTF, la bandera es el secreto que demuestra que comprometiste el reto. Al
-          ingresarla correctamente ganas XP y sumas el ítem a tu inventario.</p>
-        <div class="guide-example-box">
-          <strong>Formato oficial:</strong> <code>Flag{MINECRAFT_...}</code> o en mayúsculas <code>FLAG{...}</code>
-        </div>
-        <p><strong>Tema:</strong> Concepto general de CTF (Capture The Flag).</p>
-        <p><strong>Herramientas:</strong> Navegador, terminal de Kali Linux, editor de texto.</p>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Las flags nacieron en los primeros CTF académicos (UCSB iCTF, 2003) para
-          verificar automáticamente quién había comprometido un servicio.
-        </div>
-      </div>
-    </div>
+        <p class="guide-objective"><strong>Objetivo de aprendizaje:</strong> distinguir codificación de cifrado, extraer metadatos de un PNG y revertir dos capas (Base64 + ROT-13) sin conocer la bandera de antemano.</p>
 
-    <!-- BANDERA 1: HIERRO -->
-    <div class="ctf-guide-card">
-      <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/iron_ingot.png') }}" alt=""
-            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>1. Bandera — Lingote de Hierro: Esteganografía, Base64 y César</h3>
-      </div>
-      <div class="guide-card-body">
-        <p><strong>Concepto:</strong> La flag está oculta en los metadatos de una imagen. Debes extraerla, decodificar
-          una capa de transporte y deshacer un cifrado clásico.</p>
-        <p><strong>Tema:</strong> Esteganografía en metadatos + codificación Base64 + cifrado César (ROT-13).</p>
-        <p><strong>Explicación:</strong> Los archivos PNG pueden contener campos de texto (metadatos) que no se ven en
-          la imagen. El secreto se envuelve en Base64 y se cifra con un desplazamiento de 13 posiciones.</p>
-        <p><strong>Herramientas y comandos de ejemplo:</strong></p>
-        <pre class="guide-code"># Inspeccionar metadatos de una imagen:
+        <h4>¿Qué es?</h4>
+        <p>La <strong>esteganografía</strong> oculta la existencia misma de un mensaje dentro de otro archivo; la <strong>criptografía</strong> oculta su significado. En los PNG existen bloques de texto (<code>tEXt</code>, <code>iTXt</code>, <code>zTXt</code>) pensados para guardar autor, descripción o comentario. Son invisibles al abrir la imagen, pero cualquier herramienta de metadatos los lee.</p>
+        <p><strong>Base64</strong> no cifra: es una codificación de transporte que convierte bytes en 64 símbolos imprimibles (A–Z, a–z, 0–9, <code>+</code>, <code>/</code>, con <code>=</code> de relleno). Cualquiera puede decodificarla. El <strong>cifrado César</strong> desplaza cada letra un número fijo de posiciones; <strong>ROT-13</strong> usa 13 y es involutivo (aplicarlo dos veces devuelve el original).</p>
+
+        <h4>¿Cómo funciona?</h4>
+        <p>El reto guarda el secreto en el campo de comentario de la imagen. El flujo mental es: <em>ver el archivo → preguntar qué datos contiene → identificar una cadena rara → reconocer su formato → invertir las transformaciones en orden inverso</em>. El orden importa: si primero se cifró y después se codificó, debes decodificar y luego descifrar.</p>
+
+        <h4>¿Por qué importa?</h4>
+        <p>Los metadatos filtran información sensible en la vida real: autor, software usado, rutas locales e incluso coordenadas GPS de fotografías. Un atacante que solo mira "el contenido visible" se pierde una capa entera de información. Por eso el reconocimiento de archivos es una habilidad base en forense y en pentesting.</p>
+
+        <h4>Profundización</h4>
+        <p>Base64 incrementa el tamaño aproximadamente un 33 % porque representa 3 bytes con 4 caracteres. El sufijo <code>=</code> indica relleno. Una cadena que termina en <code>=</code> y solo usa ese alfabeto es una pista gráfica muy fuerte. ROT-13 se reconoce porque las letras tienen una distribución "desplazada" pero la estructura de palabras y símbolos se mantiene. También conviene saber que <code>strings</code> puede mostrar cadenas incrustadas aunque <code>exiftool</code> no interprete el campo.</p>
+
+        <span class="guide-section-label">Ejemplo de código vulnerable</span>
+        <pre class="guide-code"><code>comment = png.get_text("Comment")
+decoded = base64.b64decode(comment).decode("utf-8")
+flag = codecs.decode(decoded, "rot_13")
+print(flag)  # el secreto queda expuesto al que sepa leer metadatos</code></pre>
+
+        <span class="guide-section-label">Herramientas y comandos de ejemplo (no son la solución)</span>
+        <pre class="guide-code"><code># 1. Inspeccionar metadatos y buscar campos de texto:
 exiftool imagen.png
+strings imagen.png | head -40
 
-# Decodificar Base64:
-echo "TEXTO_BASE64" | base64 -d
+# 2. Decodificar la capa Base64:
+echo "CADENA_BASE64" | base64 -d
 
-# Aplicar ROT-13:
-echo "TEXTO" | tr 'A-Za-z' 'N-ZA-Mn-za-m'</pre>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> El cifrado César debe su nombre a Julio César. ROT-13 es un caso particular con
-          desplazamiento 13. Los metadatos han filtrado información sensible en casos reales (autor, software, rutas).
+# 3. Deshacer el desplazamiento César:
+echo "CADENA_ROT13" | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+
+# 4. Confirmar el tipo real del archivo:
+file imagen.png</code></pre>
+
+        <details class="guide-spoiler">
+          <summary>Pista conceptual (ábrela solo si te atascas)</summary>
+          <p>Hay dos capas y el orden importa. Prueba <code>Base64 → ROT-13</code> y también <code>ROT-13 → Base64</code>; quédate con la salida que tenga sentido legible. No necesitas adivinar la bandera.</p>
+        </details>
+
+        <div class="guide-defense-box"><strong>Cómo defenderse:</strong> elimina metadatos antes de publicar (<code>exiftool -all= imagen.png</code>) o vuelve a codificar la imagen. No incluyas rutas, nombres de usuario ni GPS. Trata los metadatos como datos no confiables y escanea archivos con DLP/AV.</div>
+
+        <div class="guide-checklist"><strong>Al terminar, comprueba que puedes:</strong>
+          <ul>
+            <li>Explicar por qué Base64 no es cifrado.</li>
+            <li>Describir qué hace <code>tr 'A-Za-z' 'N-ZA-Mn-za-m'</code>.</li>
+            <li>Nombrar dos metadatos que puedan filtrar información.</li>
+          </ul>
         </div>
-      </div>
-    </div>
 
-    <!-- BANDERA 2: DIAMANTE -->
-    <div class="ctf-guide-card">
+        <div class="guide-highlight-box"><strong>Curiosidad:</strong> el cifrado César debe su nombre a Julio César, que lo usaba para mensajes militares. ROT-13 es un caso particular y es su propio inverso. En casos reales, fotos con EXIF han revelado la ubicación exacta de quien las tomó.</div>
+      </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('overworld_view') }}" class="guide-challenge-link">Ir al reto →</a>
+        <a href="#flag-2" class="guide-next-link">Siguiente tema →</a>
+      </div>
+    </article>
+
+    <!-- BANDERA 2 -->
+    <article class="ctf-guide-card {% if 'diamond' in inv %}is-solved{% endif %}" id="flag-2">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/diamond.png') }}" alt=""
-            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>2. Bandera — Diamante: Inyección SQL (SQLi)</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/diamond.png') }}" alt="Diamante"></span>
+        <div class="guide-card-heading">
+          <h3>2. Diamante en Y=-58</h3>
+          <span class="guide-card-subtitle">Inyección SQL (SQLi)</span>
+        </div>
+        {% if 'diamond' in inv %}<span class="guide-solved-badge">✓ Resuelta</span>{% endif %}
+      </div>
+      <div class="guide-card-meta">
+        <span class="guide-meta-item">Dificultad: Media</span>
+        <span class="guide-meta-item">Overworld</span>
+        <span class="guide-meta-item">Prerrequisito: tema 1</span>
+        <span class="guide-meta-item">OWASP: A03 Injection</span>
       </div>
       <div class="guide-card-body">
-        <p><strong>Concepto:</strong> El buscador de cofres concatena tu entrada directamente en la consulta SQL.
-          Aprovechando eso puedes ver registros que deberían estar bloqueados.</p>
-        <p><strong>Tema:</strong> SQL Injection (SQLi).</p>
-        <p><strong>Explicación:</strong> La comilla simple cierra el texto esperado, <code>OR 1=1</code> hace verdadera
-          la condición para todos los registros y <code>--</code> comenta el resto de la consulta, anulando filtros como
-          <code>AND bloqueado = 0</code>.
-        </p>
-        <p><strong>Ejemplos de SQLi (para practicar):</strong></p>
-        <pre class="guide-code"># Bypass de login / filtro:
+        <p class="guide-objective"><strong>Objetivo de aprendizaje:</strong> reconocer cuándo una entrada del usuario se concatena en una consulta SQL y entender cómo cambiar la lógica de la consulta sin saber la sintaxis completa de la base de datos.</p>
+
+        <h4>¿Qué es?</h4>
+        <p>La <strong>inyección SQL</strong> ocurre cuando datos controlados por el usuario se insertan dentro de una sentencia SQL como si fueran código. La base de datos no distingue entre "texto que viene del formulario" y "instrucción escrita por el programador": ejecuta todo junto. Es el riesgo <strong>A03: Injection</strong> del OWASP Top 10.</p>
+
+        <h4>¿Cómo funciona?</h4>
+        <p>La aplicación construye la consulta con una cadena de texto. Una comilla simple <code>'</code> cierra el literal que esperaba el programador; a partir de ahí, lo que escribas es sintaxis SQL real. <code>OR 1=1</code> convierte la condición en verdadera para todas las filas y <code>--</code> comenta el resto de la línea, eliminando filtros posteriores como <code>AND is_locked = 0</code>. En consultas <code>LIKE '%...%'</code> hay que cerrar también el comodín.</p>
+
+        <h4>¿Por qué importa?</h4>
+        <p>Permite leer registros ajenos, saltarse autenticación, modificar o borrar datos y, según los privilegios del usuario de la base de datos, llegar a ejecutar comandos en el servidor. Es una de las vulnerabilidades más antiguas y más rentables: lleva décadas apareciendo en informes de incidentes.</p>
+
+        <h4>Profundización</h4>
+        <p>No todas las SQLi son iguales. En <strong>error-based</strong> la aplicación devuelve el error de la BD; en <strong>UNION-based</strong> se añaden columnas a la consulta original (deben coincidir en número y tipo); en <strong>boolean-based blind</strong> se infiere información según cambie o no la respuesta; en <strong>time-based blind</strong> se usa una función de retardo para medir el tiempo de respuesta. El motor importa: MySQL acepta <code>#</code> como comentario, SQLite y PostgreSQL suelen necesitar <code>-- </code> con espacio final. Por eso copiar payloads sin entender el contexto falla tan a menudo.</p>
+
+        <span class="guide-section-label">Ejemplo de código vulnerable</span>
+        <pre class="guide-code"><code>sql = f"SELECT * FROM cofres WHERE nombre LIKE '%{chest_query}%' AND is_locked = 0"
+cursor.execute(sql)  # la entrada del usuario se concatenó al SQL</code></pre>
+
+        <span class="guide-section-label">Ejemplos de SQLi para practicar (no son la solución)</span>
+        <pre class="guide-code"><code># Bypass de filtro / condición siempre verdadera:
 ' OR 1=1 --
 ' OR '1'='1
 admin' --
 
-# Union-based (conceptual):
+# UNION-based (conceptual, ajusta el número de columnas):
 ' UNION SELECT NULL, NULL --
 
 # Time-based (conceptual):
 ' OR SLEEP(5) --
 
-# Herramientas: sqlmap, Burp Suite, navegador.
-        </pre>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> La primera SQLi masiva se reportó en 1998. Hoy sigue siendo el riesgo #1 del
-          OWASP Top 10. La defensa es usar consultas parametrizadas.
-        </div>
-      </div>
-    </div>
+# Herramientas: sqlmap (con petición guardada), Burp Suite, navegador, sqlite3.
+sqlmap -r peticion.txt --dbs</code></pre>
 
-    <!-- BANDERA 3: CONSOLA DE LAS CUEVAS -->
-    <div class="ctf-guide-card">
+        <details class="guide-spoiler">
+          <summary>Pista conceptual (ábrela solo si te atascas)</summary>
+          <p>El buscador usa <code>LIKE '%...%'</code>. Piensa en cómo cerrar la comilla y el comodín a la vez, y en qué parte de la condición conviene neutralizar el filtro <code>is_locked</code>. Observa la respuesta: ¿cambia el número de resultados o solo el contenido?</p>
+        </details>
+
+        <div class="guide-defense-box"><strong>Cómo defenderse:</strong> usa <em>prepared statements</em> / consultas parametrizadas (<code>cursor.execute(sql, (valor,))</code>) en lugar de concatenar. Valida y normaliza la entrada, aplica mínimo privilegio al usuario de la BD y mantén un WAF como capa adicional, nunca como única defensa.</div>
+
+        <div class="guide-checklist"><strong>Al terminar, comprueba que puedes:</strong>
+          <ul>
+            <li>Explicar qué hace cada carácter de <code>' OR 1=1 --</code>.</li>
+            <li>Diferenciar SQLi UNION-based de time-based.</li>
+            <li>Escribir la versión segura de la consulta con parámetros.</li>
+          </ul>
+        </div>
+
+        <div class="guide-highlight-box"><strong>Curiosidad:</strong> la primera SQLi documentada apareció en 1998 en la revista <em>Phrack</em>. Hoy sigue ocupando el puesto A03 del OWASP Top 10 y suele aparecer en aplicaciones internas "de confianza".</div>
+      </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('overworld_view') }}" class="guide-challenge-link">Ir al reto →</a>
+        <a href="#flag-3" class="guide-next-link">Siguiente tema →</a>
+      </div>
+    </article>
+
+    <!-- BANDERA 3 -->
+    <article class="ctf-guide-card {% if 'portal' in inv %}is-solved{% endif %}" id="flag-3">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/nether_portal.svg') }}" alt=""
-            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>3. Bandera — Consola de las Cuevas: Enumeración y allowlist</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/nether_portal.svg') }}" alt="Portal al Nether"></span>
+        <div class="guide-card-heading">
+          <h3>3. Portal al Nether</h3>
+          <span class="guide-card-subtitle">Enumeración de rutas y validación por allowlist</span>
+        </div>
+        {% if 'portal' in inv %}<span class="guide-solved-badge">✓ Resuelta</span>{% endif %}
+      </div>
+      <div class="guide-card-meta">
+        <span class="guide-meta-item">Dificultad: Fácil</span>
+        <span class="guide-meta-item">Overworld</span>
+        <span class="guide-meta-item">Prerrequisito: tema 1</span>
+        <span class="guide-meta-item">OWASP: A01 / info disclosure</span>
       </div>
       <div class="guide-card-body">
-        <p><strong>Concepto:</strong> Una terminal restringida permite enumerar rutas y leer archivos para encontrar la
-          llave de ignición del portal.</p>
-        <p><strong>Tema:</strong> Enumeración de rutas y validación por allowlist.</p>
-        <p><strong>Explicación:</strong> La consola solo acepta una lista cerrada de comandos (<code>ls</code>,
-          <code>cat</code>, <code>help</code>, <code>clear</code>) y resuelve rutas contra un diccionario. No es una
-          shell real.
-        </p>
-        <p><strong>Herramientas y comandos de ejemplo:</strong></p>
-        <pre class="guide-code"># Enumerar:
+        <p class="guide-objective"><strong>Objetivo de aprendizaje:</strong> entender la diferencia entre una shell real y una consola simulada, y por qué una lista blanca de comandos es más segura que intentar prohibir todos los comandos peligrosos.</p>
+
+        <h4>¿Qué es?</h4>
+        <p>La <strong>enumerateción</strong> es la fase de reconocimiento en la que descubres qué recursos existen: archivos, carpetas, comandos o servicios. Una <strong>allowlist</strong> (lista blanca) es un mecanismo de control que solo permite lo que está explícitamente autorizado y rechaza todo lo demás por defecto.</p>
+
+        <h4>¿Cómo funciona?</h4>
+        <p>Esta consola no es un intérprete de comandos del sistema: acepta un conjunto cerrado (<code>ls</code>, <code>cat</code>, <code>help</code>, <code>clear</code>) y resuelve las rutas contra un diccionario interno. Es decir, el "sistema de archivos" es un mapa en memoria. El reto consiste en enumerar ese mapa y leer el archivo que contiene la llave de ignición.</p>
+
+        <h4>¿Por qué importa?</h4>
+        <p>Si una aplicación expone rutas, nombres de archivo o estructuras de directorios, está regalando información útil a un atacante. Y si además construye rutas concatenando la entrada del usuario sin normalizar, aparece el <em>path traversal</em>: usar <code>../</code> para salir del directorio permitido. Aquí el diseño con diccionario evita ese problema, pero conviene saber cómo se produce para reconocerlo en otros sistemas.</p>
+
+        <h4>Profundización</h4>
+        <p>Una <strong>blocklist</strong> (lista negra) intenta prohibir <code>rm</code>, <code>cat</code>, <code>;</code>, <code>../</code>… y siempre se queda corta: basta un comando, un alias o una codificación que nadie prohibió. La allowlist invierte la carga de la prueba: si algo no está en la lista, no se ejecuta. Este es el principio <em>default deny</em>. En rutas, la versión segura es normalizar con <code>os.path.realpath()</code> y comprobar que el resultado sigue dentro del directorio base.</p>
+
+        <span class="guide-section-label">Ejemplo de código con allowlist</span>
+        <pre class="guide-code"><code>ALLOWED = {"ls", "cat", "help", "clear"}
+
+if command not in ALLOWED:
+    return "Comando no permitido"
+
+# Las rutas se resuelven contra un diccionario, no contra el disco real:
+target = CAVE_ROUTES.get(argument)
+if target is None:
+    return "Ruta no encontrada"</code></pre>
+
+        <span class="guide-section-label">Comandos de ejemplo (no son la solución)</span>
+        <pre class="guide-code"><code># Enumerar el contenido de la raíz:
 ls
-ls /cueva/<nombre>
 
-# Leer archivos:
-cat /cueva/<nombre>/<archivo>
+# Entrar en una ruta y volver a listar:
+ls /cueva/&lt;nombre&gt;
 
-# Ayuda:
+# Leer un archivo concreto:
+cat /cueva/&lt;nombre&gt;/&lt;archivo&gt;
+
+# Ver los comandos aceptados:
 help
-        </pre>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Una consola que valida por <em>allowlist</em> solo ejecuta lo que está en la
-          lista. Las listas negras fallan porque siempre aparece un comando nuevo que nadie prohibió.
-        </div>
-      </div>
-    </div>
+clear</code></pre>
 
-    <!-- BANDERA 4: ORO / XSS -->
-    <div class="ctf-guide-card">
+        <details class="guide-spoiler">
+          <summary>Pista conceptual (ábrela solo si te atascas)</summary>
+          <p>Empieza con <code>ls</code> sin argumentos. La salida te da el nombre de la primera carpeta; repite el proceso dentro de ella. En algún nivel aparecerá un archivo de texto con el material para encender el portal.</p>
+        </details>
+
+        <div class="guide-defense-box"><strong>Cómo defenderse:</strong> validar comandos por allowlist, normalizar y acotar rutas, no exponer el mapa completo de archivos, registrar intentos de acceso fallidos y ejecutar cualquier funcionalidad de shell con el mínimo privilegio posible.</div>
+
+        <div class="guide-checklist"><strong>Al terminar, comprueba que puedes:</strong>
+          <ul>
+            <li>Explicar por qué una allowlist supera a una blocklist.</li>
+            <li>Definir path traversal y describir cómo se evita.</li>
+            <li>Diferenciar una shell real de una consola simulada.</li>
+          </ul>
+        </div>
+
+        <div class="guide-highlight-box"><strong>Curiosidad:</strong> los <em>bad characters filters</em> de los años 90 prohibían espacios y puntos y comilla, pero olvidaban tabuladores o saltos de línea. Es el origen de muchos bypasses clásicos: prohibir no es lo mismo que permitir solo lo seguro.</div>
+      </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('overworld_view') }}" class="guide-challenge-link">Ir al reto →</a>
+        <a href="#flag-4" class="guide-next-link">Siguiente tema →</a>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- DIMENSIÓN 2: NETHER                                                   -->
+  <!-- ==================================================================== -->
+  <div class="guide-dimension-divider guide-dim-nether">
+    <img src="{{ url_for('static', filename='img/Dimencion del nether_netherrack.png') }}" alt="">
+    <div>
+      <h2>Dimensión 2 · Nether — Ataques web y de servidor</h2>
+      <p>Scripts que se ejecutan en navegadores ajenos, archivos que no deberían ejecutarse y roles que el cliente puede mentir.</p>
+    </div>
+  </div>
+
+  <div class="ctf-guide-grid ctf-guide-grid-wide">
+
+    <!-- BANDERA 4 -->
+    <article class="ctf-guide-card {% if 'gold' in inv %}is-solved{% endif %}" id="flag-4">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/gold_ingot.png') }}" alt=""
-            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>4. Bandera — Lingote de Oro: Stored XSS y robo de cookies</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/gold_ingot.png') }}" alt="Lingote de oro"></span>
+        <div class="guide-card-heading">
+          <h3>4. Lingote de Oro</h3>
+          <span class="guide-card-subtitle">Stored XSS y robo de cookies de sesión</span>
+        </div>
+        {% if 'gold' in inv %}<span class="guide-solved-badge">✓ Resuelta</span>{% endif %}
+      </div>
+      <div class="guide-card-meta">
+        <span class="guide-meta-item">Dificultad: Media</span>
+        <span class="guide-meta-item">Nether</span>
+        <span class="guide-meta-item">Prerrequisito: nociones de HTML</span>
+        <span class="guide-meta-item">OWASP: A03 XSS</span>
       </div>
       <div class="guide-card-body">
-        <p><strong>Concepto:</strong> Inyectas código JavaScript en una nota pública. Otro usuario (el Piglin Guard) la
-          ejecuta en su navegador con sus permisos, permitiendo robar su sesión.</p>
-        <p><strong>Tema:</strong> Stored XSS y robo de cookies de sesión.</p>
-        <p><strong>Explicación:</strong> El tablón muestra la nota sin escaparla. El navegador del Guard interpreta el
-          script y puede enviar la cookie a un endpoint del servidor.</p>
-        <p><strong>Más ejemplos de script (XSS):</strong></p>
-        <pre class="guide-code">&lt;script&gt;alert(1)&lt;/script&gt;
+        <p class="guide-objective"><strong>Objetivo de aprendizaje:</strong> comprender por qué guardar y volver a mostrar texto sin escaparlo permite ejecutar JavaScript en el navegador de otra persona, y qué barreras (CSP, HttpOnly) limitan el daño.</p>
+
+        <h4>¿Qué es?</h4>
+        <p><strong>Cross-Site Scripting (XSS)</strong> es una vulnerabilidad de inyección de código en el lado del cliente: la aplicación incluye datos del usuario en una página sin escaparlos y el navegador los interpreta como HTML o JavaScript. Hay tres variantes: <em>reflejado</em> (el payload va en la petición y vuelve en la respuesta), <em>almacenado</em> (se guarda en la base de datos y afecta a quien visite después) y <em>DOM-based</em> (el script modifica el DOM en el navegador).</p>
+
+        <h4>¿Cómo funciona?</h4>
+        <p>Aquí el ataque es <strong>almacenado</strong>: escribes una nota en el tablón de ofertas, el servidor la guarda sin sanitizar y la plantilla la renderiza con <code>|safe</code>, que desactiva el escapado automático. Cuando el Piglin Guard abre la página con su sesión privilegiada, su navegador ejecuta el script como si la aplicación misma lo hubiera escrito.</p>
+
+        <h4>¿Por qué importa?</h4>
+        <p>El JavaScript ejecutado corre en el contexto del dominio de la víctima: puede leer <code>document.cookie</code> (si no es HttpOnly), hacer peticiones en su nombre, capturar pulsaciones de teclado, redirigir a un sitio falso o modificar el contenido de la página. El XSS almacenado es el más peligroso porque no necesitas convencer a nadie de pulsar un enlace: basta con que visite la página.</p>
+
+        <h4>Profundización</h4>
+        <p>El escapado depende del <strong>contexto</strong>. No es lo mismo insertar datos dentro de texto HTML, dentro de un atributo entre comillas, dentro de un bloque <code>&lt;script&gt;</code> o dentro de una URL: cada contexto necesita una codificación distinta. Por eso "quitar &lt;script&gt;" nunca es una defensa completa: existen <code>&lt;img onerror&gt;</code>, <code>&lt;svg onload&gt;</code> y muchas otras etiquetas y eventos. Las cookies con <code>HttpOnly</code> impiden leerlas desde JavaScript, y una <strong>CSP</strong> con <code>nonce</code> o <code>hash</code> puede bloquear scripts inline aunque el HTML sea vulnerable.</p>
+
+        <span class="guide-section-label">Ejemplo de código vulnerable</span>
+        <pre class="guide-code"><code>note_to_piglin = request.form.get("note_to_piglin", "")
+# se guarda sin sanitizar y luego se muestra con |safe:
+# &lt;div&gt;{{ note_to_piglin | safe }}&lt;/div&gt;</code></pre>
+
+        <span class="guide-section-label">Más ejemplos de script (no son la solución)</span>
+        <pre class="guide-code"><code>&lt;script&gt;alert(1)&lt;/script&gt;
 &lt;script&gt;console.log('XSS')&lt;/script&gt;
 &lt;img src=x onerror=alert(1)&gt;
 &lt;svg onload=alert(1)&gt;
 &lt;body onload=alert(1)&gt;
 &lt;a href="javascript:alert(1)"&gt;haz clic&lt;/a&gt;
-&lt;iframe src="javascript:alert(1)"&gt;&lt;/iframe&gt;
+&lt;iframe src="javascript:alert(1)"&gt;&lt;/iframe&gt;</code></pre>
 
-# Robo de cookies (conceptual):
-&lt;script&gt;fetch('/endpoint?cookie=' + encodeURIComponent(document.cookie));&lt;/script&gt;
-        </pre>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> El worm "Samy" en MySpace (2005) infectó a más de un millón de perfiles en una
-          hora usando XSS almacenado. La defensa es escapar/validar la entrada y usar CSP.
+        <details class="guide-spoiler">
+          <summary>Payload de referencia (ábrelo solo si te atascas)</summary>
+          <pre class="guide-code"><code>&lt;script&gt;fetch('/endpoint?cookie=' + encodeURIComponent(document.cookie));&lt;/script&gt;</code></pre>
+          <p>Observa qué información sale del navegador de la víctima y hacia dónde. En un entorno real, ese endpoint sería controlado por el atacante.</p>
+        </details>
+
+        <div class="guide-defense-box"><strong>Cómo defenderse:</strong> escapar la salida según el contexto (nunca <code>|safe</code> con datos de usuario), validar la entrada, usar una Content Security Policy estricta, marcar cookies con <code>HttpOnly</code>, <code>Secure</code> y <code>SameSite</code>, y sanitizar HTML con una librería reconocida si se permite formato.</div>
+
+        <div class="guide-checklist"><strong>Al terminar, comprueba que puedes:</strong>
+          <ul>
+            <li>Diferenciar XSS reflejado, almacenado y DOM-based.</li>
+            <li>Explicar por qué <code>|safe</code> es peligroso aquí.</li>
+            <li>Nombrar dos medidas que reduzcan el impacto aunque exista XSS.</li>
+          </ul>
         </div>
-      </div>
-    </div>
 
-    <!-- BANDERA 5: BLAZE / FILE UPLOAD -->
-    <div class="ctf-guide-card">
+        <div class="guide-highlight-box"><strong>Curiosidad:</strong> en 2005 el gusano "Samy" se propagó por MySpace usando XSS almacenado: cada perfil visitado infectaba al visitante. En menos de una hora superó el millón de perfiles y MySpace tuvo que cerrar temporalmente la web.</div>
+      </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('nether_view') }}" class="guide-challenge-link">Ir al reto →</a>
+        <a href="#flag-5" class="guide-next-link">Siguiente tema →</a>
+      </div>
+    </article>
+
+    <!-- BANDERA 5 -->
+    <article class="ctf-guide-card {% if 'blaze' in inv %}is-solved{% endif %}" id="flag-5">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/blaze_rod.png') }}" alt=""
-            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>5. Bandera — Vara de Blaze: Subida de archivos a RCE</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/blaze_rod.png') }}" alt="Vara de blaze"></span>
+        <div class="guide-card-heading">
+          <h3>5. Vara de Blaze</h3>
+          <span class="guide-card-subtitle">Unrestricted File Upload → RCE</span>
+        </div>
+        {% if 'blaze' in inv %}<span class="guide-solved-badge">✓ Resuelta</span>{% endif %}
+      </div>
+      <div class="guide-card-meta">
+        <span class="guide-meta-item">Dificultad: Media</span>
+        <span class="guide-meta-item">Nether</span>
+        <span class="guide-meta-item">Prerrequisito: tema 3</span>
+        <span class="guide-meta-item">OWASP: A04 / RCE</span>
       </div>
       <div class="guide-card-body">
-        <p><strong>Concepto:</strong> Un formulario permite subir archivos y además ejecutarlos. Sin validación de
-          extensión ni contenido, puedes subir código malicioso.</p>
-        <p><strong>Tema:</strong> Unrestricted File Upload → ejecución remota de código (RCE).</p>
-        <p><strong>Explicación:</strong> El servidor guarda el archivo con el nombre y tipo que tú indicas y ofrece una
-          forma de ejecutarlo. Un script en Python puede leer archivos del servidor.</p>
-        <p><strong>Comandos para crear la carpeta/archivo desde la terminal:</strong></p>
-        <pre class="guide-code"># Crear una carpeta de trabajo:
-mkdir -p ~/ctf/blaze && cd ~/ctf/blaze
+        <p class="guide-objective"><strong>Objetivo de aprendizaje:</strong> identificar qué validaciones faltan en un formulario de subida y entender cómo un archivo inocente se convierte en ejecución remota de código.</p>
+
+        <h4>¿Qué es?</h4>
+        <p>La <strong>subida de archivos irrestricta</strong> ocurre cuando el servidor acepta cualquier archivo, no comprueba su tipo real y además lo guarda en un lugar desde el que puede ser ejecutado. El resultado es una <strong>webshell</strong>: un script subido por el atacante que el servidor ejecuta con sus propios permisos.</p>
+
+        <h4>¿Cómo funciona?</h4>
+        <p>El formulario recibe el archivo, <code>secure_filename()</code> limpia el nombre (quita rutas y caracteres raros) pero <em>no valida la extensión ni el contenido</em>. Luego se guarda en una carpeta accesible y existe una forma de ejecutarlo. Un script de Python puede abrir archivos del servidor y devolver su contenido: eso ya es RCE (<em>Remote Code Execution</em>).</p>
+
+        <h4>¿Por qué importa?</h4>
+        <p>La ejecución remota de código es el escalation máximo en un servidor web: permite leer credenciales, moverse lateralmente, instalar persistencia o usar el equipo como plataforma de ataque. Un simple formulario de "sube tu avatar" mal validado ha sido el punto de entrada de numerosos incidentes reales.</p>
+
+        <h4>Profundización</h4>
+        <p>Validar solo por extensión es insuficiente: <code>foto.png.php</code> puede engañar a un filtro que mira solo el final, y el <code>Content-Type</code> lo envía el cliente, así que se puede falsificar. Lo robusto es comprobar los <strong>magic bytes</strong> del archivo (los primeros bytes que identifican el formato), usar una allowlist de extensiones, renombrar el archivo con un nombre aleatorio, guardarlo <em>fuera</em> del directorio web y asegurar que el servidor no tenga permiso de ejecución en la carpeta de subidas.</p>
+
+        <span class="guide-section-label">Ejemplo de código vulnerable</span>
+        <pre class="guide-code"><code>filename = secure_filename(file.filename)
+file.save(os.path.join(UPLOAD_FOLDER, filename))
+# Sin allowlist de extensión, sin comprobación de magic bytes
+# y con ruta de ejecución accesible para el usuario.</code></pre>
+
+        <span class="guide-section-label">Comandos para crear la carpeta y el script desde la terminal</span>
+        <pre class="guide-code"><code># Crear un directorio de trabajo:
+mkdir -p ~/ctf/blaze &amp;&amp; cd ~/ctf/blaze
 
 # Crear el script con un editor:
 nano receta.py
-# o con echo:
-echo "print(open('/ruta/del/archivo').read())" > receta.py
 
-# Ver el contenido:
+# O generarlo con una línea:
+echo "print(open('/ruta/del/archivo').read())" &gt; receta.py
+
+# Comprobar lo que has creado:
 cat receta.py
-ls -la
-        </pre>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> La falta de validación de extensiones es la causa de muchos incidentes reales: un
-          formulario de "subir avatar" que termina ejecutando un webshell. La defensa es validar extensión, MIME y
-          contenido.
-        </div>
-      </div>
-    </div>
+ls -la</code></pre>
 
-    <!-- BANDERA 6: PEARL / PRIVILEGE ESCALATION -->
-    <div class="ctf-guide-card">
+        <details class="guide-spoiler">
+          <summary>Pista conceptual (ábrela solo si te atascas)</summary>
+          <p>Piensa en el contenido del script antes que en su nombre: ¿qué información quieres que el servidor te devuelva? Después observa qué extensión acepta el formulario y cómo se ofrece la ejecución. La extensión correcta es parte del rompecabezas.</p>
+        </details>
+
+        <div class="guide-defense-box"><strong>Cómo defenderse:</strong> allowlist de extensiones y MIME, verificación de magic bytes, almacenamiento fuera del webroot, nombres aleatorios, permisos de solo lectura en la carpeta de subidas, desactivar la ejecución de scripts en esa ruta y escanear los archivos con antivirus.</div>
+
+        <div class="guide-checklist"><strong>Al terminar, comprueba que puedes:</strong>
+          <ul>
+            <li>Explicar por qué <code>secure_filename()</code> no basta.</li>
+            <li>Definir webshell y RCE con tus palabras.</li>
+            <li>Listar tres validaciones que debería tener el formulario.</li>
+          </ul>
+        </div>
+
+        <div class="guide-highlight-box"><strong>Curiosidad:</strong> muchas webshells se han ocultado dentro de imágenes reales (unión de bytes válidos de PNG más código PHP/Python al final). Por eso mirar solo la extensión o el icono del archivo nunca es suficiente.</div>
+      </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('nether_view') }}" class="guide-challenge-link">Ir al reto →</a>
+        <a href="#flag-6" class="guide-next-link">Siguiente tema →</a>
+      </div>
+    </article>
+
+    <!-- BANDERA 6 -->
+    <article class="ctf-guide-card {% if 'pearl' in inv %}is-solved{% endif %}" id="flag-6">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/ender_pearl.png') }}" alt=""
-            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>6. Bandera — Ojo de Ender: Violación de mínimo privilegio</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/ender_pearl.png') }}" alt="Ojo de Ender"></span>
+        <div class="guide-card-heading">
+          <h3>6. Ojo de Ender</h3>
+          <span class="guide-card-subtitle">Broken Access Control y parameter tampering</span>
+        </div>
+        {% if 'pearl' in inv %}<span class="guide-solved-badge">✓ Resuelta</span>{% endif %}
+      </div>
+      <div class="guide-card-meta">
+        <span class="guide-meta-item">Dificultad: Media</span>
+        <span class="guide-meta-item">Nether</span>
+        <span class="guide-meta-item">Prerrequisito: tema 3</span>
+        <span class="guide-meta-item">OWASP: A01 Broken Access Control</span>
       </div>
       <div class="guide-card-body">
-        <p><strong>Concepto:</strong> El servidor decide tu rol a partir de un dato que tú mismo envías (parámetro o
-          cookie). Si lo modificas, puedes obtener privilegios que no te corresponden.</p>
-        <p><strong>Tema:</strong> Broken Access Control / parameter tampering.</p>
-        <p><strong>Explicación:</strong> Esto se conoce como "decide by client": el cliente puede mentir sobre su
-          identidad o rol. En la práctica, cambiar un parámetro en la URL o en una cookie ha dado acceso de
-          administrador.</p>
-        <p><strong>Flujo de carpetas en la terminal:</strong></p>
-        <pre class="guide-code"># Ver dónde estás:
+        <p class="guide-objective"><strong>Objetivo de aprendizaje:</strong> entender que el navegador es un cliente hostil y que ninguna decisión de seguridad puede tomarse en función de un dato que el propio cliente envía.</p>
+
+        <h4>¿Qué es?</h4>
+        <p>El <strong>control de acceso roto</strong> (<em>Broken Access Control</em>, A01 del OWASP Top 10) agrupa los fallos que permiten a un usuario hacer cosas para las que no está autorizado. El <strong>parameter tampering</strong> es una de sus formas: modificar parámetros, cookies o campos ocultos para engañar al servidor sobre tu identidad o tu rol.</p>
+
+        <h4>¿Cómo funciona?</h4>
+        <p>El servidor lee el rol desde un parámetro o una cookie (<code>user_role</code>) y decide qué permisos conceder. Como ese valor viaja en la petición, quien controla el navegador puede cambiarlo. El error no está en que el dato sea modificable —todos lo son—, sino en que el servidor lo acepte como prueba de identidad sin contrastarlo con la sesión real.</p>
+
+        <h4>¿Por qué importa?</h4>
+        <p>Es la puerta más directa a la escalada de privilegios: pasar de "visitante" a "administrador" con cambiar una cadena. Una variante muy común es el <strong>IDOR</strong> (<em>Insecure Direct Object Reference</em>): cambiar un identificador en la petición para ver el registro de otra persona. OWASP lo coloca en el puesto A01 precisamente por su frecuencia y su impacto.</p>
+
+        <h4>Profundización</h4>
+        <p>El <em>flujo de carpetas en la terminal</em> que aparece abajo no es decorativo: es la fase de <strong>reconocimiento local</strong>. Con <code>pwd</code>, <code>ls</code>, <code>cd</code>, <code>find</code> y <code>cat</code> descubres dónde están los artefactos del reto y qué nombres usan. Después aplicas el mismo criterio a la capa web: con Burp Suite interceptas la petición y observas qué campos viajan (rol, usuario, identificador). La habilidad transferible es la misma: <em>descubrir qué datos controla el cliente y preguntarse si el servidor debería fiarse de ellos</em>.</p>
+
+        <span class="guide-section-label">Ejemplo de código vulnerable</span>
+        <pre class="guide-code"><code>user_role = request.args.get("user_role") or request.cookies.get("user_role", "guest_traveler")
+
+if user_role in ["ender_master", "admin"]:
+    grant_secret_access()  # se concede acceso sin verificar la sesión real</code></pre>
+
+        <span class="guide-section-label">Flujo de carpetas en la terminal (reconocimiento)</span>
+        <pre class="guide-code"><code># ¿Dónde estoy?
 pwd
 
-# Listar contenido:
+# ¿Qué hay aquí?
 ls -la
 
-# Entrar a una carpeta:
+# Entrar y subir un nivel:
 cd nombre_carpeta
-
-# Subir un nivel:
 cd ..
 
-# Buscar archivos:
+# Localizar y leer archivos:
 find . -name "*.txt"
+cat archivo.txt</code></pre>
 
-# Leer un archivo:
-cat archivo.txt
+        <details class="guide-spoiler">
+          <summary>Pista conceptual (ábrela solo si te atascas)</summary>
+          <p>Con la terminal identifica los nombres que usa el sistema. Luego, en la petición web, fíjate en el campo que indica tu rol: el servidor confía en él más de lo que debería. No necesitas una contraseña; necesitas que el servidor pregunte a su propia sesión, no al cliente.</p>
+        </details>
 
-# (La idea es inspeccionar el sistema de archivos y entender cómo se organizan los recursos.)
-        </pre>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Cambiar un parámetro en la URL o en una cookie ha dado acceso de administrador en
-          sistemas reales (IDOR / broken access control). La defensa es validar permisos en el servidor.
+        <div class="guide-defense-box"><strong>Cómo defenderse:</strong> decidir permisos siempre en el servidor a partir de la sesión autenticada; nunca confiar en parámetros, cookies ni campos ocultos; firmar o cifrar las cookies; aplicar RBAC con <em>default deny</em> y verificar la propiedad de cada objeto (defensa contra IDOR).</div>
+
+        <div class="guide-checklist"><strong>Al terminar, comprueba que puedes:</strong>
+          <ul>
+            <li>Explicar por qué "el cliente miente" es el punto de partida.</li>
+            <li>Definir IDOR y en qué se parece al parameter tampering.</li>
+            <li>Escribir la comprobación segura usando la sesión del servidor.</li>
+          </ul>
         </div>
-      </div>
-    </div>
 
-    <!-- BANDERA 7: CRYSTALS / CVE -->
-    <div class="ctf-guide-card">
+        <div class="guide-highlight-box"><strong>Curiosidad:</strong> durante años, numerosos paneles de administración consideraban "administrador" a quien enviaba un parámetro <code>admin=true</code>. La corrección no fue ocultar el parámetro, sino dejar de creer en él.</div>
+      </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('nether_view') }}" class="guide-challenge-link">Ir al reto →</a>
+        <a href="#flag-7" class="guide-next-link">Siguiente tema →</a>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- DIMENSIÓN 3: THE END                                                  -->
+  <!-- ==================================================================== -->
+  <div class="guide-dimension-divider guide-dim-end">
+    <img src="{{ url_for('static', filename='img/Dimencion del end_end_stone.png') }}" alt="">
+    <div>
+      <h2>Dimensión 3 · The End — Servicios, shells y Active Directory</h2>
+      <p>Puertas traseras en servicios, comandos del sistema y enumeración de un dominio completo.</p>
+    </div>
+  </div>
+
+  <div class="ctf-guide-grid ctf-guide-grid-wide">
+
+    <!-- BANDERA 7 -->
+    <article class="ctf-guide-card {% if 'crystals' in inv %}is-solved{% endif %}" id="flag-7">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/end_crystal.png') }}" alt=""
-            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>7. Bandera — Cristales del End: Explotación de servicio y backdoor</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/end_crystal.png') }}" alt="Cristal del End"></span>
+        <div class="guide-card-heading">
+          <h3>7. Cristales del End</h3>
+          <span class="guide-card-subtitle">Explotación de servicio y backdoor (CVE simulado)</span>
+        </div>
+        {% if 'crystals' in inv %}<span class="guide-solved-badge">✓ Resuelta</span>{% endif %}
+      </div>
+      <div class="guide-card-meta">
+        <span class="guide-meta-item">Dificultad: Media/Alta</span>
+        <span class="guide-meta-item">The End</span>
+        <span class="guide-meta-item">Prerrequisito: tema 6</span>
+        <span class="guide-meta-item">Familia: exploit / supply chain</span>
       </div>
       <div class="guide-card-body">
-        <p><strong>Concepto:</strong> Un servicio interno tiene una puerta atrás (backdoor) que compara tu entrada
-          contra un token fijo y, si coincide, ejecuta comandos.</p>
-        <p><strong>Tema:</strong> Explotación de servicio / backdoor (CVE simulado).</p>
-        <p><strong>Explicación:</strong> Estas backdoors casi nunca se aleatorizan: comparan tu entrada contra un token
-          fijo. El proveedor y el año suelen estar escritos en el propio token.</p>
-        <p><strong>Más ejemplos de exploit (incluye el necesario):</strong></p>
-        <pre class="guide-code"># Payloads de ejemplo para servicios con backdoor:
-CVE-2026-OVERLOAD;shatter_crystals
-AB;shatter_crystals
-OVERLOAD_CRYSTALS
+        <p class="guide-objective"><strong>Objetivo de aprendizaje:</strong> reconocer el patrón de una puerta trasera por token fijo, entender cómo se activa y por qué ese diseño es tan frágil frente a cualquiera que lea el código.</p>
 
-# Concatenación de comandos (conceptual):
-valor; ls
-valor && whoami
-valor | cat /etc/passwd
+        <h4>¿Qué es?</h4>
+        <p>Una <strong>backdoor</strong> o puerta trasera es código deliberadamente oculto en un sistema para permitir acceso no autorizado. Un <strong>CVE</strong> (<em>Common Vulnerabilities and Exposures</em>) es un identificador público para una vulnerabilidad conocida. Aquí se simula un servicio con una backdoor activable por una cadena concreta.</p>
 
-# Otros triggers comunes:
-shatter_crystals
+        <h4>¿Cómo funciona?</h4>
+        <p>El servicio recibe tu payload y lo compara con una lista de disparadores (<em>triggers</em>) escritos literalmente en el código. Si alguno aparece, ejecuta una orden interna que destruye los cristales. No hay autenticación, no hay firma criptográfica: solo una comparación de texto. Por eso basta con descubrir el token para activarla.</p>
+
+        <h4>¿Por qué importa?</h4>
+        <p>Las backdoors converting cualquier superficie de entrada en un interruptor de acceso total. Son especialmente graves cuando llegan por <strong>supply chain</strong>: el software legítimo que instalas ya contiene la puerta. El impacto típico es ejecución remota, persistencia y robo de información sin generar eventos de login normales.</p>
+
+        <h4>Profundización</h4>
+        <p>Esta backdoor usa un token fijo, lo que la hace muy detectable por quien lea el código fuente o compare hashes del binario con una versión confiable. En el mundo real hay backdoors más sutiles: se activan con una cabecera HTTP concreta, con un <em>User-Agent</em> extraño o con una secuencia de bytes en un protocolo. Por eso la defensa combina revisión de código, firma de artefactos, comparación de integridad, SBOM y monitorización de procesos hijos de servicios web. Fíjate también en la diferencia entre un trigger simple (<code>token</code>) y uno con concatenación (<code>token;acción</code>): el segundo aprovecha que la entrada acaba llegando a una shell, tema de la bandera 8.</p>
+
+        <span class="guide-section-label">Ejemplo de código vulnerable</span>
+        <pre class="guide-code"><code>TRIGGERS = ["CVE-2026-OVERLOAD", "AB;", "shatter_crystals", "OVERLOAD_CRYSTALS"]
+
+if any(trigger in payload for trigger in TRIGGERS):
+    run_sandboxed("shatter_crystals")  # acceso sin autenticación</code></pre>
+
+        <span class="guide-section-label">Más ejemplos de exploit (no son la solución)</span>
+        <pre class="guide-code"><code># Formas típicas de escribir un disparador:
 CVE-2026-OVERLOAD
-        </pre>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Backdoors reales se han escondido en software legítimo (servidores IRC,
-          compiladores) y se activaban con una secuencia exacta de bytes.
-        </div>
-      </div>
-    </div>
+AB;
+OVERLOAD_CRYSTALS
+shatter_crystals
 
-    <!-- BANDERA 8: DRAGON / COMMAND INJECTION -->
-    <div class="ctf-guide-card">
+# Concatenación conceptual (prepara el tema de Command Injection):
+valor; ls
+valor &amp;&amp; whoami
+valor | cat /etc/passwd</code></pre>
+
+        <details class="guide-spoiler">
+          <summary>Payload de referencia (ábrelo solo si te atascas)</summary>
+          <pre class="guide-code"><code>CVE-2026-OVERLOAD;shatter_crystals</code></pre>
+          <p>Fíjate en que combina el identificador de la "vulnerabilidad" con la acción. El proveedor y el año suelen aparecer escritos en el propio token: es una pista, no una coincidencia.</p>
+        </details>
+
+        <div class="guide-defense-box"><strong>Cómo defenderse:</strong> eliminar la backdoor y auditar el código, verificar integridad y firmas de dependencias, mantener un SBOM, aplicar parches, restringir qué comandos puede lanzar el servicio y alertar sobre procesos inesperados.</div>
+
+        <div class="guide-checklist"><strong>Al terminar, comprueba que puedes:</strong>
+          <ul>
+            <li>Describir una backdoor por token fijo y por qué es detectable.</li>
+            <li>Explicar qué es un CVE y para qué sirve.</li>
+            <li>Relacionar este reto con el riesgo de supply chain.</li>
+          </ul>
+        </div>
+
+        <div class="guide-highlight-box"><strong>Curiosidad:</strong> se han encontrado backdoors en software legítimo que se activaban solo al recibir una secuencia exacta de bytes. Algunos estaban en compiladores: el código malicioso no estaba en tu programa, aparecía cuando el compilador lo generaba.</div>
+      </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('the_end_view') }}" class="guide-challenge-link">Ir al reto →</a>
+        <a href="#flag-8" class="guide-next-link">Siguiente tema →</a>
+      </div>
+    </article>
+
+    <!-- BANDERA 8 -->
+    <article class="ctf-guide-card {% if 'dragon' in inv %}is-solved{% endif %}" id="flag-8">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/ender_dragon.png') }}" alt=""
-            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>8. Bandera — Ender Dragón: Inyección de comandos (Command Injection)</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/ender_dragon.png') }}" alt="Ender Dragón"></span>
+        <div class="guide-card-heading">
+          <h3>8. Ender Dragón</h3>
+          <span class="guide-card-subtitle">Inyección de comandos (Command Injection)</span>
+        </div>
+        {% if 'dragon' in inv %}<span class="guide-solved-badge">✓ Resuelta</span>{% endif %}
+      </div>
+      <div class="guide-card-meta">
+        <span class="guide-meta-item">Dificultad: Alta</span>
+        <span class="guide-meta-item">The End</span>
+        <span class="guide-meta-item">Prerrequisito: tema 7</span>
+        <span class="guide-meta-item">OWASP: A03 Injection</span>
       </div>
       <div class="guide-card-body">
-        <p><strong>Concepto:</strong> Tu entrada se inserta dentro de una línea que se ejecuta en una shell. Si terminas
-          el comando antes, la shell interpreta el resto como una orden nueva.</p>
-        <p><strong>Tema:</strong> Command Injection.</p>
-        <p><strong>Explicación:</strong> La shell no sabe dónde acaba tu dato. Usando metacaracteres como
-          <code>;</code>, <code>&amp;&amp;</code> o <code>|</code> puedes ejecutar comandos adicionales.
-        </p>
-        <p><strong>Comando inicial (ejemplo):</strong></p>
-        <pre class="guide-code"># Comando inicial para empezar la inyección:
-100; cat /secret/dragon_slain.txt
+        <p class="guide-objective"><strong>Objetivo de aprendizaje:</strong> entender cómo un dato del usuario se convierte en parte de una orden del sistema operativo y cómo usar metacaracteres para cambiar el comando que se ejecuta.</p>
+
+        <h4>¿Qué es?</h4>
+        <p>La <strong>inyección de comandos</strong> (<em>OS Command Injection</em>) ocurre cuando una aplicación pasa entrada del usuario a una shell del sistema operativo sin sanitizarla. La diferencia con SQLi es el intérprete: aquí no engañas a una base de datos, engañas a <code>/bin/sh</code>, <code>cmd.exe</code> o equivalente.</p>
+
+        <h4>¿Cómo funciona?</h4>
+        <p>El código construye una cadena con una f-string y la ejecuta con <code>shell=True</code>. La shell analiza esa cadena completa y no sabe qué parte era tu dato y cuál era la orden original. Los metacaracteres <code>;</code>, <code>&amp;&amp;</code>, <code>|</code>, <code>&amp;</code>, <code>$( )</code>, las comillas invertidas y el salto de línea tienen significado especial: permiten terminar el comando legítimo y añadir otro.</p>
+
+        <h4>¿Por qué importa?</h4>
+        <p>Es ejecución remota de código en su forma más directa: leer archivos, listar directorios, abrir una reverse shell, modificar configuración o moverse a otros equipos de la red. El proceso se ejecuta con los permisos del servicio web, así que el impacto depende de cómo esté configurado ese usuario.</p>
+
+        <h4>Profundización</h4>
+        <p>La raíz del problema es <code>shell=True</code>. Con <code>subprocess.run(["echo", valor], shell=False)</code>, el valor se pasa como <em>un único argumento</em> y ningún metacarácter se interpreta: es la forma correcta. Cuando no queda más remedio que usar shell, hay que escapar con <code>shlex.quote()</code> y validar con una allowlist, pero seguirá siendo frágil. También existe la <em>blind command injection</em>: la aplicación no devuelve la salida, así que se confirma con retardos (<code>sleep</code>) o con peticiones salientes. El playground del reto muestra en tiempo real cómo se construye el comando y qué metacaracteres introduces: úsalo para observar, no solo para acertar.</p>
+
+        <span class="guide-section-label">Ejemplo de código vulnerable</span>
+        <pre class="guide-code"><code>cmd = f"echo 'Calculando impacto de flecha: potencia {shot_power}'"
+output, error = run_sandboxed(cmd, shell=True)
+# shot_power llega sin validar y se interpreta como sintaxis de shell</code></pre>
+
+        <span class="guide-section-label">Comandos de ejemplo (no son la solución)</span>
+        <pre class="guide-code"><code># Metacaracteres y qué hacen:
+valor; comando      # ejecuta el segundo comando después del primero
+valor &amp;&amp; comando    # ejecuta el segundo solo si el primero funciona
+valor | comando     # usa la salida del primero como entrada del segundo
+
+# Forma segura en Python, para comparar:
+subprocess.run(["echo", valor], shell=False)</code></pre>
+
+        <details class="guide-spoiler">
+          <summary>Comando inicial de referencia (ábrelo solo si te atascas)</summary>
+          <pre class="guide-code"><code>100; cat /secret/dragon_slain.txt
 
 # Variantes:
-100 && cat /secret/dragon_slain.txt
-100 | cat /secret/dragon_slain.txt
-        </pre>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Shellshock (CVE-2014-6271) permitió ejecutar comandos arbitrarios en millones de
-          servidores Linux y dispositivos IoT. La defensa es evitar <code>shell=True</code> y validar/sanitizar la
-          entrada.
-        </div>
-      </div>
-    </div>
+100 &amp;&amp; cat /secret/dragon_slain.txt
+100 | cat /secret/dragon_slain.txt</code></pre>
+          <p>Fíjate en la estructura: un valor numérico válido, un separador y una orden de lectura. El número mantiene contento al validador superficial; el separador hace el trabajo real.</p>
+        </details>
 
-    <!-- BANDERA 9: HUEVO / POWERVIEW (ACTIVE DIRECTORY) -->
-    <div class="ctf-guide-card guide-highlight">
+        <div class="guide-defense-box"><strong>Cómo defenderse:</strong> evitar <code>shell=True</code>, usar APIs que acepten listas de argumentos, validar tipos y rangos (por aquí, numérico), aplicar allowlists, escapar con <code>shlex.quote()</code> si no hay alternativa y ejecutar el servicio con el mínimo privilegio posible.</div>
+
+        <div class="guide-checklist"><strong>Al terminar, comprueba que puedes:</strong>
+          <ul>
+            <li>Explicar la diferencia entre <code>;</code> y <code>&amp;&amp;</code>.</li>
+            <li>Escribir la versión segura con <code>shell=False</code>.</li>
+            <li>Describir la command injection ciega y cómo se detecta.</li>
+          </ul>
+        </div>
+
+        <div class="guide-highlight-box"><strong>Curiosidad:</strong> Shellshock (CVE-2014-6271) permitía ejecutar comandos arbitrarios mediante variables de entorno en Bash. Afectó a millones de servidores y dispositivos IoT: un simple encabezado HTTP bastaba para comprometerlos.</div>
+      </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('the_end_view') }}" class="guide-challenge-link">Ir al reto →</a>
+        <a href="#flag-9" class="guide-next-link">Siguiente tema →</a>
+      </div>
+    </article>
+
+    <!-- BANDERA 9 -->
+    <article class="ctf-guide-card {% if 'egg' in inv %}is-solved{% endif %}" id="flag-9">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/dragon_egg.png') }}" alt=""
-            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>9. Bandera — Huevo de Dragón: Enumeración de Active Directory con PowerView</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/dragon_egg.png') }}" alt="Huevo de dragón"></span>
+        <div class="guide-card-heading">
+          <h3>9. Huevo de Dragón</h3>
+          <span class="guide-card-subtitle">Enumeración de Active Directory con PowerView</span>
+        </div>
+        {% if 'egg' in inv %}<span class="guide-solved-badge">✓ Resuelta</span>{% endif %}
+      </div>
+      <div class="guide-card-meta">
+        <span class="guide-meta-item">Dificultad: Alta</span>
+        <span class="guide-meta-item">The End</span>
+        <span class="guide-meta-item">Prerrequisito: tema 6</span>
+        <span class="guide-meta-item">Familia: AD / post-explotación</span>
       </div>
       <div class="guide-card-body">
-        <p><strong>Concepto:</strong> El Huevo está archivado en un dominio de Active Directory simulado (end.local).
-          Debes enumerar usuarios, grupos, equipos y recursos compartidos para localizar el archivo del Huevo en el
-          servidor de archivos.</p>
-        <p><strong>Tema:</strong> Enumeración de Active Directory con PowerView.</p>
-        <p><strong>Explicación:</strong> PowerView es una herramienta de auditoría de AD que permite listar objetos del
-          dominio (usuarios, grupos, equipos, shares, sesiones). Las descripciones de cuentas de servicio suelen revelar
-          recursos internos, y los shares pueden exponer archivos sensibles.</p>
-        <p><strong>Comandos disponibles (consola PowerView):</strong></p>
-        <pre class="guide-code">Get-NetDomain
+        <p class="guide-objective"><strong>Objetivo de aprendizaje:</strong> comprender cómo se enumera un dominio de Active Directory para descubrir usuarios, grupos, equipos y recursos compartidos, y por qué esa información abre la puerta a siguientes fases del ataque.</p>
+
+        <h4>¿Qué es?</h4>
+        <p><strong>Active Directory (AD)</strong> es el servicio de directorio de Windows que centraliza identidades: usuarios, grupos, equipos y políticas. <strong>PowerView</strong>, parte de la suite PowerSploit, es una herramienta de auditoría que consulta AD mediante LDAP y SMB para enumerar esos objetos. En este reto la consola es <em>simulada</em>: no ejecuta PowerShell real ni accede al sistema de archivos, solo resuelve los cmdlets contra un dominio ficticio.</p>
+
+        <h4>¿Cómo funciona?</h4>
+        <p>La enumeración sigue un orden lógico: primero identificar el dominio y sus controladores; después listar usuarios y grupos; luego equipos y recursos compartidos; y finalmente correlacionar pistas. Las descripciones de cuentas de servicio suelen contener notas internas con nombres de servidores o rutas: son oro para el atacante porque revelan dónde están los datos sin need de explotar nada.</p>
+
+        <h4>¿Por qué importa?</h4>
+        <p>En pentesting, la enumeración de AD es la fase que convierte un acceso inicial en un mapa completo del dominio. Permite encontrar cuentas privilegiadas, shares mal protegidos y rutas de movimiento lateral. Herramientas como BloodHound grafican esas relaciones y muestran el camino más corto hasta el objetivo.</p>
+
+        <h4>Profundización</h4>
+        <p>Cada cmdlet responde una pregunta distinta: <code>Get-NetDomain</code> identifica el dominio, <code>Get-NetDomainController</code> localiza los DC, <code>Get-NetUser</code> y <code>Get-NetGroup</code> mapean identidades, <code>Get-NetGroupMember</code> revela pertenencias, <code>Get-NetComputer</code> lista equipos, <code>Get-NetShare</code> y <code>Find-DomainShare</code> encuentran recursos compartidos, e <code>Invoke-UserHunter</code> busca dónde hay sesiones de usuarios. La defensa se apoya en mínimo privilegio sobre los shares, cuentas de servicio administradas (gMSA) para no guardar contraseñas en descripciones, y monitorización de consultas LDAP y eventos de acceso a SMB. Los atacantes, por su parte, suelen ocultar estas consultas tras procesos legítimos de PowerShell.</p>
+
+        <span class="guide-section-label">Comandos disponibles en la consola simulada</span>
+        <pre class="guide-code"><code>Get-NetDomain
 Get-NetDomainController
 Get-NetUser
-Get-NetUser -UserName <usuario>
+Get-NetUser -UserName &lt;usuario&gt;
 Get-NetGroup
-Get-NetGroupMember -GroupName "<grupo>"
+Get-NetGroupMember -GroupName "&lt;grupo&gt;"
 Get-NetComputer
-Get-NetShare -ComputerName <equipo>
+Get-NetShare -ComputerName &lt;equipo&gt;
 Find-DomainShare
 Invoke-UserHunter
-Get-Content \\\\SERVIDOR\\recurso\\archivo.txt
+Get-Content \\SERVIDOR\recurso\archivo.txt
 help
-clear
-        </pre>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> PowerView forma parte de PowerSploit y se usa en auditorías de Active Directory
-          para enumerar usuarios, grupos, equipos, sesiones y shares. La defensa combina mínimo privilegio en los
-          recursos compartidos, cuentas de servicio administradas (gMSA) y monitorización de consultas LDAP y SMB.
+clear</code></pre>
+
+        <details class="guide-spoiler">
+          <summary>Pista conceptual (ábrela solo si te atascas)</summary>
+          <p>No busques el archivo directamente. Primero lee las descripciones de los usuarios: alguna cuenta de servicio suele mencionar el recurso. Cuando sepas el equipo y el nombre del share, usa <code>Get-NetShare</code> y <code>Find-DomainShare</code> para confirmarlos.</p>
+        </details>
+
+        <div class="guide-defense-box"><strong>Cómo defenderse:</strong> aplicar mínimo privilegio en shares, usar gMSA en lugar de contraseñas escritas en descripciones, no guardar rutas internas en campos de texto, monitorizar LDAP/SMB y eventos 4662/5140, restringir PowerShell con<em>Constrained Language Mode</em> y revisar periódicamente la pertenencia a grupos privilegiados.</div>
+
+        <div class="guide-checklist"><strong>Al terminar, comprueba que puedes:</strong>
+          <ul>
+            <li>Explicar para qué sirve cada familia de cmdlets listada.</li>
+            <li>Describir cómo una descripción de cuenta filtra información.</li>
+            <li>Nombrar dos medidas defensivas contra la enumeración de AD.</li>
+          </ul>
+        </div>
+
+        <div class="guide-highlight-box"><strong>Curiosidad:</strong> PowerView forma parte de PowerSploit y se creó para auditorías legítimas de Active Directory. Irónicamente, su popularidad en auditorías es la misma que en ataques reales: la diferencia está en la autorización, no en las herramientas.</div>
+      </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('the_end_view') }}" class="guide-challenge-link">Ir al reto →</a>
+        <a href="#flag-10" class="guide-next-link">Siguiente tema →</a>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- MÉTODO DE APRENDIZAJE Y GLOSARIO                                     -->
+  <!-- ==================================================================== -->
+  <div class="ctf-guide-grid ctf-guide-grid-wide">
+
+    <article class="ctf-guide-card guide-highlight" id="flag-10">
+      <div class="guide-card-header">
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/diamond_pickaxe.png') }}" alt="Pico de diamante"></span>
+        <div class="guide-card-heading">
+          <h3>10. Método de Aprendizaje Recomendado</h3>
+          <span class="guide-card-subtitle">Un plan de estudio, no una lista de respuestas</span>
         </div>
       </div>
-    </div>
+      <div class="guide-card-body">
+        <p class="guide-objective"><strong>Objetivo:</strong> convertir nueve retos en competencias reutilizables. El secreto no es acertar la flag, sino poder explicar luego qué fallaba y cómo se arregla.</p>
 
+        <h4>Fase 0 · Prepara tu entorno</h4>
+        <p>Ten a mano un navegador con herramientas de desarrollo, una terminal de Kali Linux (o similar) y un editor de texto. Crea una carpeta de trabajo por dimensión y lleva una bitácora: escribe qué observas, qué pruebas y qué resultado obtienes. La bitácora es lo que diferencia "copiar un payload" de "aprender".</p>
 
-    <!-- MÉTODO DE APRENDIZAJE -->
-    <div class="ctf-guide-card guide-highlight">
+        <h4>Fase 1 · Overworld: observar antes de explotar</h4>
+        <p>Con las banderas 1 a 3 practica el reconocimiento: metadatos, cadenas codificadas, consultas a bases de datos y enumeración de consolas. Repite el ciclo <em>observar → hipotetizar → probar → explicar</em>. Si no puedes explicar por qué funcionó, vuelve al apartado "Profundización" del tema.</p>
+
+        <h4>Fase 2 · Nether: el navegador y el servidor</h4>
+        <p>Con las banderas 4 a 6 cambia el foco a la web: código que se ejecuta en navegadores ajenos, archivos que el servidor no debería ejecutar y roles que el cliente no debería decidir. Aquí conviene usar las DevTools y Burp Suite para ver qué viaja realmente en cada petición.</p>
+
+        <h4>Fase 3 · The End: servicios y dominios</h4>
+        <p>Las banderas 7 a 9 elevan el nivel: backdoors, shells y enumeración de Active Directory. Antes de tocar nada, lee el código con el botón "Ver Código" y señala en voz alta la línea donde se confía ciegamente en la entrada. Después usa el playground del Dragón para ver el comando construido en tiempo real.</p>
+
+        <h4>Hábitos que aceleran el aprendizaje</h4>
+        <ul class="guide-bullet-list">
+          <li><strong>Usa "Ver Código":</strong> está pensado para que identifiques la línea vulnerable, no para copiar y pegar.</li>
+          <li><strong>Compra pistas con XP:</strong> las pistas son conceptuales; piden dirección, no la respuesta.</li>
+          <li><strong>Explica en voz alta:</strong> si no puedes explicar el ataque a un compañero, aún no lo dominas.</li>
+          <li><strong>Cambia una variable:</strong> prueba otra extensión, otro separador, otro parámetro. Aprenderás más de los fallos que de los aciertos.</li>
+          <li><strong>Escribe la defensa:</strong> por cada bandera, anota cómo la evitarías como desarrollador.</li>
+        </ul>
+
+        <div class="guide-checklist"><strong>Checklist final antes de dar por terminado el laboratorio:</strong>
+          <ul>
+            <li>Puedo explicar los nueve temas sin mirar esta guía.</li>
+            <li>Sé nombrar una defensa concreta para cada uno.</li>
+            <li>He completado las tres dimensiones y entiendo por qué una desbloquea la siguiente.</li>
+            <li>He usado la guía como referencia, no como solucionario.</li>
+          </ul>
+        </div>
+
+        <div class="guide-highlight-box"><strong>Curiosidad:</strong> en seguridad, la competencia más buscada no es memorizar payloads, sino saber <em>qué preguntar</em> cuando algo no funciona. Esta guía está diseñada para entrenar esa pregunta.</div>
+      </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('desafios_view') }}" class="guide-challenge-link">Ir a los desafíos →</a>
+        <a href="#flag-11" class="guide-next-link">Ver glosario →</a>
+      </div>
+    </article>
+
+    <article class="ctf-guide-card" id="flag-11">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/diamond_pickaxe.png') }}" alt=""
-            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>10. Método de Aprendizaje Recomendado</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/logo_shield.png') }}" alt="Escudo"></span>
+        <div class="guide-card-heading">
+          <h3>11. Glosario exprés</h3>
+          <span class="guide-card-subtitle">Términos que aparecen a lo largo de la guía</span>
+        </div>
       </div>
       <div class="guide-card-body">
-        <ol class="guide-ordered-list">
-          <li><strong>Comienza por el Overworld:</strong> es la dimensión introductoria.</li>
-          <li><strong>Usa el botón "Ver Código":</strong> inspecciona el código vulnerable para entender dónde está el
-            error.</li>
-          <li><strong>Consulta las Pistas:</strong> desbloquea pistas conceptuales usando la XP que acumulas.</li>
-          <li><strong>Lee la Guía por bandera:</strong> cada ítem te da el concepto y la curiosidad antes de atacar.
-          </li>
-          <li><strong>Practica con las herramientas:</strong> usa los comandos de ejemplo como referencia, no como
-            solución directa.</li>
-        </ol>
+        <dl class="guide-glossary">
+          <dt>Allowlist</dt>
+          <dd>Lista de elementos permitidos; todo lo demás se rechaza por defecto.</dd>
+          <dt>Blocklist</dt>
+          <dd>Lista de elementos prohibidos; todo lo demás se permite. Más débil que una allowlist.</dd>
+          <dt>Blind injection</dt>
+          <dd>Inyección cuyo resultado no se muestra; se infiere por tiempo o por cambios de comportamiento.</dd>
+          <dt>CVE</dt>
+          <dd>Identificador público de una vulnerabilidad conocida, con formato CVE-AÑO-NÚMERO.</dd>
+          <dt>CSP</dt>
+          <dd>Content Security Policy: cabecera que limita qué scripts y recursos puede cargar el navegador.</dd>
+          <dt>HttpOnly</dt>
+          <dd>Atributo de cookie que impide leerla desde JavaScript, mitigando el robo por XSS.</dd>
+          <dt>IDOR</dt>
+          <dd>Referencia directa a objetos insegura: cambiar un identificador para acceder a datos ajenos.</dd>
+          <dt>Metacarácter</dt>
+          <dd>Carácter con significado especial para un intérprete, como <code>;</code>, <code>|</code> o <code>'</code>.</dd>
+          <dt>Payload</dt>
+          <dd>Datos deliberadamente construidos para provocar un comportamiento concreto en el objetivo.</dd>
+          <dt>RCE</dt>
+          <dd>Remote Code Execution: ejecución de código en un sistema remoto.</dd>
+          <dt>Supply chain</dt>
+          <dd>Riesgo introducido a través de dependencias o software de terceros aparentemente legítimo.</dd>
+          <dt>XSS</dt>
+          <dd>Cross-Site Scripting: inyección de scripts en el navegador de otro usuario.</dd>
+        </dl>
+
+        <div class="guide-highlight-box"><strong>Recuerda:</strong> una herramienta no sustituye al criterio. Entiende el problema antes de elegir el comando.</div>
       </div>
-    </div>
+      <div class="guide-card-footer">
+        <a href="{{ url_for('guia_view') }}" class="guide-challenge-link">Volver arriba ↑</a>
+        <a href="#flag-1" class="guide-next-link">Volver a la bandera 1 →</a>
+      </div>
+    </article>
 
   </div>
 
   <div class="ctf-guide-cta">
     <a href="{{ url_for('desafios_view') }}" class="ctf-btn-start">
-      ¡Ir a los Desafíos por Dimensión! ⚔️
+      <img src="{{ url_for('static', filename='img/Desafios_nether_star.png') }}" class="guide-cta-icon" alt="">
+      ¡Ir a los Desafíos por Dimensión!
     </a>
   </div>
 

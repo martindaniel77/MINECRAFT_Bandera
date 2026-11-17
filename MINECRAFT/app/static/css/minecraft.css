@@ -18,7 +18,9 @@
   --mc-cyan: #55ffff;
   --mc-xp-green: #80ff20;
   --mc-xp-shadow: #143d00;
-  --mc-font: 'Minecraftia', 'Courier New', 'Lucida Console', monospace;
+  --mc-font: 'Press Start 2P', 'Minecraftia', 'Courier New', monospace;
+  --mc-body-font: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --mc-font-code: 'Consolas', 'Courier New', monospace;
 }
 
 * {
@@ -28,7 +30,7 @@
 }
 
 body {
-  font-family: var(--mc-font);
+  font-family: var(--mc-body-font);
   background-color: #121212;
   color: #f0f0f0;
   line-height: 1.5;
@@ -523,7 +525,7 @@ body.dimension-the_end::after {
 
 .mc-input {
   width: 100%;
-  font-family: var(--mc-font);
+  font-family: var(--mc-body-font);
   background: #171717;
   border: 2px solid #525252;
   color: #ffffff;
@@ -2450,6 +2452,7 @@ body.is-landing {
 
 .ctf-input {
   width: 100%;
+  font-family: var(--mc-body-font);
   background: #1e293b;
   border: 1.5px solid #334155;
   border-radius: 8px;
@@ -2458,7 +2461,6 @@ body.is-landing {
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  font-family: var(--mc-font);
 }
 
 .ctf-input:focus {
@@ -2762,4 +2764,437 @@ body.is-landing {
   .mc-xp-label {
     font-size: 0.7rem;
   }
+}
+
+
+/* ==========================================================================
+   GUÍA DE APRENDIZAJE — ESTRUCTURA AMPLIADA, ÍNDICE Y NAVEGACIÓN
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* Iconos de la guía: una sola regla, sin estilos inline repetidos */
+.guide-icon img {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+  display: block;
+}
+
+.ctf-page-header .header-icon img {
+  width: 2.8rem;
+  height: 2.8rem;
+  object-fit: contain;
+}
+
+.guide-cta-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* Índice sticky */
+.guide-toc {
+  position: sticky;
+  top: 84px;
+  z-index: 25;
+  background: rgba(8, 13, 23, 0.96);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid #1e293b;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 32px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.guide-toc-title {
+  color: #4ade80;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  margin-bottom: 9px;
+}
+
+.guide-toc-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.guide-toc-links a {
+  color: #cbd5e1;
+  background: #0f172a;
+  border: 1px solid #263449;
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.guide-toc-links a:hover,
+.guide-toc-links a:focus-visible {
+  color: #ffffff;
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.18);
+  outline: none;
+}
+
+/* Separadores por dimensión */
+.guide-dimension-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 38px 0 18px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: 1px solid #1e293b;
+  border-left: 5px solid #22c55e;
+}
+
+.guide-dimension-divider img {
+  width: 2.6rem;
+  height: 2.6rem;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.guide-dimension-divider h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.guide-dimension-divider p {
+  margin: 4px 0 0;
+  color: #94a3b8;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.guide-dim-overworld {
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.14), rgba(13, 20, 31, 0.65));
+}
+
+.guide-dim-nether {
+  border-left-color: #f97316;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.14), rgba(13, 20, 31, 0.65));
+}
+
+.guide-dim-end {
+  border-left-color: #a855f7;
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.14), rgba(13, 20, 31, 0.65));
+}
+
+/* Tarjetas anchas con anclas que no quedan tapadas por la navbar */
+.ctf-guide-card {
+  scroll-margin-top: 150px;
+}
+
+.ctf-guide-card.is-solved {
+  border-color: #22c55e;
+}
+
+.guide-card-heading {
+  min-width: 0;
+}
+
+.guide-card-heading h3 {
+  margin: 0;
+}
+
+.guide-card-subtitle {
+  display: block;
+  margin-top: 3px;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.guide-solved-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #052e16;
+  background: #4ade80;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.guide-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+
+.guide-meta-item {
+  background: #0f172a;
+  border: 1px solid #263449;
+  color: #94a3b8;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.73rem;
+  font-weight: 700;
+}
+
+/* Apartados internos */
+.guide-card-body h4 {
+  color: #4ade80;
+  font-size: 0.98rem;
+  font-weight: 900;
+  margin: 18px 0 6px;
+}
+
+.guide-objective {
+  background: rgba(56, 189, 248, 0.08);
+  border-left: 3px solid #38bdf8;
+  padding: 10px 12px;
+  border-radius: 6px;
+}
+
+.guide-section-label {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 16px 0 5px;
+}
+
+.guide-code code {
+  font-family: var(--mc-font-code);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.guide-defense-box {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(56, 189, 248, 0.07);
+  border-left: 3px solid #38bdf8;
+  border-radius: 6px;
+  color: #bae6fd;
+  font-size: 0.87rem;
+  line-height: 1.55;
+}
+
+.guide-defense-box strong { color: #38bdf8; }
+
+.guide-checklist {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(148, 163, 184, 0.06);
+  border: 1px dashed #334155;
+  border-radius: 6px;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.guide-checklist ul {
+  margin: 7px 0 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.guide-bullet-list {
+  color: #cbd5e1;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Spoilers de payloads */
+.guide-spoiler {
+  margin-top: 12px;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  background: #0b1220;
+}
+
+.guide-spoiler summary {
+  cursor: pointer;
+  padding: 9px 12px;
+  color: #fbbf24;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.guide-spoiler[open] summary {
+  border-bottom: 1px solid #334155;
+}
+
+.guide-spoiler .guide-code {
+  margin: 10px;
+}
+
+.guide-spoiler > p {
+  padding: 0 12px 10px;
+}
+
+/* Pie de cada tarjeta */
+.guide-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.guide-challenge-link,
+.guide-next-link {
+  color: #4ade80;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.guide-challenge-link:hover,
+.guide-next-link:hover {
+  text-decoration: underline;
+}
+
+.guide-next-link { margin-left: auto; }
+
+/* Glosario */
+.guide-glossary {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) 1fr;
+  gap: 9px 16px;
+  margin: 10px 0 0;
+  font-size: 0.88rem;
+}
+
+.guide-glossary dt {
+  color: #4ade80;
+  font-weight: 900;
+}
+
+.guide-glossary dd {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+/* Ajustes responsive */
+@media (max-width: 640px) {
+  .ctf-guide-grid-wide { grid-template-columns: 1fr; }
+  .ctf-page-title { font-size: 1.6rem; }
+  .ctf-page-desc { font-size: 0.96rem; }
+  .guide-toc { top: 70px; }
+  .guide-dimension-divider h2 { font-size: 1.2rem; }
+  .guide-glossary { grid-template-columns: 1fr; gap: 3px; }
+  .guide-glossary dd { margin-bottom: 8px; }
+}
+
+
+/* ==========================================================================
+   TIPOGRAFÍA MINECRAFT — APLICACIÓN SELECTIVA
+   La fuente pixelada va en títulos, botones, HUD, navbar y badges cortos.
+   El cuerpo de texto y el código conservan fuentes legibles.
+   ========================================================================== */
+
+/* Press Start 2P solo tiene un peso: evitar negrita sintética */
+.ctf-page-title,
+.title-capture,
+.title-flag,
+.ctf-card-title,
+.dim-main-title,
+.guide-dimension-divider h2,
+.ctf-modal-title,
+.mc-btn,
+.ctf-btn-start,
+.ctf-btn-primary,
+.ctf-btn-login,
+.ctf-btn-next-dim,
+.dim-btn-enter,
+.mc-hud-toggle,
+.mc-sidebar-toggle,
+.ctf-nav-item,
+.guide-solved-badge,
+.guide-meta-item,
+.mc-xp-value,
+.mc-xp-label,
+.ctf-year {
+  font-weight: 400;
+}
+
+/* Títulos */
+.ctf-page-title {
+  font-size: 1.45rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+.title-capture { font-size: 2rem; letter-spacing: 1px; }
+.title-flag { font-size: 2.1rem; letter-spacing: 1px; }
+.ctf-card-title { font-size: 0.85rem; }
+.dim-main-title { font-size: 0.95rem; }
+.guide-dimension-divider h2 { font-size: 0.95rem; line-height: 1.5; }
+.ctf-modal-title { font-size: 0.72rem; }
+
+/* Botones tipo GUI */
+.mc-btn { font-size: 0.72rem; }
+.ctf-btn-start { font-size: 0.85rem; letter-spacing: 0.02em; }
+.ctf-btn-primary { font-size: 0.72rem; }
+.ctf-btn-login { font-size: 0.68rem; }
+.ctf-btn-next-dim { font-size: 0.65rem; }
+.dim-btn-enter { font-size: 0.72rem; }
+.mc-hud-toggle { font-size: 0.65rem; }
+.mc-sidebar-toggle { font-size: 0.65rem; }
+
+/* HUD y números */
+.mc-xp-value { font-size: 0.95rem; }
+.mc-xp-label { font-size: 0.6rem; letter-spacing: 0; }
+.ctf-year { font-size: 0.7rem; }
+
+/* Badges cortos de la guía */
+.guide-solved-badge,
+.guide-meta-item {
+  font-family: var(--mc-font);
+  font-size: 0.6rem;
+  letter-spacing: 0;
+}
+
+/* Navbar */
+.ctf-nav-menu { gap: 12px; }
+.ctf-nav-item {
+  font-family: var(--mc-font);
+  font-size: 0.6rem;
+  padding: 8px 10px;
+  gap: 6px;
+}
+
+/* Sombra dura en encabezados pixelados */
+.dim-main-title,
+.ctf-card-title,
+.guide-dimension-divider h2,
+.ctf-modal-title,
+.ctf-nav-item {
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* La navbar con fuente pixelada necesita más sitio en pantallas medianas */
+@media (max-width: 1100px) {
+  .ctf-nav-menu { gap: 6px; }
+  .ctf-nav-item { font-size: 0.55rem; padding: 6px 8px; gap: 4px; }
+  .ctf-btn-next-dim,
+  .ctf-btn-login { font-size: 0.55rem; padding: 6px 10px; }
 }
