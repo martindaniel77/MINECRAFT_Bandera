@@ -202,7 +202,7 @@ function markItemUnlocked(step) {
     const submitBtn = form.querySelector('button[type="submit"]');
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = '✅ Conquistado';
+      submitBtn.textContent = 'Conquistado';
     }
   }
   const cardEl = inputEl.closest('.challenge-card');
@@ -220,7 +220,7 @@ async function submitFlag(dimension, step, event) {
   const flagValue = inputEl.value.trim();
   if (!flagValue) {
     if (feedbackEl) {
-      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">⚠️ Ingresa una bandera primero.</div>`;
+      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">Ingresa una bandera primero.</div>`;
     }
     return;
   }
@@ -265,13 +265,13 @@ async function submitFlag(dimension, step, event) {
       }
     } else {
       if (feedbackEl) {
-        feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">❌ Error: ${data.message}</div>`;
+        feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">Error: ${data.message}</div>`;
       }
     }
   } catch (err) {
     console.error("Error en submitFlag:", err);
     if (feedbackEl) {
-      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">❌ Error en el envío: ${err.message || 'Error de conexión con el servidor.'}</div>`;
+      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">Error en el envío: ${err.message || 'Error de conexión con el servidor.'}</div>`;
     }
   }
 }

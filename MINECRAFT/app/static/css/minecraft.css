@@ -3198,3 +3198,38 @@ body.is-landing {
   .ctf-btn-next-dim,
   .ctf-btn-login { font-size: 0.55rem; padding: 6px 10px; }
 }
+
+
+/* ==========================================================================
+   ICONOS INLINE (REEMPLAZO DE EMOJIS POR PNG)
+   ========================================================================== */
+.inline-icon {
+  display: inline-block;
+  width: 1.1rem;
+  height: 1.1rem;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 4px;
+  image-rendering: pixelated;
+}
+
+.ctf-card-header .inline-icon,
+.guide-icon .inline-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0;
+}
+
+.ctf-login-badge .inline-icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  margin-right: 0;
+}
+
+.crown-icon .inline-icon,
+.pos-gold .inline-icon,
+.pos-silver .inline-icon,
+.pos-bronze .inline-icon {
+  width: 1rem;
+  height: 1rem;
+}
