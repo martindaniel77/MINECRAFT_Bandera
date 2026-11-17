@@ -70,17 +70,17 @@ http://localhost:8080
 1. ** Overworld (Fácil):**
    -  **Hierro:** Esteganografía y Cifrado César (ROT-13) / Base64.
    -  **Diamante:** Inyección SQL (SQLi) en el cofre $Y=-58$.
-   -  **Portal:** Análisis de Metadatos (FOCA/Exif) en planos de construcción.
+   -  **Portal:** Enumeración de rutas y lectura de archivos con una consola restringida (allowlist: `ls`, `cat`, `help`, `clear`).
 
 2. ** Nether (Medio):**
    -  **Oro:** Stored XSS y Robo de Sesiones al Piglin Guard.
-   -  **Varas de Blaze:** Carga de Archivos Arbitraria (File Upload) a RCE.
+   -  **Varas de Blaze:** Carga de archivos y ejecución automática de recetas .py (RCE).
    -  **Ender Pearl:** Violación de Mínimo Privilegio / Parameter Tampering.
 
 3. ** The End (Difícil):**
    -  **Cristales:** Explotación de Servicio / CVE Simulado (Estilo Metasploit).
    -  **Ender Dragón:** Inyección de Comandos (Command Injection) en Telemetría.
-   -  **Huevo de Dragón:** Evasión de Honeypot y Path Traversal (LFI) hacia `/root/`.
+   -  **Huevo de Dragón:** Enumeración de Active Directory con PowerView (usuarios, grupos, equipos y shares) para localizar el archivo del Huevo.
 
 ---
 

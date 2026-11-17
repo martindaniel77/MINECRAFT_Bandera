@@ -3,6 +3,7 @@
 # Desarrollado por: Thorfinn777, Martyn777, Sassyjack777
 # ==============================================================================
 
+import os
 import re
 import threading
 import time
@@ -11,6 +12,13 @@ import requests
 PIGLIN_SECRET_TOKEN = "FLAG{MINECRAFT_PIGLIN_XSS_GOLD_BARTERED}"
 LEAK_PATH = "/nether/gold/leak"
 
+# Un XSS sencillo es suficiente: un <script> o un manejador de eventos.
+# También se acepta el payload clásico que apunta directo al buzón.
+XSS_PATTERN = re.compile(
+    r'<\s*script|on(?:error|load|click|mouseover|focus)\s*=|javascript\s*:',
+    re.IGNORECASE,
+)
+
 class PiglinGuardBot:
     """
     Simulación del Piglin Guard / Tesorero del Bastión.
@@ -18,20 +26,36 @@ class PiglinGuardBot:
 
     No hay motor de navegador en la imagen, así que el script inyectado no llega a
     ejecutarse por sí solo. El bot inspecciona las ofertas almacenadas y, si encuentra
-    una referencia al endpoint receptor, reproduce la exfiltración que el navegador
-    ejecutaría: envía sus propias cookies privilegiadas a ese endpoint.
+    un XSS simple (un <script> o un onerror/onload) o una referencia al endpoint
+    receptor, reproduce la exfiltración que el navegador ejecutaría: envía sus propias
+    cookies privilegiadas a ese endpoint.
     """
-    def __init__(self, base_url="http://127.0.0.1:8080"):
-        self.base_url = base_url
+    def __init__(self, base_url=None):
+        # En Docker el bot corre dentro del mismo contenedor que gunicorn.
+        self.base_url = base_url or os.environ.get('BOT_BASE_URL', 'http://127.0.0.1:8080')
         self._visit_in_progress = False
+        self._visit_pending = False
         self._visit_lock = threading.Lock()
+        # Ofertas que deben revisarse en la próxima visita. Permite procesar
+        # exactamente la oferta recién enviada, incluso tras reiniciar.
+        self._pending_targets = []
         # Última oferta ya revisada: evita re-atacar ofertas antiguas.
         self._last_seen_offer_id = 0
 
-    def trigger_visit(self):
+    def trigger_visit(self, offer_id=None):
         """Ejecuta una visita del bot en un hilo separado para no bloquear la petición"""
         with self._visit_lock:
+            if offer_id is not None:
+                try:
+                    oid = int(offer_id)
+                except (TypeError, ValueError):
+                    oid = None
+                if oid is not None and oid not in self._pending_targets:
+                    self._pending_targets.append(oid)
             if self._visit_in_progress:
+                # Si llega una oferta mientras el bot revisa, se agenda otra
+                # pasada para no perderla (ventana de carrera muy corta).
+                self._visit_pending = True
                 return
             self._visit_in_progress = True
 
@@ -52,8 +76,9 @@ class PiglinGuardBot:
             conn = get_db_connection()
             cur = conn.cursor()
             cur.execute(
-                'SELECT id FROM stolen_tokens WHERE captured_data = ?',
-                (leaked_data,)
+                'SELECT id FROM stolen_tokens WHERE captured_data = ? '
+                'AND COALESCE(offer_id, -1) = ?',
+                (leaked_data, offer_id if offer_id is not None else -1)
             )
             if cur.fetchone() is None:
                 cur.execute(
@@ -90,50 +115,89 @@ class PiglinGuardBot:
             }
             resp = requests.get(f"{self.base_url}/nether/gold/offers",
                                 cookies=cookies, headers=headers, timeout=3)
-            self._execute_stored_payload(resp.text, cookies)
-        except Exception as e:
+            # El endpoint devuelve JSON, no HTML: lo interpretamos como tal.
+            try:
+                offers = resp.json()
+            except ValueError:
+                offers = []
+
+            # Solo se revisan las ofertas que dispararon esta visita.
+            with self._visit_lock:
+                targets = list(self._pending_targets)
+                self._pending_targets.clear()
+            self._execute_stored_payload(offers, cookies, targets)
+        except Exception:
             # Ignorar si el servidor está iniciando
             pass
         finally:
             with self._visit_lock:
                 self._visit_in_progress = False
+                pending = self._visit_pending
+                self._visit_pending = False
+            if pending:
+                self.trigger_visit()
 
-    def _execute_stored_payload(self, page_html, cookies):
+    def _execute_stored_payload(self, offers, cookies, target_ids=None):
         """
-        Reproduce la ejecución del XSS almacenado. Solo se procesan las ofertas
-        nuevas (id mayor al último revisado) y, si una contiene una referencia al
-        endpoint receptor, se envía la cookie real del bot a ese endpoint usando el
-        mismo parámetro que usó el atacante.
-        """
-        offers = re.findall(
-            r'data-offer-id="(\d+)"(.*?)(?=data-offer-id="|\Z)',
-            page_html, re.DOTALL)
+        Reproduce la ejecución del XSS almacenado. Se procesan las ofertas que
+        dispararon esta visita (target_ids) o, como respaldo, las nuevas. Si una
+        contiene un XSS simple o una referencia al endpoint receptor, se envía la
+        cookie real del bot a ese endpoint usando el mismo parámetro que usó el
+        atacante (o "cookie" por defecto).
 
-        new_offers = [(int(oid), block) for oid, block in offers
-                      if int(oid) > self._last_seen_offer_id]
+        Acepta tanto la lista JSON de /nether/gold/offers como una lista de dicts.
+        """
+        normalized = []
+        for offer in offers or []:
+            if not isinstance(offer, dict):
+                continue
+            try:
+                offer_id = int(offer.get('id', 0))
+            except (TypeError, ValueError):
+                continue
+            normalized.append((offer_id, offer))
+
+        if target_ids:
+            targets = {int(oid) for oid in target_ids}
+            new_offers = [(oid, offer) for oid, offer in normalized
+                          if oid in targets]
+        else:
+            new_offers = [(oid, offer) for oid, offer in normalized
+                          if oid > self._last_seen_offer_id]
         if not new_offers:
             return
 
-        self._last_seen_offer_id = max(oid for oid, _ in new_offers)
+        # Recuerda hasta dónde se ha revisado para no re-atacar ofertas viejas.
+        self._last_seen_offer_id = max(
+            self._last_seen_offer_id,
+            max(oid for oid, _ in normalized)
+        )
 
-        for _, block in new_offers:
-            if LEAK_PATH not in block:
+        for offer_id, offer in sorted(new_offers, key=lambda item: item[0]):
+            block = " ".join(str(offer.get(field, '')) for field in
+                             ('player_name', 'offered_item', 'note_to_piglin'))
+
+            # Basta con que la oferta contenga un XSS simple. Si además trae
+            # el buzón explícito, respetamos el parámetro que use el atacante.
+            if LEAK_PATH not in block and not XSS_PATTERN.search(block):
                 continue
 
-            # Descubre con qué parámetro el atacante envía los datos (c, cookie, data...).
             param = "cookie"
-            match = re.search(re.escape(LEAK_PATH) + r"[^\"'\s]*?[?&]([A-Za-z_][A-Za-z0-9_]*)=", block)
+            match = re.search(
+                re.escape(LEAK_PATH) + r"[^\"'\s<>]*?[?&]([A-Za-z_][A-Za-z0-9_]*)=",
+                block)
             if match:
                 param = match.group(1)
 
             stolen = "; ".join(f"{k}={v}" for k, v in cookies.items())
             try:
+                params = {'offer_id': offer_id}
+                params[param] = stolen
                 requests.get(f"{self.base_url}{LEAK_PATH}",
-                             params={param: stolen},
+                             params=params,
                              headers={'User-Agent': 'PiglinGuardBot/1.0'},
                              timeout=3)
             except Exception:
                 pass
-            return
 
 bot_instance = PiglinGuardBot()

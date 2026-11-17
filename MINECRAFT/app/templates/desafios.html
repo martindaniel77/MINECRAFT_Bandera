@@ -6,7 +6,7 @@
 <div class="ctf-page-container ctf-wide-layout">
 
   <div class="ctf-page-header">
-    <div class="header-icon">🏆</div>
+    <div class="header-icon"><img src="{{ url_for('static', filename='img/Desafios_nether_star.png') }}" alt="" style="width:2.8rem;height:2.8rem;object-fit:contain;"></div>
     <h1 class="ctf-page-title">DESAFÍOS POR DIMENSIÓN DE MINECRAFT</h1>
     <p class="ctf-page-desc">
       El laboratorio está estructurado en <strong>3 dimensiones progresivas</strong>. Cada dimensión contiene 3 desafíos de seguridad diseñados para que aprendas paso a paso qué vulnerabilidades existen y cómo se resuelven.
@@ -28,7 +28,7 @@
           </div>
 
           <div class="dim-icon-title">
-            <span class="dim-big-icon">{{ dim.icon }}</span>
+            <span class="dim-big-icon"><img src="{{ url_for('static', filename=dim.icon_img) }}" alt="" style="width:2.4rem;height:2.4rem;object-fit:contain;"></span>
             <div>
               <h2 class="dim-main-title">{{ dim.title }}</h2>
               <span class="dim-sub-title">{{ dim.subtitle }}</span>

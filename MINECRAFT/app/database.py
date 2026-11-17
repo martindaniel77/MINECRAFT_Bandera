@@ -86,6 +86,31 @@ def init_db():
         )
     ''')
 
+    # Migración: la XP y las pistas desbloqueadas también deben persistir.
+    student_columns = {row[1] for row in cursor.execute('PRAGMA table_info(student_profiles)').fetchall()}
+    if 'xp' not in student_columns:
+        cursor.execute('ALTER TABLE student_profiles ADD COLUMN xp INTEGER DEFAULT 0')
+        # Perfiles creados antes de existir la XP: la XP base ahora es 0,
+        # más 10 XP por cada bandera ya resuelta.
+        cursor.execute('UPDATE student_profiles SET xp = COALESCE(flags_solved, 0) * 10')
+    if 'unlocked_hints_json' not in student_columns:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN unlocked_hints_json TEXT DEFAULT '[]'")
+
+    # Normalización de la base anterior: antes se regalaban 30 XP iniciales.
+    # Solo se corrigen los perfiles que aún reflejan esa base (nunca han gastado).
+    cursor.execute('''
+        UPDATE student_profiles
+        SET xp = COALESCE(flags_solved, 0) * 10
+        WHERE xp = 30 + (COALESCE(flags_solved, 0) * 10)
+           OR (xp = 30 AND COALESCE(flags_solved, 0) = 0
+               AND (unlocked_hints_json IS NULL OR unlocked_hints_json IN ('', '[]')))
+    ''')
+
+    # Migración: la captura del Piglin se asocia a la oferta que la provocó.
+    offer_columns = {row[1] for row in cursor.execute('PRAGMA table_info(piglin_trade_offers)').fetchall()}
+    if 'session_trace' not in offer_columns:
+        cursor.execute('ALTER TABLE piglin_trade_offers ADD COLUMN session_trace TEXT')
+
     # Tabla 6: Equipos precargados para el Ranking (como en la imagen del CTF)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS leaderboard_teams (

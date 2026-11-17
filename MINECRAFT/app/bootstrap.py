@@ -32,7 +32,7 @@ def _acquire_init_lock():
 
 def bootstrap():
     from database import init_db
-    from init_assets import create_stego_map, create_portal_blueprints, create_svg_icons
+    from init_assets import create_stego_map, create_svg_icons
 
     lock = _acquire_init_lock()
     if lock is None:
@@ -41,7 +41,6 @@ def bootstrap():
     try:
         init_db()
         create_stego_map()
-        create_portal_blueprints()
         create_svg_icons()
     finally:
         if lock is not _NO_LOCK:

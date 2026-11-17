@@ -6,7 +6,7 @@
 <div class="ctf-page-container ctf-wide-layout">
 
   <div class="ctf-page-header">
-    <div class="header-icon">🌲</div>
+    <div class="header-icon"><img src="{{ url_for('static', filename='img/Diemncion del over word_grass_block.png') }}" alt="" style="width:2.8rem;height:2.8rem;object-fit:contain;"></div>
     <h1 class="ctf-page-title">FASE 1: OVERWORLD (Nivel: Fácil)</h1>
     <p class="ctf-page-desc">
       Comienzas tu aventura en el mundo superior. Para llegar al Nether necesitas craftear herramientas y conseguir los materiales básicos:
@@ -24,7 +24,7 @@
       <div>
         <div class="challenge-header">
           <div class="challenge-icon">
-            <img src="{{ url_for('static', filename='img/iron_ingot.svg') }}" alt="Hierro">
+            <img src="{{ url_for('static', filename='img/iron_ingot.png') }}" alt="Hierro">
           </div>
           <div>
             <h3 style="color:#ffffff; font-size:1.05rem;">1. Lingote de Hierro</h3>
@@ -35,7 +35,7 @@
             Steve dejó una copia del mapa de la cueva (<code>mapa_cueva.png</code>). Se rumorea que dentro de los metadatos de la imagen ocultó coordenadas de una veta de hierro usando <strong>Base64</strong> y <strong>Cifrado César (ROT-13)</strong>.
           </p>
           <div style="margin: 12px 0;">
-            <a href="{{ url_for('static', filename='img/mapa_cueva.png') }}" download class="mc-btn mc-btn-green" style="width:100%;">
+            <a href="{{ url_for('static', filename='img/mapa_cueva.png') }}?v=2" download class="mc-btn mc-btn-green" style="width:100%;">
               Descargar mapa_cueva.png
             </a>
           </div>
@@ -84,7 +84,7 @@ print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
       <div>
         <div class="challenge-header">
           <div class="challenge-icon">
-            <img src="{{ url_for('static', filename='img/diamond.svg') }}" alt="Diamante">
+            <img src="{{ url_for('static', filename='img/diamond.png') }}" alt="Diamante">
           </div>
           <div>
             <h3 style="color:#ffffff; font-size:1.05rem;">2. Diamante en Y=-58</h3>
@@ -103,16 +103,29 @@ print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
             </button>
           </form>
 
-          {% if sql_results is defined %}
+          {% if diamond_results is defined %}
             <div class="terminal-output">
               <strong>[+] Resultados de la consulta:</strong>
-              {% if sql_results %}
-                {% for row in sql_results %}
+              {% if diamond_results %}
+                {% for row in diamond_results %}
                   <div> <strong>{{ row.chest_name }}</strong>{% if row.is_locked %}  <span style="color:#f59e0b;">(PROTEGIDO)</span>{% endif %} (Profundidad: Y={{ row.depth_level }}) -> Botín: <span style="color:#55ff55;">{{ row.secret_loot }}</span></div>
                 {% endfor %}
               {% else %}
                 <span style="color:#ef4444;">[!] No se encontraron cofres con ese término.</span>
               {% endif %}
+            </div>
+          {% endif %}
+
+          {% if query_executed %}
+            <div class="terminal-output">
+              <strong>[+] Consulta ejecutada:</strong>
+              <pre style="margin-top:4px;">{{ query_executed }}</pre>
+            </div>
+          {% endif %}
+
+          {% if sql_error %}
+            <div class="terminal-output" style="color:#ef4444;">
+              <strong>[!] Error SQL:</strong> {{ sql_error }}
             </div>
           {% endif %}
 
@@ -154,7 +167,7 @@ print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
 
 
     <!-- ================================================================= -->
-    <!-- DESAFÍO 3: PORTAL NETHER (METADATOS / FOCA / RECONOCIMIENTO) -->
+    <!-- DESAFÍO 3: CONSOLA DE LAS CUEVAS (ENUMERACIÓN Y LECTURA) -->
     <!-- ================================================================= -->
     <div class="challenge-card {% if 'portal' in session.get('inventory', []) %}unlocked{% endif %}">
       <div>
@@ -168,11 +181,11 @@ print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
         </div>
         <div class="challenge-body">
           <p>
-            Para activar la obsidiana y abrir el portal al Nether necesitas encontrar la clave secreta de ignición escondida en el archivo de planos de la fortaleza de aldeanos.
+            La llave de ignición está grabada en obsidiana antigua, en alguna de las cinco cuevas del Overworld. Solo tienes una terminal restringida: puedes enumerar rutas con <code>ls</code> y leer archivos con <code>cat</code>. También dispones de <code>help</code> y <code>clear</code>.
           </p>
           <div style="margin: 12px 0;">
-            <a href="{{ url_for('static', filename='docs/planos_portal_nether.txt') }}" target="_blank" class="mc-btn mc-btn-purple" style="width:100%;">
-               Inspeccionar Planos del Portal
+            <a href="{{ url_for('overworld_cave') }}" class="mc-btn mc-btn-purple" style="width:100%;">
+               Entrar a la consola de las cuevas
             </a>
           </div>
 
@@ -183,17 +196,20 @@ print(base64.b64decode(metadata))  # ROT-13 sobre el resultado</div>
               <button class="mc-btn" onclick="toggleSource('portal')" style="font-size:0.75rem; flex:1;">Ver Código</button>
             </div>
             <div id="hint-portal" class="hint-box">
-              <strong>Pista — Datos escondidos en un documento:</strong><br>
-              1. El reto no es criptografía: es el hábito de guardar información en sitios que las herramientas leen y los humanos se saltan.<br>
-              2. Lee el documento <em>entero</em>, incluidas las partes que parecen relleno administrativo.<br>
-              3. Si lo descargas con <code>curl</code>, recuerda que puedes pedir ver solo las cabeceras de la respuesta en lugar del cuerpo. Los metadatos también viajan ahí.
+              <strong>Pista — Enumeración y lectura:</strong><br>
+              1. Escribe <code>ls</code> para ver las cinco cuevas y <code>cat &lt;archivo&gt;</code> para leer sus archivos. <code>help</code> muestra la ayuda.<br>
+              2. Piensa como en Minecraft: el agua y el hielo no forman obsidiana; la lava sí, y el calor conserva la piedra.<br>
+              3. No todas las banderas que encuentres son reales. Valida solo cuando el archivo esté completo y la pista tenga sentido.
             </div>
             <div id="source-portal" class="source-box" style="display:none;">
-              <strong>Código vulnerable:</strong>
-              <div class="source-code-block">response.headers['X-Portal-Key'] = 'FLAG{...}'</div>
+              <strong>Validación por allowlist:</strong>
+              <div class="source-code-block">ALLOWED = {'ls', 'cat', 'help', 'clear'}
+if command not in ALLOWED:
+    return 'Comando no permitido'
+# Solo se resuelven rutas del diccionario CAVE_ROUTES</div>
             </div>
             <div class="curiosity-box">
-              <strong>Curiosidad:</strong> Un simple <code>curl -I</code> puede exponer cabeceras con tokens, versiones de servidor o claves internas.
+              <strong>Curiosidad:</strong> Una consola que solo acepta una lista cerrada de comandos usa una <em>allowlist</em>. Si validara por lista negra, cualquier comando nuevo sería una puerta abierta.
             </div>
           </div>
         </div>

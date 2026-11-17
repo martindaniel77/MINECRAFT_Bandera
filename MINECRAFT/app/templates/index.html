@@ -9,7 +9,7 @@
        HERO BANNER: CAPTURE THE FLAG
        ========================================================================= -->
   <section class="ctf-hero-section">
-    <div class="ctf-hero-bg" style="background-image: url('{{ url_for('static', filename='img/Fondo inicio.png') }}'); background-size: cover; background-position: center;"></div>
+    <div class="ctf-hero-bg" style="background-image: url('{{ url_for('static', filename='img/Fondo inicio.png') }}?v=2'); background-size: cover; background-position: center;"></div>
     <div class="ctf-hero-overlay"></div>
 
     <div class="ctf-hero-content">
@@ -54,7 +54,7 @@
           </div>
         </div>
         <div class="ctf-chest-box">
-          <img src="{{ url_for('static', filename='img/chest_glowing.png') }}" class="ctf-chest-glow" alt="Cofre de Recompensas Minecraft" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/diamond.svg') }}';">
+          <img src="{{ url_for('static', filename='img/chest_glowing.png') }}?v=2" class="ctf-chest-glow" alt="Cofre de Recompensas Minecraft" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/diamond.png') }}';">
         </div>
       </div>
     </div>
@@ -63,7 +63,7 @@
     <div class="ctf-card ctf-card-challenges">
       <div class="ctf-card-header">
         <div class="ctf-card-icon-swords">
-          <span class="pixel-swords">⚔️</span>
+          <span class="pixel-swords"><img src="{{ url_for('static', filename='img/Inicio_wooden_pickaxe.png') }}" alt="" style="width:1.2rem;height:1.2rem;object-fit:contain;"></span>
         </div>
         <h3 class="ctf-card-title">Desafíos por Dimensión</h3>
       </div>
@@ -74,10 +74,10 @@
           <!-- Dimensión 1: Overworld -->
           <a href="{{ url_for('overworld_view') }}" class="ctf-challenge-row row-dim-overworld" title="Entrar a los 3 retos del Overworld">
             <div class="row-left">
-              <span class="code-icon">🌲</span>
+              <span class="code-icon"><img src="{{ url_for('static', filename='img/Diemncion del over word_grass_block.png') }}" alt="" style="width:1.2rem;height:1.2rem;object-fit:contain;"></span>
               <div class="row-titles-wrap">
                 <span class="row-title">1. Overworld (Fácil)</span>
-                <span class="row-sub">Adentro: Lingote de Hierro (César/ROT-13), Diamante (SQLi), Planos del Portal</span>
+                <span class="row-sub">Adentro: Lingote de Hierro (César/ROT-13), Diamante (SQLi), Consola de las Cuevas</span>
               </div>
             </div>
             <div class="row-right">
@@ -89,10 +89,10 @@
           <!-- Dimensión 2: Nether -->
           <a href="{{ url_for('nether_view') }}" class="ctf-challenge-row row-dim-nether" title="Entrar a los 3 retos del Nether">
             <div class="row-left">
-              <span class="code-icon">🔥</span>
+              <span class="code-icon"><img src="{{ url_for('static', filename='img/Dimencion del nether_netherrack.png') }}" alt="" style="width:1.2rem;height:1.2rem;object-fit:contain;"></span>
               <div class="row-titles-wrap">
                 <span class="row-title">2. Nether (Medio)</span>
-                <span class="row-sub">Adentro: Lingote de Oro (Stored XSS), Varas de Blaze (Webshell RCE), Ojo de Ender</span>
+                <span class="row-sub">Adentro: Lingote de Oro (Stored XSS), Varas de Blaze (Receta RCE), Ojo de Ender</span>
               </div>
             </div>
             <div class="row-right">
@@ -104,10 +104,10 @@
           <!-- Dimensión 3: The End -->
           <a href="{{ url_for('the_end_view') }}" class="ctf-challenge-row row-dim-the-end" title="Entrar a los 3 retos de The End">
             <div class="row-left">
-              <span class="code-icon">🌌</span>
+              <span class="code-icon"><img src="{{ url_for('static', filename='img/Dimencion del end_end_stone.png') }}" alt="" style="width:1.2rem;height:1.2rem;object-fit:contain;"></span>
               <div class="row-titles-wrap">
                 <span class="row-title">3. The End (Difícil - Boss)</span>
-                <span class="row-sub">Adentro: Cristales (CVE simulada), Ender Dragón (Command Injection), Huevo de Dragón (LFI)</span>
+                <span class="row-sub">Adentro: Cristales (CVE simulada), Ender Dragón (Command Injection), Huevo de Dragón (PowerView / AD)</span>
               </div>
             </div>
             <div class="row-right">

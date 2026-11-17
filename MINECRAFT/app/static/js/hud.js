@@ -12,12 +12,19 @@ console.log(
 const HOTBAR_ORDER = ['iron', 'diamond', 'portal', 'gold', 'blaze', 'pearl', 'crystals', 'dragon', 'egg'];
 
 window.unlockedHints = new Set();
-window.currentXp = 30;
+window.currentXp = 0;
+window.hintCost = Number(document.body?.dataset?.hintCost || 20);
 
 // Inicialización de Eventos y Sonido de Dimensión
 document.addEventListener('DOMContentLoaded', () => {
 
-  // Sincronizar HUD
+  // Sincronizar HUD y leer la XP que renderizó el servidor.
+  const xpBadge = document.getElementById('hud-xp-level');
+  if (xpBadge) {
+    const serverXp = parseInt(xpBadge.textContent, 10);
+    if (!Number.isNaN(serverXp)) window.currentXp = serverXp;
+  }
+  updateHintButtons();
   syncInventoryHUD();
 
   // Mostrar/ocultar barra inferior (HUD)
@@ -96,6 +103,16 @@ function showToast(message, type = 'info') {
   }, 2600);
 }
 
+// 1b. Muestra el coste de XP en las pistas que aún no se han investigado.
+function updateHintButtons() {
+  const cost = Number(window.hintCost || document.body?.dataset?.hintCost || 20);
+  document.querySelectorAll('button[onclick*="toggleHint"]').forEach((btn) => {
+    if (btn.classList.contains('mc-btn-unlocked')) return;
+    btn.textContent = `Ver Pista (-${cost} XP)`;
+    btn.title = `Investigar esta pista consume ${cost} XP`;
+  });
+}
+
 // 2. Control de Pistas con Consumo de XP (Gamificado)
 async function toggleHint(challengeId) {
   const hintEl = document.getElementById(`hint-${challengeId}`);
@@ -131,12 +148,14 @@ async function toggleHint(challengeId) {
       
       if (btn) {
         btn.textContent = 'Ver Pista';
+        btn.title = 'Pista ya investigada';
         btn.classList.add('mc-btn-unlocked');
       }
 
       updateXpDisplay(data.xp);
       showToast(data.message, 'success');
     } else {
+      if (data.xp !== undefined) updateXpDisplay(data.xp);
       showToast(`Aviso: ${data.message}`, 'error');
     }
   } catch (err) {
@@ -240,7 +259,8 @@ async function submitFlag(dimension, step, event) {
 
       // Si completó la dimensión actual, permitir avanzar
       if (data.dimension_completed) {
-        showCelebration(`¡Has completado la dimensión ${dimension.toUpperCase()}! (+50 XP)`);
+        const earned = (data.earned_xp !== undefined) ? data.earned_xp : 0;
+        showCelebration(`¡Has completado la dimensión ${dimension.toUpperCase()}! (+${earned} XP)`);
         setTimeout(() => window.location.reload(), 1400);
       }
     } else {
@@ -259,9 +279,14 @@ async function submitFlag(dimension, step, event) {
 // Actualiza barra y textos de XP
 function updateXpDisplay(xp) {
   window.currentXp = xp;
-  const levelBadge = document.getElementById('mc-xp-level');
+  const levelBadge = document.getElementById('hud-xp-level');
   if (levelBadge) {
-    levelBadge.textContent = `XP ${xp}`;
+    levelBadge.textContent = `${xp}`;
+  }
+
+  const legacyBadge = document.getElementById('mc-xp-level');
+  if (legacyBadge) {
+    legacyBadge.textContent = `XP ${xp}`;
   }
 
   const xpNum = document.getElementById('mc-xp-number');
@@ -309,10 +334,16 @@ async function syncInventoryHUD() {
         const btn = document.querySelector(`button[onclick*="toggleHint('${challengeId}')"]`);
         if (btn) {
           btn.textContent = 'Ver Pista';
+          btn.title = 'Pista ya investigada';
           btn.classList.add('mc-btn-unlocked');
         }
       });
     }
+
+    if (data.hint_cost !== undefined) {
+      window.hintCost = Number(data.hint_cost);
+    }
+    updateHintButtons();
   } catch (e) {
     console.error("Error sincronizando inventario HUD:", e);
   }

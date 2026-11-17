@@ -4,8 +4,4 @@ __pycache__/
 app/minecraft_ctf.db
 app/.init.lock
 app/static/uploads/*
-# Se ignora el CONTENIDO de img/ y docs/, no la carpeta: si se ignorase la
-# carpeta entera, git no entraria en ella y la excepcion de abajo no serviria.
-app/static/img/*
 app/static/docs/*
-!app/static/img/logo_creeper.*
