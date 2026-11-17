@@ -246,7 +246,23 @@ reconocimiento que el alumno debe practicar.
 
 ---
 
-#  Decisiones pendientes de reunión
+#  
+---
+
+#  Actualizaciones de interfaz (UI) y guía de aprendizaje
+
+Las siguientes mejoras se incorporaron a la plataforma y afectan la experiencia del estudiante, aunque no cambian las soluciones:
+
+- **Iconos por imagen:** Los emojis del panel superior y de las páginas se reemplazaron por imágenes PNG específicas (`Inicio_wooden_pickaxe.png`, `Desafios_nether_star.png`, `Ranking_totem_of_undying.png`, `Guia_recipe_book.png`, `Acerca de_barrier.png`, `Diemncion del over word_grass_block.png`, `Dimencion del nether_netherrack.png`, `Dimencion del end_end_stone.png`).
+- **Guía de aprendizaje:** La pestaña "Guía" ahora es una guía de aprendizaje (no de solución) con un ítem por bandera: concepto, tema, explicación, comandos/herramientas de ejemplo y una curiosidad. Los comandos son ejemplos genéricos, no la solución directa.
+- **Playground de Command Injection (Dragón):** La bandera 2 de The End incluye un playground interactivo que muestra el comando construido en tiempo real y detecta metacaracteres.
+- **Botón "Siguiente dimensión":** La barra superior muestra un botón para avanzar a la siguiente dimensión cuando se desbloquea, usando la imagen de la dimensión correspondiente.
+- **PowerView (Huevo):** La bandera 9 de The End es una consola PowerView simulada para enumerar Active Directory (usuarios, grupos, equipos, shares) y leer el Huevo desde `\\END-FS01\vault`.
+
+Estas mejoras mantienen las soluciones documentadas en este archivo válidas.
+
+---
+Decisiones pendientes de reunión
 
 Estas ideas se descartaron temporalmente y **están pendientes de decisión del equipo**; no se han implementado.
 

