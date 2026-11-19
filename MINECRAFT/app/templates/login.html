@@ -7,7 +7,7 @@
   <div class="ctf-login-box">
 
     <div class="ctf-login-header">
-      <div class="ctf-login-badge">👤</div>
+      <div class="ctf-login-badge"><img src="{{ url_for('static', filename='img/logo_shield.png') }}" class="inline-icon" alt=""></div>
       <h2 class="ctf-login-title">INICIAR SESIÓN DE ESTUDIANTE</h2>
       <p class="ctf-login-subtitle">
         Plataforma adaptada para estudiantes. <strong>Solo requieres UNA credencial</strong> (Gamertag o Código de
@@ -19,7 +19,7 @@
       <div class="ctf-form-group">
         <label for="pageCredential" class="ctf-form-label">Tu Gamertag o Código de Estudiante:</label>
         <div class="ctf-input-wrapper">
-          <span class="input-icon">🎮</span>
+          <span class="input-icon"><img src="{{ url_for('static', filename='img/Desafios_nether_star.png') }}" class="inline-icon" alt=""></span>
           <input type="text" id="pageCredential" name="credential" class="ctf-input"
             placeholder="Ej: Steve, Alex, Alumno1..." required autofocus autocomplete="off">
         </div>
@@ -37,13 +37,14 @@
 
       <div class="ctf-modal-actions">
         <button type="submit" class="ctf-btn-primary" style="width: 100%;">
-          ¡Entrar al Desafío! ⚔️
+          <img src="{{ url_for('static', filename='img/Desafios_nether_star.png') }}" class="inline-icon" alt="">
+          ¡Entrar al Desafío!
         </button>
       </div>
     </form>
 
     <div class="ctf-login-info">
-      <h4>📌 ¿Por qué solo una credencial?</h4>
+      <h4><img src="{{ url_for('static', filename='img/Guia_recipe_book.png') }}" class="inline-icon" alt=""> ¿Por qué solo una credencial?</h4>
       <p>
         Para eliminar barreras de acceso en el aula, tu progreso, banderas recolectadas y puntaje en el ranking se
         enlazan de forma ágil a tu identificador sin requerir contraseñas complejas.

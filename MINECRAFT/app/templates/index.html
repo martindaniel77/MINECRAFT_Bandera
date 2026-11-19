@@ -39,7 +39,7 @@
     <div class="ctf-card ctf-card-info">
       <div class="ctf-card-header">
         <div class="ctf-card-icon-creeper">
-          <span class="pixel-creeper">🟩</span>
+          <span class="pixel-creeper"><img src="{{ url_for('static', filename='img/creeper_icon.png') }}" class="inline-icon" alt=""></span>
         </div>
         <h3 class="ctf-card-title">¿Qué es un CTF?</h3>
       </div>
@@ -50,7 +50,7 @@
             Un <strong>Capture The Flag (CTF)</strong> es una competencia interactiva de seguridad donde resuelves desafíos de análisis de código, explotación web y forensia digital para encontrar secretos llamados <strong>Banderas</strong> (<code>Flag{...}</code>).
           </p>
           <div class="ctf-mini-pedagogy">
-            <span>💡 <strong>Diseñado para aprender:</strong> Cada reto te muestra código real vulnerable y te permite razonar la solución sin frustración.</span>
+            <span><img src="{{ url_for('static', filename='img/Guia_recipe_book.png') }}" class="inline-icon" alt=""> <strong>Diseñado para aprender:</strong> Cada reto te muestra código real vulnerable y te permite razonar la solución sin frustración.</span>
           </div>
         </div>
         <div class="ctf-chest-box">
@@ -124,7 +124,7 @@
     <div class="ctf-card ctf-card-ranking">
       <div class="ctf-card-header">
         <div class="ctf-card-icon-trophy">
-          <span class="pixel-trophy">🏆</span>
+          <span class="pixel-trophy"><img src="{{ url_for('static', filename='img/Ranking_totem_of_undying.png') }}" class="inline-icon" alt=""></span>
         </div>
         <h3 class="ctf-card-title">Ranking</h3>
       </div>
@@ -144,19 +144,26 @@
                 <td class="td-pos">{{ team.rank_pos }}</td>
                 <td class="td-team">
                   <span class="team-icon">
-                    {% if team.badge_icon == 'creeper' %}🟩
-                    {% elif team.badge_icon == 'grass' %}🌱
-                    {% elif team.badge_icon == 'diamond' %}💎
-                    {% elif team.badge_icon == 'redstone' %}🔴
-                    {% elif team.badge_icon == 'pickaxe' %}⛏️
-                    {% else %}👤{% endif %}
+                    {% if team.badge_icon == 'creeper' %}
+                      <img src="{{ url_for('static', filename='img/creeper_icon.png') }}" class="inline-icon" alt="">
+                    {% elif team.badge_icon == 'grass' %}
+                      <img src="{{ url_for('static', filename='img/Diemncion del over word_grass_block.png') }}" class="inline-icon" alt="">
+                    {% elif team.badge_icon == 'diamond' %}
+                      <img src="{{ url_for('static', filename='img/diamond.png') }}" class="inline-icon" alt="">
+                    {% elif team.badge_icon == 'redstone' %}
+                      <img src="{{ url_for('static', filename='img/heart.png') }}" class="inline-icon" alt="">
+                    {% elif team.badge_icon == 'pickaxe' %}
+                      <img src="{{ url_for('static', filename='img/Inicio_wooden_pickaxe.png') }}" class="inline-icon" alt="">
+                    {% else %}
+                      <img src="{{ url_for('static', filename='img/logo_creeper.png') }}" class="inline-icon" alt="">
+                    {% endif %}
                   </span>
                   <span class="team-name">{{ team.team_name }}</span>
                 </td>
                 <td class="td-pts">
                   <span class="pts-value">{{ team.score }}</span>
                   {% if team.is_crown %}
-                    <span class="crown-icon" title="Líder del Torneo">👑</span>
+                    <span class="crown-icon" title="Líder del Torneo"><img src="{{ url_for('static', filename='img/Ranking_totem_of_undying.png') }}" class="inline-icon" alt="Líder del Torneo"></span>
                   {% endif %}
                 </td>
               </tr>

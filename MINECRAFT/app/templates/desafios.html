@@ -40,7 +40,7 @@
 
         <!-- CONTENIDO: QUÉ VAS A ENCONTRAR ADENTRO -->
         <div class="dim-card-body">
-          <h4 class="dim-section-label">🎯 ¿Qué vas a encontrar adentro?</h4>
+          <h4 class="dim-section-label"><img src="{{ url_for('static', filename='img/chest_glowing.png') }}" class="inline-icon" alt=""> ¿Qué vas a encontrar adentro?</h4>
           
           <div class="dim-challenges-list">
             {% for ch in dim.challenges %}
@@ -53,13 +53,13 @@
                   <div class="ch-header-row">
                     <strong class="ch-name">{{ ch.name }}</strong>
                     {% if ch.solved %}
-                      <span class="ch-status-pill solved">✅ Conquistado</span>
+                      <span class="ch-status-pill solved"><img src="{{ url_for('static', filename='img/diamond.png') }}" class="inline-icon" alt=""> Conquistado</span>
                     {% else %}
-                      <span class="ch-status-pill pending">⏳ Pendiente</span>
+                      <span class="ch-status-pill pending"><img src="{{ url_for('static', filename='img/experience_bottle.png') }}" class="inline-icon" alt=""> Pendiente</span>
                     {% endif %}
                   </div>
                   
-                  <span class="ch-vuln-type">🛡️ {{ ch.type }}</span>
+                  <span class="ch-vuln-type"><img src="{{ url_for('static', filename='img/logo_shield.png') }}" class="inline-icon" alt=""> {{ ch.type }}</span>
                   <p class="ch-detail">{{ ch.description }}</p>
                 </div>
               </div>
@@ -71,11 +71,12 @@
         <div class="dim-card-footer">
           {% if dim.is_locked %}
             <button type="button" class="mc-btn mc-btn-disabled mc-btn-locked" onclick="triggerLockedShake(this, '{{ dim.lock_msg }}')" title="{{ dim.lock_msg }}">
-              🔒 Bloqueado (Falta requisito previo)
+              <img src="{{ url_for('static', filename='img/Acerca de_barrier.png') }}" class="inline-icon" alt=""> Bloqueado (Falta requisito previo)
             </button>
           {% else %}
             <a href="{{ dim.url }}" class="dim-btn-enter dim-btn-{{ dim.id }}">
-              ¡Entrar a la Dimensión {{ dim.subtitle }}! ⚔️
+              <img src="{{ url_for('static', filename='img/Desafios_nether_star.png') }}" class="inline-icon" alt="">
+              ¡Entrar a la Dimensión {{ dim.subtitle }}!
             </a>
           {% endif %}
         </div>

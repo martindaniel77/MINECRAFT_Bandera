@@ -30,7 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mostrar/ocultar barra inferior (HUD)
   const hudToggle = document.getElementById('mc-hud-toggle');
   const hudBottom = document.getElementById('mc-hud-bottom');
+  const HUD_VISIBILITY_KEY = 'mc_hud_visible';
   let hudVisible = true;
+
+  try {
+    const savedVisibility = sessionStorage.getItem(HUD_VISIBILITY_KEY);
+    if (savedVisibility !== null) hudVisible = savedVisibility === 'true';
+  } catch (e) {
+    // sessionStorage puede no estar disponible; se usa el estado por defecto.
+  }
+
   function setHudVisible(visible) {
     hudVisible = visible;
     document.body.classList.toggle('hud-hidden', !visible);
@@ -39,9 +48,16 @@ document.addEventListener('DOMContentLoaded', () => {
       hudToggle.textContent = visible ? 'Ocultar HUD' : 'Mostrar HUD';
       hudToggle.style.bottom = visible ? '150px' : '12px';
     }
+    try {
+      sessionStorage.setItem(HUD_VISIBILITY_KEY, String(visible));
+    } catch (e) {
+      // No persistir si el almacenamiento de sesión está bloqueado.
+    }
   }
+
   if (hudToggle) {
     hudToggle.addEventListener('click', () => setHudVisible(!hudVisible));
+    setHudVisible(hudVisible);
   }
 
   // Barra lateral desplegable a la derecha
@@ -202,7 +218,7 @@ function markItemUnlocked(step) {
     const submitBtn = form.querySelector('button[type="submit"]');
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = '✅ Conquistado';
+      submitBtn.textContent = 'Conquistado';
     }
   }
   const cardEl = inputEl.closest('.challenge-card');
@@ -220,7 +236,7 @@ async function submitFlag(dimension, step, event) {
   const flagValue = inputEl.value.trim();
   if (!flagValue) {
     if (feedbackEl) {
-      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">⚠️ Ingresa una bandera primero.</div>`;
+      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">Ingresa una bandera primero.</div>`;
     }
     return;
   }
@@ -265,13 +281,13 @@ async function submitFlag(dimension, step, event) {
       }
     } else {
       if (feedbackEl) {
-        feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">❌ Error: ${data.message}</div>`;
+        feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">Error: ${data.message}</div>`;
       }
     }
   } catch (err) {
     console.error("Error en submitFlag:", err);
     if (feedbackEl) {
-      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">❌ Error en el envío: ${err.message || 'Error de conexión con el servidor.'}</div>`;
+      feedbackEl.innerHTML = `<div class="mc-alert mc-alert-error">Error en el envío: ${err.message || 'Error de conexión con el servidor.'}</div>`;
     }
   }
 }

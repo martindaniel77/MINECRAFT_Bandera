@@ -180,7 +180,6 @@ def build_dimensions_info(inv):
             'subtitle': 'El Mundo Exterior',
             'badge': 'Nivel: Fácil',
             'badge_class': 'green',
-            'icon': '🌲',
             'icon_img': 'img/Diemncion del over word_grass_block.png',
             'theme_color': '#22c55e',
             'url': url_for('overworld_view'),
@@ -222,7 +221,6 @@ def build_dimensions_info(inv):
             'subtitle': 'El Inframundo',
             'badge': 'Nivel: Medio',
             'badge_class': 'blue',
-            'icon': '🔥',
             'icon_img': 'img/Dimencion del nether_netherrack.png',
             'theme_color': '#ef4444',
             'url': url_for('nether_view'),
@@ -264,7 +262,6 @@ def build_dimensions_info(inv):
             'subtitle': 'El Fin del Mundo - Boss Final',
             'badge': 'Nivel: Difícil',
             'badge_class': 'purple',
-            'icon': '🌌',
             'icon_img': 'img/Dimencion del end_end_stone.png',
             'theme_color': '#a855f7',
             'url': url_for('the_end_view'),
@@ -323,7 +320,6 @@ def inject_brand_and_authors():
     if dimension_is_complete(inv, 'the_end'):
         next_dimension = {
             'id': 'victory',
-            'icon': '🏆',
             'icon_img': 'img/Desafios_nether_star.png',
             'name': 'Victoria',
             'url': url_for('victory_view'),
@@ -332,7 +328,6 @@ def inject_brand_and_authors():
     elif dimension_is_complete(inv, 'nether'):
         next_dimension = {
             'id': 'the_end',
-            'icon': '🌌',
             'icon_img': 'img/Dimencion del end_end_stone.png',
             'name': 'The End',
             'url': url_for('the_end_view'),
@@ -341,7 +336,6 @@ def inject_brand_and_authors():
     elif dimension_is_complete(inv, 'overworld'):
         next_dimension = {
             'id': 'nether',
-            'icon': '🔥',
             'icon_img': 'img/Dimencion del nether_netherrack.png',
             'name': 'Nether',
             'url': url_for('nether_view'),

@@ -48,23 +48,30 @@
           <tr class="ranking-row {% if team.is_current_user %}is-me{% endif %}">
             <td class="td-pos">
               {% if team.rank_pos == 1 %}
-                <span class="pos-gold">🥇 1</span>
+                <span class="pos-gold"><img src="{{ url_for('static', filename='img/diamond.png') }}" class="inline-icon" alt=""> 1</span>
               {% elif team.rank_pos == 2 %}
-                <span class="pos-silver">🥈 2</span>
+                <span class="pos-silver"><img src="{{ url_for('static', filename='img/gold_ingot.png') }}" class="inline-icon" alt=""> 2</span>
               {% elif team.rank_pos == 3 %}
-                <span class="pos-bronze">🥉 3</span>
+                <span class="pos-bronze"><img src="{{ url_for('static', filename='img/iron_ingot.png') }}" class="inline-icon" alt=""> 3</span>
               {% else %}
                 {{ team.rank_pos }}
               {% endif %}
             </td>
             <td class="td-team">
               <span class="team-icon">
-                {% if team.badge_icon == 'creeper' %}🟩
-                {% elif team.badge_icon == 'grass' %}🌱
-                {% elif team.badge_icon == 'diamond' %}💎
-                {% elif team.badge_icon == 'redstone' %}🔴
-                {% elif team.badge_icon == 'pickaxe' %}⛏️
-                {% else %}👤{% endif %}
+                {% if team.badge_icon == 'creeper' %}
+                  <img src="{{ url_for('static', filename='img/creeper_icon.png') }}" class="inline-icon" alt="">
+                {% elif team.badge_icon == 'grass' %}
+                  <img src="{{ url_for('static', filename='img/Diemncion del over word_grass_block.png') }}" class="inline-icon" alt="">
+                {% elif team.badge_icon == 'diamond' %}
+                  <img src="{{ url_for('static', filename='img/diamond.png') }}" class="inline-icon" alt="">
+                {% elif team.badge_icon == 'redstone' %}
+                  <img src="{{ url_for('static', filename='img/heart.png') }}" class="inline-icon" alt="">
+                {% elif team.badge_icon == 'pickaxe' %}
+                  <img src="{{ url_for('static', filename='img/Inicio_wooden_pickaxe.png') }}" class="inline-icon" alt="">
+                {% else %}
+                  <img src="{{ url_for('static', filename='img/logo_creeper.png') }}" class="inline-icon" alt="">
+                {% endif %}
               </span>
               <span class="team-name">{{ team.team_name }}</span>
               {% if team.is_current_user %}
@@ -83,7 +90,7 @@
             <td class="td-pts">
               <span class="pts-value">{{ team.score }}</span>
               {% if team.is_crown %}
-                <span class="crown-icon" title="Líder del Torneo">👑</span>
+                <span class="crown-icon" title="Líder del Torneo"><img src="{{ url_for('static', filename='img/Ranking_totem_of_undying.png') }}" class="inline-icon" alt="Líder del Torneo"></span>
               {% endif %}
             </td>
           </tr>

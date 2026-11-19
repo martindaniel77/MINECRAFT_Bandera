@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=9">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/minecraft.css') }}?v=10">
 </head>
 
 <body
@@ -80,13 +80,13 @@
         {% endif %}
         {% if is_authenticated %}
         <div class="ctf-user-pill" title="Sesión activa como {{ current_student }}">
-          <span class="ctf-user-tag">👤 {{ current_student }}</span>
+          <span class="ctf-user-tag"><img src="{{ url_for('static', filename='img/logo_creeper.png') }}" class="inline-icon" alt=""> {{ current_student }}</span>
           <span class="ctf-user-score">{{ student_score }} pts</span>
           <a href="{{ url_for('logout') }}" class="ctf-btn-logout" title="Cerrar sesión">Salir</a>
         </div>
         {% else %}
         <button type="button" class="ctf-btn-login" onclick="openLoginModal()" id="btnOpenLogin">
-          <span class="btn-login-icon">👤</span> Iniciar Sesión
+          <span class="btn-login-icon"><img src="{{ url_for('static', filename='img/logo_shield.png') }}" class="inline-icon" alt=""></span> Iniciar Sesión
         </button>
         {% endif %}
       </div>
@@ -115,7 +115,7 @@
   <footer class="ctf-footer">
     <div class="ctf-footer-inner">
       <div class="ctf-footer-left">
-        <span class="ctf-creeper-ico">🟩</span>
+        <span class="ctf-creeper-ico"><img src="{{ url_for('static', filename='img/creeper_icon.png') }}" class="inline-icon" alt=""></span>
         <span class="ctf-footer-phrase">Seguridad + Minecraft = El desafío perfecto</span>
       </div>
 
@@ -135,7 +135,7 @@
     <div class="ctf-modal-box">
       <div class="ctf-modal-header">
         <div class="ctf-modal-title">
-          <span class="modal-icon">👤</span> INICIAR SESIÓN DE ESTUDIANTE
+          <span class="modal-icon"><img src="{{ url_for('static', filename='img/logo_shield.png') }}" class="inline-icon" alt=""></span> INICIAR SESIÓN DE ESTUDIANTE
         </div>
         <button type="button" class="ctf-modal-close" onclick="closeLoginModal()">&times;</button>
       </div>
@@ -151,7 +151,7 @@
           <div class="ctf-form-group">
             <label for="studentCredential" class="ctf-form-label">Gamertag o Código de Estudiante:</label>
             <div class="ctf-input-wrapper">
-              <span class="input-icon">🎮</span>
+              <span class="input-icon"><img src="{{ url_for('static', filename='img/Desafios_nether_star.png') }}" class="inline-icon" alt=""></span>
               <input type="text" id="studentCredential" name="credential" class="ctf-input"
                 placeholder="Ej: Steve, Alex, Alumno1..." required autofocus autocomplete="off">
             </div>
@@ -167,13 +167,14 @@
 
           <div class="ctf-modal-actions">
             <button type="submit" class="ctf-btn-primary" id="btnSubmitLogin">
-              ¡Entrar al Desafío! ⚔️
+              <img src="{{ url_for('static', filename='img/Desafios_nether_star.png') }}" class="inline-icon" alt="">
+              ¡Entrar al Desafío!
             </button>
           </div>
         </form>
 
         <div class="ctf-modal-footer-tip">
-          <span>💡 <strong>Tip para el estudiante:</strong> Tu progreso, banderas y posición en el ranking se guardarán
+          <span><img src="{{ url_for('static', filename='img/Guia_recipe_book.png') }}" class="inline-icon" alt=""> <strong>Tip para el estudiante:</strong> Tu progreso, banderas y posición en el ranking se guardarán
             bajo este nombre.</span>
         </div>
       </div>
@@ -188,6 +189,12 @@
   'the_end_dragon_damage'
   ] %}
   {% if request.endpoint in hud_endpoints %}
+  <!-- BOTÓN PARA MOSTRAR/OCULTAR LA BARRA INFERIOR DE BANDERAS (HUD) -->
+  <button type="button" class="mc-hud-toggle" id="mc-hud-toggle" aria-expanded="true"
+    aria-controls="mc-hud-bottom" title="Mostrar u ocultar la barra de banderas conseguidas">
+    Ocultar HUD
+  </button>
+
   <div class="mc-hud-bottom" id="mc-hud-bottom">
     <div class="mc-stats-bar">
       <div class="mc-hearts" title="Vida de Steve">
@@ -231,7 +238,7 @@
   {% endif %}
 
   <!-- SCRIPTS BÁSICOS -->
-  <script src="{{ url_for('static', filename='js/hud.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/hud.js') }}?v=3"></script>
   <script>
     function openLoginModal() {
       const modal = document.getElementById('loginModalOverlay');

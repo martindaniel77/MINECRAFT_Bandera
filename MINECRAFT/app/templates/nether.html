@@ -63,7 +63,7 @@
 
           {% if request.args.get('awaiting') %}
             <div class="mc-alert mc-alert-info" id="gold-awaiting">
-              ⏳ El Piglin Guard está revisando tu oferta...
+              <img src="{{ url_for('static', filename='img/experience_bottle.png') }}" class="inline-icon" alt=""> El Piglin Guard está revisando tu oferta...
             </div>
           {% endif %}
 
@@ -85,7 +85,7 @@
           <!-- Tokens robados al Piglin -->
           {% if stolen_tokens %}
             <div class="terminal-output" style="border-color:#22c55e; max-height:none;">
-              <strong style="color:#55ff55;">[✔] ¡SESIÓN DEL PIGLIN GUARD CAPTURADA!</strong>
+              <strong style="color:#55ff55;"><img src="{{ url_for('static', filename='img/diamond.png') }}" class="inline-icon" alt=""> ¡SESIÓN DEL PIGLIN GUARD CAPTURADA!</strong>
               {% for token in stolen_tokens %}
                 <div style="margin-top:8px; color:#ffaa00;">
                   <strong>Cookie robada:</strong>
