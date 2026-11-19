@@ -189,6 +189,12 @@
   'the_end_dragon_damage'
   ] %}
   {% if request.endpoint in hud_endpoints %}
+  <!-- BOTÓN PARA MOSTRAR/OCULTAR LA BARRA INFERIOR DE BANDERAS (HUD) -->
+  <button type="button" class="mc-hud-toggle" id="mc-hud-toggle" aria-expanded="true"
+    aria-controls="mc-hud-bottom" title="Mostrar u ocultar la barra de banderas conseguidas">
+    Ocultar HUD
+  </button>
+
   <div class="mc-hud-bottom" id="mc-hud-bottom">
     <div class="mc-stats-bar">
       <div class="mc-hearts" title="Vida de Steve">
@@ -232,7 +238,7 @@
   {% endif %}
 
   <!-- SCRIPTS BÁSICOS -->
-  <script src="{{ url_for('static', filename='js/hud.js') }}?v=2"></script>
+  <script src="{{ url_for('static', filename='js/hud.js') }}?v=3"></script>
   <script>
     function openLoginModal() {
       const modal = document.getElementById('loginModalOverlay');

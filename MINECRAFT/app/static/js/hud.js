@@ -30,7 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mostrar/ocultar barra inferior (HUD)
   const hudToggle = document.getElementById('mc-hud-toggle');
   const hudBottom = document.getElementById('mc-hud-bottom');
+  const HUD_VISIBILITY_KEY = 'mc_hud_visible';
   let hudVisible = true;
+
+  try {
+    const savedVisibility = sessionStorage.getItem(HUD_VISIBILITY_KEY);
+    if (savedVisibility !== null) hudVisible = savedVisibility === 'true';
+  } catch (e) {
+    // sessionStorage puede no estar disponible; se usa el estado por defecto.
+  }
+
   function setHudVisible(visible) {
     hudVisible = visible;
     document.body.classList.toggle('hud-hidden', !visible);
@@ -39,9 +48,16 @@ document.addEventListener('DOMContentLoaded', () => {
       hudToggle.textContent = visible ? 'Ocultar HUD' : 'Mostrar HUD';
       hudToggle.style.bottom = visible ? '150px' : '12px';
     }
+    try {
+      sessionStorage.setItem(HUD_VISIBILITY_KEY, String(visible));
+    } catch (e) {
+      // No persistir si el almacenamiento de sesión está bloqueado.
+    }
   }
+
   if (hudToggle) {
     hudToggle.addEventListener('click', () => setHudVisible(!hudVisible));
+    setHudVisible(hudVisible);
   }
 
   // Barra lateral desplegable a la derecha
